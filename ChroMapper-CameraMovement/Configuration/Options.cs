@@ -10,12 +10,15 @@ namespace ChroMapper_CameraMovement.Configuration
     {
         public static class Modifier
         {
-            public static bool Movement = false;
-            public static bool TurnToHead = false;
-            public static float AvatarHeadHight = 1.5f;
-            public static float AvatarHeadSize = 0.3f;
-            public static string ScriptFileName = "SongScript.json";
-            public static string ScriptMapperExe = "scriptmapper.exe";
+            public static bool Movement { set; get; }
+            public static bool TurnToHead { set; get; }
+            public static bool Avatar { set; get; }
+            public static bool UIhidden { set; get; }
+            public static float AvatarHeadHight { set; get; }
+            public static float AvatarHeadSize { set; get; }
+            public static float AvatarArmSize { set; get; }
+            public static string ScriptFileName { set; get; }
+            public static string ScriptMapperExe { set; get; }
         }
     }
 }

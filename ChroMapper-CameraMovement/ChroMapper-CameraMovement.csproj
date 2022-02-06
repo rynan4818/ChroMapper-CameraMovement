@@ -119,6 +119,7 @@
     <Compile Include="Configuration\Options.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SattingData.cs" />
     <Compile Include="UserInterface\UI.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@ using ChroMapper_CameraMovement.Configuration;
 using System.IO;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace ChroMapper_CameraMovement
 {
@@ -12,10 +13,9 @@ namespace ChroMapper_CameraMovement
     public class Plugin
     {
         public static CameraMovement movement;
-        public static AudioTimeSyncController atsc;
         private UI _ui;
-        public delegate void ExitEventHandler();
-        public event ExitEventHandler evt;
+        public bool scriptMapperAlive;
+        public static string setting_file;
 
         [Init]
         private void Init()
@@ -23,6 +23,8 @@ namespace ChroMapper_CameraMovement
             UnityEngine.Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;
             _ui = new UI(this);
+            setting_file = Path.Combine(Environment.CurrentDirectory, "cameramovement.json");
+            SattingData.SettingLoad(setting_file);
         }
 
         [Exit]
@@ -38,35 +40,45 @@ namespace ChroMapper_CameraMovement
                     return;
 
                 movement = new GameObject("CameraMovement").AddComponent<CameraMovement>();
+                movement.UI_set(_ui);
                 MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
                 _ui.AddMenu(mapEditorUI);
-            }
-            else
-            {
-                movement?.Shutdown();
             }
         }
         public void Reload()
         {
             movement.Reload();
         }
-        public void ScriptMapperRun()
+        public async void ScriptMapperRun()
         {
+            if (scriptMapperAlive)
+                return;
+            scriptMapperAlive = true;
+            movement.MapSave();
+            while (movement.SavingThread())
+                await Task.Delay(100);
             var path = movement.MapGet();
             var scriptmapper = Path.Combine(Environment.CurrentDirectory, Options.Modifier.ScriptMapperExe);
             if (File.Exists(path) && File.Exists(scriptmapper))
             {
-                Process proc = new Process();
-                proc.StartInfo.FileName = scriptmapper;
-                proc.StartInfo.Arguments = $@"""{path}""";
-                proc.EnableRaisingEvents = true;
-                proc.Exited += new EventHandler(proc_Exited);
-                proc.Start();
+                try
+                {
+                    Process.Start(scriptmapper, $@"""{path}""");
+                }
+                catch
+                {
+                    UnityEngine.Debug.Log("ScriptMapperError");
+                    return;
+                }
+                await Task.Delay(1000);
+                movement.Reload();
             }
+            scriptMapperAlive = false;
         }
-        void proc_Exited(object sender, EventArgs e)
+        public void SettingSave()
         {
-            movement.Reload();
+            var setting = new SattingData();
+            setting.SettingSave(setting_file);
         }
     }
 }

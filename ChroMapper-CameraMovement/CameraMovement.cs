@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.Threading;
 using UnityEngine;
 using ChroMapper_CameraMovement.Configuration;
+using ChroMapper_CameraMovement.UserInterface;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -13,9 +13,21 @@ namespace ChroMapper_CameraMovement
 {
     public class CameraMovement : MonoBehaviour
     {
+        private UI _ui;
         public static AudioTimeSyncController atsc;
-        public static GameObject mapEditorCamera;
-        public static GameObject sphere;
+        public static AutoSaveController autoSave;
+        public static GameObject cm_MapEditorCamera;
+        public static GameObject cm_GridX;
+        public static GameObject cm_interface;
+        public static GameObject cm_Grid;
+        public static GameObject cm_measureGrid4_1;
+        public static GameObject cm_measureGrid1;
+        public static GameObject cm_base;
+        public static GameObject cm_baseTransparent;
+        public static GameObject avatarHead;
+        public static GameObject avatarArm;
+        public static GameObject avatarBody;
+        public static GameObject avatarLeg;
 
         protected bool dataLoaded = false;
         protected CameraData data = new CameraData();
@@ -37,7 +49,21 @@ namespace ChroMapper_CameraMovement
         protected bool turnToHead;
         protected bool turnToHeadHorizontal;
         protected float beforeSeconds;
+        protected float gridXBaseAlpha = 0.05f;
+        protected float gridXGridAlpha = 0.5f;
+        protected float interfaceOpacity = 0.2f;
+        protected float gridGridAlpha = 0.5f;
+        protected Color measureGridColor4_1;
+        protected Color measureGridColor1;
+        protected Color baseColor;
+        protected Color baseTransparentColor;
+        protected Vector3 beforePositon = Vector3.zero;
+        protected Quaternion beforeRotation = Quaternion.Euler(0,0,0);
 
+        public void UI_set(UI ui)
+        {
+            this._ui = ui;
+        }
         public class Movements
         {
             public Vector3 StartPos;
@@ -164,38 +190,121 @@ namespace ChroMapper_CameraMovement
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, BeatSaberSongContainer.Instance.DifficultyData.BeatmapFilename).Replace("/", "\\");
         }
+        public void MapSave()
+        {
+            autoSave.Save();
+        }
+        public bool SavingThread()
+        {
+            Type type = autoSave.GetType();
+            FieldInfo field = type.GetField("savingThread", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+            Thread savingThread = (Thread)(field.GetValue(autoSave));
+            return savingThread != null && savingThread.IsAlive;
+        }
         public void Reload()
         {
-            sphere.transform.position = new Vector3(0, Options.Modifier.AvatarHeadHight, 0);
-            sphere.transform.localScale = new Vector3(Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize);
+            //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
+            avatarHead.transform.position = new Vector3(0, Options.Modifier.AvatarHeadHight, 0);
+            avatarHead.transform.localScale = new Vector3(Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize);
+            //首の高さ 1.43-0.25÷2=1.305m
+            //胴体の中心からの高さは0.3m→1.305m÷0.3m=4.35
+            var body_size_y = (Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f)) / 4.35f;
+            //胴体の直径0.2mは胴体の中心からの高さの1/3
+            var body_size_xz = body_size_y / 1.5f;
+            //胴体の中心1.005は首の高さ1.305m-胴体の中心からの高さ0.3m=1.005
+            var body_pos_y = Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f) - body_size_y;
+            avatarBody.transform.position = new Vector3(0, body_pos_y, 0);
+            avatarBody.transform.localScale = new Vector3(body_size_xz, body_size_y, body_size_xz);
+            //腕の中心高さ1.25mは首の高さ1.305mの 1.305m÷1.25m=1.044
+            var arm_pos_y = (Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f)) / 1.044f;
+            //腕の大きさ0.06mは腕の長さ1.25m→1.25÷0.06=20.83
+            var arm_size_yz = Options.Modifier.AvatarArmSize / 20.83f;
+            avatarArm.transform.position = new Vector3(0, arm_pos_y, 0);
+            avatarArm.transform.localScale = new Vector3(Options.Modifier.AvatarArmSize, arm_size_yz, arm_size_yz);
+            //足の高さは腕の中心から腕のサイズを引いたもの
+            var leg_size_y = arm_pos_y - (arm_size_yz / 2.0f);
+            var leg_pos_y = leg_size_y / 2.0f;
+            var leg_size_xz = leg_size_y / 12f;
+            avatarLeg.transform.position = new Vector3(0, leg_pos_y, 0);
+            avatarLeg.transform.localScale = new Vector3(leg_size_xz, leg_size_y, leg_size_xz);
+            if (Options.Modifier.Avatar)
+            {
+                avatarHead.gameObject.SetActive(true);
+                avatarArm.gameObject.SetActive(true);
+                avatarBody.gameObject.SetActive(true);
+                avatarLeg.gameObject.SetActive(true);
+            }
+            else
+            {
+                avatarHead.gameObject.SetActive(false);
+                avatarArm.gameObject.SetActive(false);
+                avatarBody.gameObject.SetActive(false);
+                avatarLeg.gameObject.SetActive(false);
+            }
             movementNextStartTime = 0;
             eventID = 0;
             beforeSeconds = 0;
             LoadCameraData(ScriptGet());
+            if (Options.Modifier.UIhidden)
+            {
+                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
+                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
+                cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0); //Gridのシェーダーを消しても床が消えない、なんでー(後回し)
+                cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0,0,0,0));
+                cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
+                cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
+                cm_base.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
+                cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", 0);
+            }
+            else
+            {
+                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", gridXBaseAlpha);
+                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", gridXGridAlpha);
+                cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", gridGridAlpha);
+                cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor4_1);
+                cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor1);
+                cm_base.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseColor);
+                cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseTransparentColor);
+                cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", interfaceOpacity);
+            }
         }
         private void Start()
         {
             atsc = FindObjectOfType<AudioTimeSyncController>();
-            mapEditorCamera = GameObject.Find("MapEditor Camera");
-            sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sphere.transform.position = new Vector3(0, Options.Modifier.AvatarHeadHight, 0);
-            sphere.transform.localScale = new Vector3(Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize);
-            movementNextStartTime = 0;
-            eventID = 0;
-            beforeSeconds = 0;
-            LoadCameraData(ScriptGet());
+            autoSave = FindObjectOfType<AutoSaveController>();
+            cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
+            cm_GridX = GameObject.Find("Grid X");
+            cm_Grid = GameObject.Find("Grid");
+            cm_interface = GameObject.Find("Interface");
+            cm_measureGrid4_1 = GameObject.Find("1/4th Measure Grid");
+            cm_measureGrid1 = GameObject.Find("One Measure Grid");
+            cm_base = GameObject.Find("Base");
+            cm_baseTransparent = GameObject.Find("Base Transparent");
+            gridXBaseAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_BaseAlpha");
+            gridXGridAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
+            gridGridAlpha = cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
+            measureGridColor4_1 = cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
+            measureGridColor1 = cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
+            baseColor = cm_base.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
+            baseTransparentColor = cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
+            interfaceOpacity = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_OPACITY");
+            avatarHead = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            avatarArm = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            avatarLeg = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            avatarBody = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+
+            this.Reload();
         }
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F10))
+            if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation)
             {
-                Debug.Log("CameraMovement:AudioTime1=" + atsc.CurrentSeconds + "sec");
-                movementNextStartTime = 0;
-                eventID = 0;
-                beforeSeconds = 0;
+                _ui.CameraPosRotUpdate(cm_MapEditorCamera.transform);
+                beforePositon = cm_MapEditorCamera.transform.position;
+                beforeRotation = cm_MapEditorCamera.transform.rotation;
             }
 
-            if (!dataLoaded) return; // || !atsc.IsPlaying
+            if (!dataLoaded) return;
             if (!Options.Modifier.Movement) return;
             if (beforeSeconds == atsc.CurrentSeconds) return;
 
@@ -226,24 +335,18 @@ namespace ChroMapper_CameraMovement
                 if (turnToHeadHorizontal)
                     cameraRot = new Vector3(cameraRot.x, lookRotation.eulerAngles.y, cameraRot.z);
                 else
-                    mapEditorCamera.transform.SetPositionAndRotation(cameraPos, lookRotation);
+                    cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, lookRotation);
             }
             if (!(turnToHead && turnToHeadHorizontal))
-                mapEditorCamera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
+                cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
 
             Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
-
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
         {
             return new Vector3(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent));
         }
-        public virtual void Shutdown()
-        {
-            Destroy(this);
-        }
-
         protected bool LoadCameraData(string pathFile)
         {
             string path = pathFile;

@@ -1,42 +1,46 @@
 # ChroMapper-CameraMovement
-[CameraPlus](https://github.com/Snow1226/CameraPlus)—p‚Ì[MovementScript](https://github.com/Snow1226/CameraPlus/wiki/MovementScript)‚ğ“Ç‚İ‚ñ‚ÅAì•ˆƒc[ƒ‹‚Ì[ChroMapper](https://github.com/Caeden117/ChroMapper)‚ÅƒJƒƒ‰ƒ[ƒN‚ÌÄŒ»‚ğ‚·‚éChroMapper—pƒvƒ‰ƒOƒCƒ“‚Å‚·B
-å‚É[Script Mapper](https://github.com/hibit-at/Scriptmapper)‚ğg‚Á‚ÄAƒJƒƒ‰ƒXƒNƒŠƒvƒg‚ğì¬‚Ì‚ğ‘O’ñ‚Æ‚µ‚½ì‚è‚É‚È‚Á‚Ä‚¢‚Ü‚·B
+[CameraPlus](https://github.com/Snow1226/CameraPlus)ç”¨ã®[MovementScript](https://github.com/Snow1226/CameraPlus/wiki/MovementScript)ã‚’èª­ã¿è¾¼ã‚“ã§ã€ä½œè­œãƒ„ãƒ¼ãƒ«ã®[ChroMapper](https://github.com/Caeden117/ChroMapper)ã§ã‚«ãƒ¡ãƒ©ãƒ¯ãƒ¼ã‚¯ã®å†ç¾ã‚’ã™ã‚‹ChroMapperç”¨ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã§ã™ã€‚
+ä¸»ã«[Script Mapper](https://github.com/hibit-at/Scriptmapper)ã‚’ä½¿ã£ãŸã‚«ãƒ¡ãƒ©ã‚¹ã‚¯ãƒªãƒ—ãƒˆã®ä½œæˆã‚’å‰æã¨ã—ãŸä½œã‚Šã«ãªã£ã¦ã„ã¾ã™ã€‚
 
-# ƒCƒ“ƒXƒg[ƒ‹•û–@
-1. [ƒŠƒŠ[ƒXƒy[ƒW](https://github.com/rynan4818/ChroMapper-CameraMovement/releases)‚©‚çAÅV”Å‚Ìƒvƒ‰ƒOƒCƒ“‚Ìzipƒtƒ@ƒCƒ‹‚ğƒ_ƒEƒ“ƒ[ƒh‚µ‚Ä‰º‚³‚¢B
+![image](https://user-images.githubusercontent.com/14249877/152683121-afceb1e1-ef7b-497b-a30e-cd6e3230a784.png)
 
-2. ChroMapper‚ÌƒCƒ“ƒXƒg[ƒ‹ƒtƒHƒ‹ƒ_‚É‚ ‚é`Plugins`ƒtƒHƒ‹ƒ_‚ÉAƒ_ƒEƒ“ƒ[ƒh‚µ‚½zipƒtƒ@ƒCƒ‹‚ğ‰ğ“€‚µ‚Ä`ChroMapper-CameraMovement.dll`‚Æ`Newtonsoft.Json.dll`‚ğƒRƒs[‚µ‚Ä‰º‚³‚¢B
+# ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«æ–¹æ³•
+1. [ãƒªãƒªãƒ¼ã‚¹ãƒšãƒ¼ã‚¸](https://github.com/rynan4818/ChroMapper-CameraMovement/releases)ã‹ã‚‰ã€æœ€æ–°ç‰ˆã®ãƒ—ãƒ©ã‚°ã‚¤ãƒ³ã®zipãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ã¦ä¸‹ã•ã„ã€‚
 
-3. [Script Mapper](https://github.com/hibit-at/Scriptmapper)‚ğƒ_ƒEƒ“ƒ[ƒh‚µ‚ÄAChroMapper‚ÌƒCƒ“ƒXƒg[ƒ‹ƒtƒHƒ‹ƒ_(ChroMapper.exe‚ª‚ ‚éƒtƒHƒ‹ƒ_)‚É`scriptmapper.exe`‚ğƒRƒs[‚µ‚Ü‚·B
+2. ChroMapperã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ãƒ•ã‚©ãƒ«ãƒ€ã«ã‚ã‚‹`Plugins`ãƒ•ã‚©ãƒ«ãƒ€ã«ã€ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ãŸzipãƒ•ã‚¡ã‚¤ãƒ«ã‚’è§£å‡ã—ã¦`ChroMapper-CameraMovement.dll`ã¨`Newtonsoft.Json.dll`ã‚’ã‚³ãƒ”ãƒ¼ã—ã¦ä¸‹ã•ã„ã€‚
 
-# g—p–@
-•ˆ–Ê‚ğ“Ç‚İ‚ñ‚ÅƒGƒfƒBƒ^‰æ–Ê‚ğo‚µ‚Ä‰º‚³‚¢BTabƒL[‚ğ‰Ÿ‚·‚Æ‰E‘¤‚ÉƒAƒCƒRƒ“ƒpƒlƒ‹‚ªo‚Ü‚·‚Ì‚ÅA…F‚ÌƒJƒƒ‰ƒAƒCƒRƒ“‚ğ‰Ÿ‚·‚Æ CameraMovement‚Ìİ’èƒpƒlƒ‹‚ªŠJ‚«‚Ü‚·B
+3. [Script Mapper](https://github.com/hibit-at/Scriptmapper)ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ã—ã¦ã€ChroMapperã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ãƒ•ã‚©ãƒ«ãƒ€(ChroMapper.exeãŒã‚ã‚‹ãƒ•ã‚©ãƒ«ãƒ€)ã«`scriptmapper.exe`ã‚’ã‚³ãƒ”ãƒ¼ã—ã¾ã™ã€‚
 
-* Movement Enable F ƒJƒƒ‰ƒXƒNƒŠƒvƒg‚É‡‚í‚¹‚ÄƒJƒƒ‰‚ªˆÚ“®‚µ‚Ü‚·B
-* UI Hidden F ì•ˆ—p‚ÌƒOƒŠƒbƒhUI‚È‚Ç‚ğÁ‚µ‚Ü‚·B(‚Ü‚¾°‚È‚Çˆê•”‚ªÁ‚¦‚Ü‚¹‚ñ)
-* Turn To Head F ƒJƒƒ‰ƒXƒNƒŠƒvƒg‚ÌTurnToHeadUseCameraSetting‚Ìİ’è‚ªtrue‚Ì‚ÉAƒJƒƒ‰‚ªƒAƒoƒ^[‚Ì•ûŒü‚ğ©“®‚ÅŒü‚«‚Ü‚·B(CameraPlus‚ÌTurnToHeadƒpƒ‰ƒ[ƒ^‚É‘Š“–‚µ‚Ü‚·B)
-* Avatar F ƒAƒoƒ^[‚Ì3DƒIƒuƒWƒFƒNƒg‚ğ•\¦‚µ‚Ü‚·B
-* Head Hight F ƒAƒoƒ^[‚Ì“ª‚Ì‚‚³i‹…‚Ì’†Sj[’PˆÊ m]
-* Head Size F ƒAƒoƒ^[‚Ì“ª‚Ì‘å‚«‚³(‹…‚Ì’¼Œa) [’PˆÊ m]
-* Arm Size F ƒAƒoƒ^[‚Ì—¼è‚Ì’·‚³ [’PˆÊ m]
-* Script File F •ˆ–ÊƒtƒHƒ‹ƒ_‚É‚ ‚é“Ç‚İ‚ŞƒJƒƒ‰ƒXƒNƒŠƒvƒgƒtƒ@ƒCƒ‹–¼
-* Cam Pos Rot F Œ»İ‚ÌƒJƒƒ‰ˆÊ’u (“Ç‚İæ‚èê—p)
-* Reload F İ’è‚È‚Ç‚ğè“®‚Å“Ç‚İ‚İ’¼‚·
-* Setting Save : ã‹Lİ’è‚ğ•Û‘¶‚·‚é
-* Script Mapper Run F •ˆ–Êƒf[ƒ^‚ğ•Û‘¶‚µ‚ÄAScript Mapper‚ÅƒuƒbƒNƒ}[ƒN‚ğƒJƒƒ‰ƒXƒNƒŠƒvƒg‚É•ÏŠ·‚µ‚Ü‚·B
+# ä½¿ç”¨æ³•
+è­œé¢ã‚’èª­ã¿è¾¼ã‚“ã§ã‚¨ãƒ‡ã‚£ã‚¿ç”»é¢ã‚’å‡ºã—ã¦ä¸‹ã•ã„ã€‚Tabã‚­ãƒ¼ã‚’æŠ¼ã™ã¨å³å´ã«ã‚¢ã‚¤ã‚³ãƒ³ãƒ‘ãƒãƒ«ãŒå‡ºã¾ã™ã®ã§ã€æ°´è‰²ã®ã‚«ãƒ¡ãƒ©ã‚¢ã‚¤ã‚³ãƒ³ã‚’æŠ¼ã™ã¨ä¸‹ã®ç”»åƒ CameraMovementã®è¨­å®šãƒ‘ãƒãƒ«ãŒé–‹ãã¾ã™ã€‚
 
-## •â‘«
-ChroMapper‚ÌƒuƒbƒNƒ}[ƒN‚ÍMMA2‚Æ“¯‚¶"B"ƒL[‚Å‚·‚ªA‰º‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“ã‚ğƒNƒŠƒbƒN‚·‚é‚ÆÅ•ÒW‚Å‚«‚Ü‚·B‚Ü‚½ƒuƒbƒNƒ}[ƒN‚Ìíœ‚ÍAƒ^ƒCƒ€ƒ‰ƒCƒ“ã‚ÌƒuƒbƒNƒ}[ƒN‚ğƒ}ƒEƒX’†ƒNƒŠƒbƒN‚Å‚·B
+![image](https://user-images.githubusercontent.com/14249877/152683142-b7a21ccf-e509-487b-8b38-a075da027b1f.png)
+
+* Movement Enable ï¼š ã‚«ãƒ¡ãƒ©ã‚¹ã‚¯ãƒªãƒ—ãƒˆã«åˆã‚ã›ã¦ã‚«ãƒ¡ãƒ©ãŒç§»å‹•ã—ã¾ã™ã€‚
+* UI Hidden ï¼š ä½œè­œç”¨ã®ã‚°ãƒªãƒƒãƒ‰UIãªã©ã‚’æ¶ˆã—ã¾ã™ã€‚(ã¾ã åºŠãªã©ä¸€éƒ¨ãŒæ¶ˆãˆã¾ã›ã‚“)
+* Turn To Head ï¼š ã‚«ãƒ¡ãƒ©ã‚¹ã‚¯ãƒªãƒ—ãƒˆã®TurnToHeadUseCameraSettingã®è¨­å®šãŒtrueã®æ™‚ã«ã€ã‚«ãƒ¡ãƒ©ãŒã‚¢ãƒã‚¿ãƒ¼ã®æ–¹å‘ã‚’è‡ªå‹•ã§å‘ãã¾ã™ã€‚(CameraPlusã®TurnToHeadãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«ç›¸å½“ã—ã¾ã™ã€‚)
+* Avatar ï¼š ã‚¢ãƒã‚¿ãƒ¼ã®3Dã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è¡¨ç¤ºã—ã¾ã™ã€‚
+* Head Hight ï¼š ã‚¢ãƒã‚¿ãƒ¼ã®é ­ã®é«˜ã•ï¼ˆçƒã®ä¸­å¿ƒï¼‰[å˜ä½ m]
+* Head Size ï¼š ã‚¢ãƒã‚¿ãƒ¼ã®é ­ã®å¤§ãã•(çƒã®ç›´å¾„) [å˜ä½ m]
+* Arm Size ï¼š ã‚¢ãƒã‚¿ãƒ¼ã®ä¸¡æ‰‹ã®é•·ã• [å˜ä½ m]
+* Script File ï¼š è­œé¢ãƒ•ã‚©ãƒ«ãƒ€ã«ã‚ã‚‹èª­ã¿è¾¼ã‚€ã‚«ãƒ¡ãƒ©ã‚¹ã‚¯ãƒªãƒ—ãƒˆãƒ•ã‚¡ã‚¤ãƒ«å
+* Cam Pos Rot ï¼š ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©ä½ç½® (èª­ã¿å–ã‚Šå°‚ç”¨)
+* Reload ï¼š è¨­å®šãªã©ã‚’æ‰‹å‹•ã§èª­ã¿è¾¼ã¿ç›´ã™
+* Setting Save : ä¸Šè¨˜è¨­å®šã‚’ä¿å­˜ã™ã‚‹
+* Script Mapper Run ï¼š è­œé¢ãƒ‡ãƒ¼ã‚¿ã‚’ä¿å­˜ã—ã¦ã€Script Mapperã§ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯ã‚’ã‚«ãƒ¡ãƒ©ã‚¹ã‚¯ãƒªãƒ—ãƒˆã«å¤‰æ›ã—ã¾ã™ã€‚
+
+## è£œè¶³
+ChroMapperã®ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯ã¯MMA2ã¨åŒã˜"B"ã‚­ãƒ¼ã§ã™ãŒã€ä¸‹ã®ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ä¸Šã‚’ã‚¯ãƒªãƒƒã‚¯ã™ã‚‹ã¨æœ€ç·¨é›†ã§ãã¾ã™ã€‚ã¾ãŸãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯ã®å‰Šé™¤ã¯ã€ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ä¸Šã®ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯ã‚’ãƒã‚¦ã‚¹ä¸­ã‚¯ãƒªãƒƒã‚¯ã§ã™ã€‚
 
 # ToDo
-* UI Hidden‚Å•s—v‚ÈUI‚ğ‘S•”Á‚·(ƒQ[ƒ€‚ÌƒvƒŒƒC‰æ–Ê‚É‹ß‚­‚·‚é)
-* ƒuƒbƒNƒ}[ƒN‚Ì•\¦‚ğMMA2‚Ì—l‚É°‚É•\¦‚³‚¹‚½‚¢AƒNƒŠƒbƒN‚µ‚ÄÄ•ÒW
-* Script Mapper‚ÌƒRƒ}ƒ“ƒh‚ğƒƒjƒ…[‚Å‘I‘ğ‚µ‚ÄƒuƒbƒNƒ}[ƒN“ü—Í
-* Œ»İ‚ÌƒJƒƒ‰ˆÊ’u‚ğinput.csv‚Éo—Í‚·‚éƒ{ƒ^ƒ“
-* VRM‚Æ‚©“Ç‚İ‚ñ‚ÅƒAƒoƒ^[•\¦‚µ‚½‚¢‚¯‚Ç“ï‚µ‚»‚¤B
+* UI Hiddenã§ä¸è¦ãªUIã‚’å…¨éƒ¨æ¶ˆã™(ã‚²ãƒ¼ãƒ ã®ãƒ—ãƒ¬ã‚¤ç”»é¢ã«è¿‘ãã™ã‚‹)
+* ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯ã®è¡¨ç¤ºã‚’MMA2ã®æ§˜ã«åºŠã«è¡¨ç¤ºã•ã›ãŸã„ã€ã‚¯ãƒªãƒƒã‚¯ã—ã¦å†ç·¨é›†
+* Script Mapperã®ã‚³ãƒãƒ³ãƒ‰ã‚’ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã§é¸æŠã—ã¦ãƒ–ãƒƒã‚¯ãƒãƒ¼ã‚¯å…¥åŠ›
+* ç¾åœ¨ã®ã‚«ãƒ¡ãƒ©ä½ç½®ã‚’input.csvã«å‡ºåŠ›ã™ã‚‹ãƒœã‚¿ãƒ³
+* VRMã¨ã‹èª­ã¿è¾¼ã‚“ã§ã‚¢ãƒã‚¿ãƒ¼è¡¨ç¤ºã—ãŸã„ã‘ã©é›£ã—ãã†ã€‚
 
-# ŠJ”­Òî•ñ
-‚±‚ÌƒvƒƒWƒFƒNƒg‚ğƒrƒ‹ƒh‚·‚é‚É‚ÍAChroMapper‚ÌƒCƒ“ƒXƒg[ƒ‹ƒpƒX‚ğw’è‚·‚é ChroMapper-CameraMovement\ChroMapper-CameraMovement.csproj.user ƒtƒ@ƒCƒ‹‚ğì¬‚·‚é•K—v‚ª‚ ‚è‚Ü‚·B
+# é–‹ç™ºè€…æƒ…å ±
+ã“ã®ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆã‚’ãƒ“ãƒ«ãƒ‰ã™ã‚‹ã«ã¯ã€ChroMapperã®ã‚¤ãƒ³ã‚¹ãƒˆãƒ¼ãƒ«ãƒ‘ã‚¹ã‚’æŒ‡å®šã™ã‚‹ ChroMapper-CameraMovement\ChroMapper-CameraMovement.csproj.user ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä½œæˆã™ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -47,7 +51,7 @@ ChroMapper‚ÌƒuƒbƒNƒ}[ƒN‚ÍMMA2‚Æ“¯‚¶"B"ƒL[‚Å‚·‚ªA‰º‚Ìƒ^ƒCƒ€ƒ‰ƒCƒ“ã‚ğƒNƒŠƒbƒN‚
 </Project>
 ```
 
-## ƒvƒ‰ƒOƒCƒ“»ì‚ÌQl
-`CameraMovement.cs`‚Ì‘å”¼‚ÍA‚·‚Ì[‚³‚ñ»ì‚ÌCameraPlus‚Ì[CameraMovement.cs](https://github.com/Snow1226/CameraPlus/blob/master/CameraPlus/Behaviours/CameraMovement.cs)‚ğƒRƒs[‚µ‚Äì¬‚µ‚Ä‚¢‚Ü‚·BƒJƒƒ‰ˆÚ“®•”•ª‚Í‘S‚­“¯‚¶‚Å‚·B
+## ãƒ—ãƒ©ã‚°ã‚¤ãƒ³è£½ä½œã®å‚è€ƒ
+`CameraMovement.cs`ã®å¤§åŠã¯ã€ã™ã®ãƒ¼ã•ã‚“è£½ä½œã®CameraPlusã®[CameraMovement.cs](https://github.com/Snow1226/CameraPlus/blob/master/CameraPlus/Behaviours/CameraMovement.cs)ã‚’ã‚³ãƒ”ãƒ¼ã—ã¦ä½œæˆã—ã¦ã„ã¾ã™ã€‚ã‚«ãƒ¡ãƒ©ç§»å‹•éƒ¨åˆ†ã¯å…¨ãåŒã˜ã§ã™ã€‚
 
-`UI.cs`‚Ì‘å”¼‚ÍKival Evan‚³‚ñ»ì‚Ì[Lolighter](https://github.com/KivalEvan/ChroMapper-Lolighter)‚Ì[UI.cs](https://github.com/KivalEvan/ChroMapper-Lolighter/blob/main/UI/UI.cs)‚ğƒRƒs[‚µ‚Äì¬‚µ‚Ä‚¢‚Ü‚·B
+`UI.cs`ã®å¤§åŠã¯Kival Evanã•ã‚“è£½ä½œã®[Lolighter](https://github.com/KivalEvan/ChroMapper-Lolighter)ã®[UI.cs](https://github.com/KivalEvan/ChroMapper-Lolighter/blob/main/UI/UI.cs)ã‚’ã‚³ãƒ”ãƒ¼ã—ã¦ä½œæˆã—ã¦ã„ã¾ã™ã€‚

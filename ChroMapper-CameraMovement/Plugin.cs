@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace ChroMapper_CameraMovement
 {
@@ -63,12 +64,36 @@ namespace ChroMapper_CameraMovement
             {
                 try
                 {
-                    Process p = Process.Start(scriptmapper, $@"""{path}""");
-                    p.WaitForExit();
+                    using (Process proc = Process.Start(scriptmapper, $@"""{path}"""))
+                    {
+                        proc.WaitForExit();
+                        proc.Close();
+                    }
                 }
                 catch
                 {
-                    UnityEngine.Debug.Log("ScriptMapperError");
+                    UnityEngine.Debug.LogError("ScriptMapperError");
+                    return;
+                }
+                var logfile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Modifier.ScriptMapperLog).Replace("/", "\\");
+                if (File.Exists(logfile))
+                {
+                    using (StreamReader results = File.OpenText(logfile))
+                    {
+                        string text = "";
+                        while ((text = results.ReadLine()) != null)
+                        {
+                            if (Regex.IsMatch(text, @"^!.+!$"))
+                            {
+                                UnityEngine.Debug.LogError($"ScriptMapperWarning:{text}");
+                            }
+                        }
+                        results.Close();
+                    }
+                }
+                else
+                {
+                    UnityEngine.Debug.LogError("ScriptMapper No Logfile");
                     return;
                 }
                 movement.Reload();

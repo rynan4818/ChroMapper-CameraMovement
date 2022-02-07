@@ -28,6 +28,7 @@ namespace ChroMapper_CameraMovement
         public static GameObject avatarArm;
         public static GameObject avatarBody;
         public static GameObject avatarLeg;
+        public static GameObject avatarHair;
 
         protected bool dataLoaded = false;
         protected CameraData data = new CameraData();
@@ -210,11 +211,11 @@ namespace ChroMapper_CameraMovement
             //胴体の中心からの高さは0.3m→1.305m÷0.3m=4.35
             var body_size_y = (Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f)) / 4.35f;
             //胴体の直径0.2mは胴体の中心からの高さの1/3
-            var body_size_xz = body_size_y / 1.5f;
+            var body_size_x = body_size_y / 1.5f;
             //胴体の中心1.005は首の高さ1.305m-胴体の中心からの高さ0.3m=1.005
             var body_pos_y = Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f) - body_size_y;
             avatarBody.transform.position = new Vector3(0, body_pos_y, 0);
-            avatarBody.transform.localScale = new Vector3(body_size_xz, body_size_y, body_size_xz);
+            avatarBody.transform.localScale = new Vector3(body_size_x, body_size_y, body_size_x * 0.8f);
             //腕の中心高さ1.25mは首の高さ1.305mの 1.305m÷1.25m=1.044
             var arm_pos_y = (Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f)) / 1.044f;
             //腕の大きさ0.06mは腕の長さ1.25m→1.25÷0.06=20.83
@@ -227,12 +228,16 @@ namespace ChroMapper_CameraMovement
             var leg_size_xz = leg_size_y / 12f;
             avatarLeg.transform.position = new Vector3(0, leg_pos_y, 0);
             avatarLeg.transform.localScale = new Vector3(leg_size_xz, leg_size_y, leg_size_xz);
+            //おさげ
+            avatarHair.transform.localScale = new Vector3(Options.Modifier.AvatarHeadSize / 1.4f, Options.Modifier.AvatarHeadSize * 2.0f, Options.Modifier.AvatarHeadSize / 17f);
+            avatarHair.transform.position = new Vector3(0, Options.Modifier.AvatarHeadHight - Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize / -2.0f);
             if (Options.Modifier.Avatar)
             {
                 avatarHead.gameObject.SetActive(true);
                 avatarArm.gameObject.SetActive(true);
                 avatarBody.gameObject.SetActive(true);
                 avatarLeg.gameObject.SetActive(true);
+                avatarHair.gameObject.SetActive(true);
             }
             else
             {
@@ -240,6 +245,7 @@ namespace ChroMapper_CameraMovement
                 avatarArm.gameObject.SetActive(false);
                 avatarBody.gameObject.SetActive(false);
                 avatarLeg.gameObject.SetActive(false);
+                avatarHair.gameObject.SetActive(false);
             }
             movementNextStartTime = 0;
             eventID = 0;
@@ -293,6 +299,7 @@ namespace ChroMapper_CameraMovement
             avatarArm = GameObject.CreatePrimitive(PrimitiveType.Cube);
             avatarLeg = GameObject.CreatePrimitive(PrimitiveType.Cube);
             avatarBody = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            avatarHair = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
             this.Reload();
         }

@@ -16,6 +16,7 @@ namespace ChroMapper_CameraMovement
         public float avatarArmSize = 1.17f;
         public string scriptFileName = "SongScript.json";
         public string scriptMapperExe = "scriptmapper.exe";
+        public string scriptMapperLog = "log_latest.txt";
 
         public static void SettingLoad(string setting_file)
         {
@@ -42,6 +43,7 @@ namespace ChroMapper_CameraMovement
             Options.Modifier.AvatarArmSize = data.avatarArmSize;
             Options.Modifier.ScriptFileName = data.scriptFileName;
             Options.Modifier.ScriptMapperExe = data.scriptMapperExe;
+            Options.Modifier.ScriptMapperLog = data.scriptMapperLog;
         }
         public void SettingSave(string setting_file)
         {
@@ -54,6 +56,7 @@ namespace ChroMapper_CameraMovement
             this.avatarArmSize = Options.Modifier.AvatarArmSize;
             this.scriptFileName = Options.Modifier.ScriptFileName;
             this.scriptMapperExe = Options.Modifier.ScriptMapperExe;
+            this.scriptMapperLog = Options.Modifier.ScriptMapperLog;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

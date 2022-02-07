@@ -19,6 +19,7 @@ namespace ChroMapper_CameraMovement.Configuration
             public static float AvatarArmSize { set; get; }
             public static string ScriptFileName { set; get; }
             public static string ScriptMapperExe { set; get; }
+            public static string ScriptMapperLog { set; get; }
         }
     }
 }

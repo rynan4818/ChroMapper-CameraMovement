@@ -44,7 +44,7 @@ namespace ChroMapper_CameraMovement
         protected int eventID;
         protected float movementStartTime, movementEndTime, movementNextStartTime;
         protected DateTime movementStartDateTime, movementEndDateTime, movementDelayEndDateTime;
-        protected bool _paused = false;
+        protected bool _reload = false;
         protected DateTime _pauseTime;
         protected bool turnToHead;
         protected bool turnToHeadHorizontal;
@@ -244,6 +244,7 @@ namespace ChroMapper_CameraMovement
             movementNextStartTime = 0;
             eventID = 0;
             beforeSeconds = 0;
+            _reload = true;
             LoadCameraData(ScriptGet());
             if (Options.Modifier.UIhidden)
             {
@@ -297,50 +298,49 @@ namespace ChroMapper_CameraMovement
         }
         private void Update()
         {
+            if (dataLoaded && Options.Modifier.Movement && (_reload || beforeSeconds != atsc.CurrentSeconds))
+            {
+                _reload = false;
+                if (beforeSeconds > atsc.CurrentSeconds)
+                {
+                    movementNextStartTime = 0;
+                    eventID = 0;
+                    beforeSeconds = 0;
+                }
+                beforeSeconds = atsc.CurrentSeconds;
+
+                while (movementNextStartTime <= atsc.CurrentSeconds)
+                    UpdatePosAndRot();
+
+                float difference = movementEndTime - movementStartTime;
+                float current = atsc.CurrentSeconds - movementStartTime;
+                if (difference != 0)
+                    movePerc = Mathf.Clamp(current / difference, 0, 1);
+
+                Vector3 cameraPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
+                Vector3 cameraRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
+                if (turnToHead)
+                {
+                    Vector3 turnToTarget = new Vector3(0, Options.Modifier.AvatarHeadHight, 0);  //アバターの頭の位置
+                    turnToTarget += LerpVector3(StartHeadOffset, EndHeadOffset, Ease(movePerc));
+                    var direction = turnToTarget - cameraPos;
+                    var lookRotation = Quaternion.LookRotation(direction);
+                    if (turnToHeadHorizontal)
+                        cameraRot = new Vector3(cameraRot.x, lookRotation.eulerAngles.y, cameraRot.z);
+                    else
+                        cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, lookRotation);
+                }
+                if (!(turnToHead && turnToHeadHorizontal))
+                    cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
+
+                Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
+            }
             if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation)
             {
                 _ui.CameraPosRotUpdate(cm_MapEditorCamera.transform);
                 beforePositon = cm_MapEditorCamera.transform.position;
                 beforeRotation = cm_MapEditorCamera.transform.rotation;
             }
-
-            if (!dataLoaded) return;
-            if (!Options.Modifier.Movement) return;
-            if (beforeSeconds == atsc.CurrentSeconds) return;
-
-            if (beforeSeconds > atsc.CurrentSeconds)
-            {
-                movementNextStartTime = 0;
-                eventID = 0;
-                beforeSeconds = 0;
-            }
-            beforeSeconds = atsc.CurrentSeconds;
-
-            while (movementNextStartTime <= atsc.CurrentSeconds)
-                UpdatePosAndRot();
-
-            float difference = movementEndTime - movementStartTime;
-            float current = atsc.CurrentSeconds - movementStartTime;
-            if (difference != 0)
-                movePerc = Mathf.Clamp(current / difference, 0, 1);
-
-            Vector3 cameraPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
-            Vector3 cameraRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
-            if (turnToHead)
-            {
-                Vector3 turnToTarget = new Vector3(0, Options.Modifier.AvatarHeadHight, 0);  //アバターの頭の位置
-                turnToTarget += LerpVector3(StartHeadOffset, EndHeadOffset, Ease(movePerc));
-                var direction = turnToTarget - cameraPos;
-                var lookRotation = Quaternion.LookRotation(direction);
-                if (turnToHeadHorizontal)
-                    cameraRot = new Vector3(cameraRot.x, lookRotation.eulerAngles.y, cameraRot.z);
-                else
-                    cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, lookRotation);
-            }
-            if (!(turnToHead && turnToHeadHorizontal))
-                cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
-
-            Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)

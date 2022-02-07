@@ -53,6 +53,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             AddCheckbox(_cameraMovementMenu.transform, "Movement Enable", "Movement Enable", new Vector2(0, -40), Options.Modifier.Movement, (check) =>
             {
                 Options.Modifier.Movement = check;
+                _plugin.Reload();
             });
             AddCheckbox(_cameraMovementMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.Modifier.UIhidden, (check) =>
             {
@@ -62,6 +63,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             AddCheckbox(_cameraMovementMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.Modifier.TurnToHead, (check) =>
             {
                 Options.Modifier.TurnToHead = check;
+                _plugin.Reload();
             });
             AddCheckbox(_cameraMovementMenu.transform, "Avatar", "Avatar", new Vector2(0, -85), Options.Modifier.Avatar, (check) =>
             {

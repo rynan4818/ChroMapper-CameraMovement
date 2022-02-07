@@ -63,14 +63,14 @@ namespace ChroMapper_CameraMovement
             {
                 try
                 {
-                    Process.Start(scriptmapper, $@"""{path}""");
+                    Process p = Process.Start(scriptmapper, $@"""{path}""");
+                    p.WaitForExit();
                 }
                 catch
                 {
                     UnityEngine.Debug.Log("ScriptMapperError");
                     return;
                 }
-                await Task.Delay(1000);
                 movement.Reload();
             }
             scriptMapperAlive = false;

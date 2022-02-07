@@ -80,10 +80,6 @@
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\TOOL\ChroMapper\chromapper\ChroMapper_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>

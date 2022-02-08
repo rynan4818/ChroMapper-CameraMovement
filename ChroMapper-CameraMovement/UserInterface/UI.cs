@@ -10,7 +10,8 @@ namespace ChroMapper_CameraMovement.UserInterface
 {
     public class UI
     {
-        private GameObject _cameraMovementMenu;
+        private GameObject _cameraMovementMainMenu;
+        private GameObject _cameraMovementSettingMenu;
         private readonly Plugin _plugin;
         private readonly ExtensionButton _extensionBtn = new ExtensionButton();
         private UITextInput _cameraPosRot;
@@ -39,38 +40,78 @@ namespace ChroMapper_CameraMovement.UserInterface
         public void AddMenu(MapEditorUI mapEditorUI)
         {
             CanvasGroup parent = mapEditorUI.MainUIGroup[5];
-            _cameraMovementMenu = new GameObject("CameraMovement Menu");
-            _cameraMovementMenu.transform.parent = parent.transform;
+            _cameraMovementMainMenu = new GameObject("CameraMovement Menu");
+            _cameraMovementSettingMenu = new GameObject("CameraMovement Setting Menu");
+            _cameraMovementMainMenu.transform.parent = parent.transform;
+            _cameraMovementSettingMenu.transform.parent = parent.transform;
 
-            AttachTransform(_cameraMovementMenu, 170, 300, 1, 1, -50, -30, 1, 1);
+            //Main Menu
+            AttachTransform(_cameraMovementMainMenu, 170, 240, 1, 1, -50, -30, 1, 1);
 
-            Image image = _cameraMovementMenu.AddComponent<Image>();
-            image.sprite = PersistentUI.Instance.Sprites.Background;
-            image.type = Image.Type.Sliced;
-            image.color = new Color(0.24f, 0.24f, 0.24f);
+            Image imageMain = _cameraMovementMainMenu.AddComponent<Image>();
+            imageMain.sprite = PersistentUI.Instance.Sprites.Background;
+            imageMain.type = Image.Type.Sliced;
+            imageMain.color = new Color(0.24f, 0.24f, 0.24f);
 
-            AddLabel(_cameraMovementMenu.transform, "CameraMovement", "CameraMovement", new Vector2(0, -15));
-            AddCheckbox(_cameraMovementMenu.transform, "Movement Enable", "Movement Enable", new Vector2(0, -40), Options.Modifier.Movement, (check) =>
+            AddLabel(_cameraMovementMainMenu.transform, "CameraMovement", "CameraMovement", new Vector2(0, -15));
+            AddCheckbox(_cameraMovementMainMenu.transform, "Movement Enable", "Movement Enable", new Vector2(0, -40), Options.Modifier.Movement, (check) =>
             {
                 Options.Modifier.Movement = check;
                 _plugin.Reload();
             });
-            AddCheckbox(_cameraMovementMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.Modifier.UIhidden, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.Modifier.UIhidden, (check) =>
             {
                 Options.Modifier.UIhidden = check;
                 _plugin.Reload();
             });
-            AddCheckbox(_cameraMovementMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.Modifier.TurnToHead, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.Modifier.TurnToHead, (check) =>
             {
                 Options.Modifier.TurnToHead = check;
                 _plugin.Reload();
             });
-            AddCheckbox(_cameraMovementMenu.transform, "Avatar", "Avatar", new Vector2(0, -85), Options.Modifier.Avatar, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Avatar", "Avatar", new Vector2(0, -85), Options.Modifier.Avatar, (check) =>
             {
                 Options.Modifier.Avatar = check;
                 _plugin.Reload();
             });
-            AddTextInput(_cameraMovementMenu.transform, "Head Hight", "Head Hight", new Vector2(0, -100), Options.Modifier.AvatarHeadHight.ToString(), (value) =>
+            _cameraPosRot = AddTextInput(_cameraMovementMainMenu.transform, "Cam Pos Rot", "Cam Pos Rot", new Vector2(0, -105), "", (value) =>
+            {
+            });
+            cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
+            CameraPosRotUpdate(cm_MapEditorCamera.transform);
+            AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -125), () =>
+            {
+                _cameraMovementSettingMenu.SetActive(true);
+            });
+            AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", new Vector2(0, -155), () =>
+            {
+                _plugin.Reload();
+            });
+            AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -185), () =>
+            {
+                _plugin.SettingSave();
+            });
+            AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(0, -215), () =>
+            {
+                _plugin.ScriptMapperRun();
+            });
+
+            _cameraMovementMainMenu.SetActive(false);
+            _extensionBtn.Click = () =>
+            {
+                _cameraMovementMainMenu.SetActive(!_cameraMovementMainMenu.activeSelf);
+            };
+
+            //Setting Menu
+            AttachTransform(_cameraMovementSettingMenu, 200, 190, 1, 1, -50, -120, 1, 1);
+
+            Image imageSetting = _cameraMovementSettingMenu.AddComponent<Image>();
+            imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
+            imageSetting.type = Image.Type.Sliced;
+            imageSetting.color = new Color(0.24f, 0.24f, 0.24f);
+
+            AddLabel(_cameraMovementSettingMenu.transform, "CameraMovement More Settings", "CameraMovement More Settings", new Vector2(0, -15));
+            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight", new Vector2(0, -40), Options.Modifier.AvatarHeadHight.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -79,7 +120,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementMenu.transform, "Head Size", "Head Size", new Vector2(0, -120), Options.Modifier.AvatarHeadSize.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Head Size", "Head Size", new Vector2(0, -60), Options.Modifier.AvatarHeadSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -88,7 +129,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -140), Options.Modifier.AvatarArmSize.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -80), Options.Modifier.AvatarArmSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -97,33 +138,21 @@ namespace ChroMapper_CameraMovement.UserInterface
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementMenu.transform, "Script File", "Script File", new Vector2(0, -160), Options.Modifier.ScriptFileName, (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -100), Options.Modifier.ScriptFileName, (value) =>
             {
                 Options.Modifier.ScriptFileName = value.Trim();
             });
-            _cameraPosRot = AddTextInput(_cameraMovementMenu.transform, "Cam Pos Rot", "Cam Pos Rot", new Vector2(0, -180), "", (value) =>
-            {
-            });
-            cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
-            CameraPosRotUpdate(cm_MapEditorCamera.transform);
-            AddButton(_cameraMovementMenu.transform, "Reload", "Reload", new Vector2(0, -210), () =>
-            {
-                _plugin.Reload();
-            });
-            AddButton(_cameraMovementMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -240), () =>
+            AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -130), () =>
             {
                 _plugin.SettingSave();
             });
-            AddButton(_cameraMovementMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(0, -270), () =>
+            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -160), () =>
             {
-                _plugin.ScriptMapperRun();
+                _cameraMovementSettingMenu.SetActive(false);
             });
 
-            _cameraMovementMenu.SetActive(false);
-            _extensionBtn.Click = () =>
-            {
-                _cameraMovementMenu.SetActive(!_cameraMovementMenu.activeSelf);
-            };
+            _cameraMovementSettingMenu.SetActive(false);
+
         }
 
         // i ended up copying Top_Cat's CM-JS UI helper, too useful to make my own tho

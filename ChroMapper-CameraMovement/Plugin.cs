@@ -75,6 +75,7 @@ namespace ChroMapper_CameraMovement
                     UnityEngine.Debug.LogError("ScriptMapperError");
                     return;
                 }
+                bool err = false;
                 var logfile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Modifier.ScriptMapperLog).Replace("/", "\\");
                 if (File.Exists(logfile))
                 {
@@ -86,6 +87,7 @@ namespace ChroMapper_CameraMovement
                             if (Regex.IsMatch(text, @"^!.+!$"))
                             {
                                 UnityEngine.Debug.LogError($"ScriptMapperWarning:{text}");
+                                err = true;
                             }
                         }
                         results.Close();
@@ -96,6 +98,8 @@ namespace ChroMapper_CameraMovement
                     UnityEngine.Debug.LogError("ScriptMapper No Logfile");
                     return;
                 }
+                if(err)
+                    PersistentUI.Instance.DisplayMessage("ScriptMapper ERROR!", PersistentUI.DisplayMessageType.Center);
                 movement.Reload();
             }
             scriptMapperAlive = false;

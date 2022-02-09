@@ -8,6 +8,7 @@ using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.UserInterface;
 using Newtonsoft.Json;
 using System.IO;
+using System.Collections;
 
 namespace ChroMapper_CameraMovement
 {
@@ -16,6 +17,7 @@ namespace ChroMapper_CameraMovement
         private UI _ui;
         public static AudioTimeSyncController atsc;
         public static AutoSaveController autoSave;
+        public static BookmarkManager bookmarkManager;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
@@ -183,9 +185,21 @@ namespace ChroMapper_CameraMovement
                 return false;
             }
         }
+        public void BookMarkWidthChange()
+        {
+            Type type = bookmarkManager.GetType();
+            FieldInfo field = type.GetField("bookmarkContainers", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+            List<BookmarkContainer>  bookmarkContainers = (List<BookmarkContainer>)(field.GetValue(bookmarkManager));
+            bookmarkContainers = bookmarkContainers.ConvertAll(container =>
+            {
+                var rectTransform = (RectTransform)container.transform;
+                rectTransform.sizeDelta = new Vector2(Options.BookMarkWidth, 20f);
+                return container;
+            });
+        }
         public string ScriptGet()
         {
-            return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Modifier.ScriptFileName).Replace("/","\\");
+            return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.ScriptFileName).Replace("/","\\");
         }
         public string MapGet()
         {
@@ -205,23 +219,23 @@ namespace ChroMapper_CameraMovement
         public void Reload()
         {
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
-            avatarHead.transform.position = new Vector3(0, Options.Modifier.AvatarHeadHight, 0);
-            avatarHead.transform.localScale = new Vector3(Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize);
+            avatarHead.transform.position = new Vector3(0, Options.AvatarHeadHight, 0);
+            avatarHead.transform.localScale = new Vector3(Options.AvatarHeadSize, Options.AvatarHeadSize, Options.AvatarHeadSize);
             //首の高さ 1.43-0.25÷2=1.305m
             //胴体の中心からの高さは0.3m→1.305m÷0.3m=4.35
-            var body_size_y = (Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f)) / 4.35f;
+            var body_size_y = (Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f)) / 4.35f;
             //胴体の直径0.2mは胴体の中心からの高さの1/3
             var body_size_x = body_size_y / 1.5f;
             //胴体の中心1.005は首の高さ1.305m-胴体の中心からの高さ0.3m=1.005
-            var body_pos_y = Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f) - body_size_y;
+            var body_pos_y = Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f) - body_size_y;
             avatarBody.transform.position = new Vector3(0, body_pos_y, 0);
             avatarBody.transform.localScale = new Vector3(body_size_x, body_size_y, body_size_x * 0.8f);
             //腕の中心高さ1.25mは首の高さ1.305mの 1.305m÷1.25m=1.044
-            var arm_pos_y = (Options.Modifier.AvatarHeadHight - (Options.Modifier.AvatarHeadSize / 2.0f)) / 1.044f;
+            var arm_pos_y = (Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f)) / 1.044f;
             //腕の大きさ0.06mは腕の長さ1.25m→1.25÷0.06=20.83
-            var arm_size_yz = Options.Modifier.AvatarArmSize / 20.83f;
+            var arm_size_yz = Options.AvatarArmSize / 20.83f;
             avatarArm.transform.position = new Vector3(0, arm_pos_y, 0);
-            avatarArm.transform.localScale = new Vector3(Options.Modifier.AvatarArmSize, arm_size_yz, arm_size_yz);
+            avatarArm.transform.localScale = new Vector3(Options.AvatarArmSize, arm_size_yz, arm_size_yz);
             //足の高さは腕の中心から腕のサイズを引いたもの
             var leg_size_y = arm_pos_y - (arm_size_yz / 2.0f);
             var leg_pos_y = leg_size_y / 2.0f;
@@ -229,9 +243,9 @@ namespace ChroMapper_CameraMovement
             avatarLeg.transform.position = new Vector3(0, leg_pos_y, 0);
             avatarLeg.transform.localScale = new Vector3(leg_size_xz, leg_size_y, leg_size_xz);
             //おさげ
-            avatarHair.transform.localScale = new Vector3(Options.Modifier.AvatarHeadSize / 1.4f, Options.Modifier.AvatarHeadSize * 2.0f, Options.Modifier.AvatarHeadSize / 17f);
-            avatarHair.transform.position = new Vector3(0, Options.Modifier.AvatarHeadHight - Options.Modifier.AvatarHeadSize, Options.Modifier.AvatarHeadSize / -2.0f);
-            if (Options.Modifier.Avatar)
+            avatarHair.transform.localScale = new Vector3(Options.AvatarHeadSize / 1.4f, Options.AvatarHeadSize * 2.0f, Options.AvatarHeadSize / 17f);
+            avatarHair.transform.position = new Vector3(0, Options.AvatarHeadHight - Options.AvatarHeadSize, Options.AvatarHeadSize / -2.0f);
+            if (Options.Avatar)
             {
                 avatarHead.gameObject.SetActive(true);
                 avatarArm.gameObject.SetActive(true);
@@ -252,7 +266,8 @@ namespace ChroMapper_CameraMovement
             beforeSeconds = 0;
             _reload = true;
             LoadCameraData(ScriptGet());
-            if (Options.Modifier.UIhidden)
+            BookMarkWidthChange();
+            if (Options.UIhidden)
             {
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
@@ -275,7 +290,7 @@ namespace ChroMapper_CameraMovement
                 cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", interfaceOpacity);
             }
         }
-        private void Start()
+        private IEnumerator Start()
         {
             atsc = FindObjectOfType<AudioTimeSyncController>();
             autoSave = FindObjectOfType<AutoSaveController>();
@@ -301,11 +316,14 @@ namespace ChroMapper_CameraMovement
             avatarBody = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             avatarHair = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
+            yield return new WaitForSeconds(0.5f); //Wait for time
+            bookmarkManager = FindObjectOfType<BookmarkManager>();
+            bookmarkManager.BookmarksUpdated += BookMarkWidthChange;
             this.Reload();
         }
         private void Update()
         {
-            if (dataLoaded && Options.Modifier.Movement && (_reload || beforeSeconds != atsc.CurrentSeconds))
+            if (dataLoaded && Options.Movement && (_reload || beforeSeconds != atsc.CurrentSeconds))
             {
                 _reload = false;
                 if (beforeSeconds > atsc.CurrentSeconds)
@@ -328,7 +346,7 @@ namespace ChroMapper_CameraMovement
                 Vector3 cameraRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
                 if (turnToHead)
                 {
-                    Vector3 turnToTarget = new Vector3(0, Options.Modifier.AvatarHeadHight, 0);  //アバターの頭の位置
+                    Vector3 turnToTarget = new Vector3(0, Options.AvatarHeadHight, 0);  //アバターの頭の位置
                     turnToTarget += LerpVector3(StartHeadOffset, EndHeadOffset, Ease(movePerc));
                     var direction = turnToTarget - cameraPos;
                     var lookRotation = Quaternion.LookRotation(direction);
@@ -348,6 +366,11 @@ namespace ChroMapper_CameraMovement
                 beforePositon = cm_MapEditorCamera.transform.position;
                 beforeRotation = cm_MapEditorCamera.transform.rotation;
             }
+        }
+
+        private void OnDisable()
+        {
+            bookmarkManager.BookmarksUpdated -= BookMarkWidthChange;
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
@@ -394,7 +417,7 @@ namespace ChroMapper_CameraMovement
             if (eventID >= data.Movements.Count)
                 eventID = 0;
 
-            turnToHead = data.TurnToHeadUseCameraSetting ? Options.Modifier.TurnToHead : data.Movements[eventID].TurnToHead;
+            turnToHead = data.TurnToHeadUseCameraSetting ? Options.TurnToHead : data.Movements[eventID].TurnToHead;
             turnToHeadHorizontal = data.Movements[eventID].TurnToHeadHorizontal;
 
             easeTransition = data.Movements[eventID].EaseTransition;

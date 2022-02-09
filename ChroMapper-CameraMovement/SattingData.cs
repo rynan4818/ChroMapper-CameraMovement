@@ -17,6 +17,7 @@ namespace ChroMapper_CameraMovement
         public string scriptFileName = "SongScript.json";
         public string scriptMapperExe = "scriptmapper.exe";
         public string scriptMapperLog = "log_latest.txt";
+        public float bookmarkWidth = 10f;
 
         public static void SettingLoad(string setting_file)
         {
@@ -34,29 +35,31 @@ namespace ChroMapper_CameraMovement
                 data = new SattingData();
             }
             Instance = data;
-            Options.Modifier.Movement = data.movement;
-            Options.Modifier.TurnToHead = data.turnToHead;
-            Options.Modifier.Avatar = data.avatar;
-            Options.Modifier.UIhidden = data.uIhidden;
-            Options.Modifier.AvatarHeadHight = data.avatarHeadHight;
-            Options.Modifier.AvatarHeadSize = data.avatarHeadSize;
-            Options.Modifier.AvatarArmSize = data.avatarArmSize;
-            Options.Modifier.ScriptFileName = data.scriptFileName;
-            Options.Modifier.ScriptMapperExe = data.scriptMapperExe;
-            Options.Modifier.ScriptMapperLog = data.scriptMapperLog;
+            Options.Movement = data.movement;
+            Options.TurnToHead = data.turnToHead;
+            Options.Avatar = data.avatar;
+            Options.UIhidden = data.uIhidden;
+            Options.AvatarHeadHight = data.avatarHeadHight;
+            Options.AvatarHeadSize = data.avatarHeadSize;
+            Options.AvatarArmSize = data.avatarArmSize;
+            Options.ScriptFileName = data.scriptFileName;
+            Options.ScriptMapperExe = data.scriptMapperExe;
+            Options.ScriptMapperLog = data.scriptMapperLog;
+            Options.BookMarkWidth = data.bookmarkWidth;
         }
         public void SettingSave(string setting_file)
         {
-            this.movement = Options.Modifier.Movement;
-            this.turnToHead = Options.Modifier.TurnToHead;
-            this.avatar = Options.Modifier.Avatar;
-            this.uIhidden = Options.Modifier.UIhidden;
-            this.avatarHeadHight = Options.Modifier.AvatarHeadHight;
-            this.avatarHeadSize = Options.Modifier.AvatarHeadSize;
-            this.avatarArmSize = Options.Modifier.AvatarArmSize;
-            this.scriptFileName = Options.Modifier.ScriptFileName;
-            this.scriptMapperExe = Options.Modifier.ScriptMapperExe;
-            this.scriptMapperLog = Options.Modifier.ScriptMapperLog;
+            this.movement = Options.Movement;
+            this.turnToHead = Options.TurnToHead;
+            this.avatar = Options.Avatar;
+            this.uIhidden = Options.UIhidden;
+            this.avatarHeadHight = Options.AvatarHeadHight;
+            this.avatarHeadSize = Options.AvatarHeadSize;
+            this.avatarArmSize = Options.AvatarArmSize;
+            this.scriptFileName = Options.ScriptFileName;
+            this.scriptMapperExe = Options.ScriptMapperExe;
+            this.scriptMapperLog = Options.ScriptMapperLog;
+            this.bookmarkWidth = Options.BookMarkWidth;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

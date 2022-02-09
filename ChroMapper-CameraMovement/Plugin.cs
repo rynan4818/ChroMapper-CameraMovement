@@ -59,7 +59,7 @@ namespace ChroMapper_CameraMovement
             while (movement.SavingThread())
                 await Task.Delay(100);
             var path = movement.MapGet();
-            var scriptmapper = Path.Combine(Environment.CurrentDirectory, Options.Modifier.ScriptMapperExe);
+            var scriptmapper = Path.Combine(Environment.CurrentDirectory, Options.ScriptMapperExe);
             if (File.Exists(path) && File.Exists(scriptmapper))
             {
                 try
@@ -76,7 +76,7 @@ namespace ChroMapper_CameraMovement
                     return;
                 }
                 bool err = false;
-                var logfile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Modifier.ScriptMapperLog).Replace("/", "\\");
+                var logfile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.ScriptMapperLog).Replace("/", "\\");
                 if (File.Exists(logfile))
                 {
                     using (StreamReader results = File.OpenText(logfile))

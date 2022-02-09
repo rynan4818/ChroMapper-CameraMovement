@@ -54,24 +54,24 @@ namespace ChroMapper_CameraMovement.UserInterface
             imageMain.color = new Color(0.24f, 0.24f, 0.24f);
 
             AddLabel(_cameraMovementMainMenu.transform, "CameraMovement", "CameraMovement", new Vector2(0, -15));
-            AddCheckbox(_cameraMovementMainMenu.transform, "Movement Enable", "Movement Enable", new Vector2(0, -40), Options.Modifier.Movement, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Movement Enable", "Movement Enable", new Vector2(0, -40), Options.Movement, (check) =>
             {
-                Options.Modifier.Movement = check;
+                Options.Movement = check;
                 _plugin.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.Modifier.UIhidden, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.UIhidden, (check) =>
             {
-                Options.Modifier.UIhidden = check;
+                Options.UIhidden = check;
                 _plugin.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.Modifier.TurnToHead, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.TurnToHead, (check) =>
             {
-                Options.Modifier.TurnToHead = check;
+                Options.TurnToHead = check;
                 _plugin.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Avatar", "Avatar", new Vector2(0, -85), Options.Modifier.Avatar, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Avatar", "Avatar", new Vector2(0, -85), Options.Avatar, (check) =>
             {
-                Options.Modifier.Avatar = check;
+                Options.Avatar = check;
                 _plugin.Reload();
             });
             _cameraPosRot = AddTextInput(_cameraMovementMainMenu.transform, "Cam Pos Rot", "Cam Pos Rot", new Vector2(0, -105), "", (value) =>
@@ -103,50 +103,59 @@ namespace ChroMapper_CameraMovement.UserInterface
             };
 
             //Setting Menu
-            AttachTransform(_cameraMovementSettingMenu, 200, 190, 1, 1, -50, -120, 1, 1);
+            AttachTransform(_cameraMovementSettingMenu, 200, 210, 1, 1, -50, -120, 1, 1);
 
             Image imageSetting = _cameraMovementSettingMenu.AddComponent<Image>();
             imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
             imageSetting.type = Image.Type.Sliced;
             imageSetting.color = new Color(0.24f, 0.24f, 0.24f);
 
-            AddLabel(_cameraMovementSettingMenu.transform, "CameraMovement More Settings", "CameraMovement More Settings", new Vector2(0, -15));
-            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight", new Vector2(0, -40), Options.Modifier.AvatarHeadHight.ToString(), (value) =>
+            AddLabel(_cameraMovementSettingMenu.transform, "More Settings", "More Settings", new Vector2(0, -15));
+            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight", new Vector2(0, -40), Options.AvatarHeadHight.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.Modifier.AvatarHeadHight = res;
+                    Options.AvatarHeadHight = res;
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Head Size", "Head Size", new Vector2(0, -60), Options.Modifier.AvatarHeadSize.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Head Size", "Head Size", new Vector2(0, -60), Options.AvatarHeadSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.Modifier.AvatarHeadSize = res;
+                    Options.AvatarHeadSize = res;
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -80), Options.Modifier.AvatarArmSize.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -80), Options.AvatarArmSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.Modifier.AvatarArmSize = res;
+                    Options.AvatarArmSize = res;
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -100), Options.Modifier.ScriptFileName, (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Width", "Bookmark Width", new Vector2(0, -100), Options.BookMarkWidth.ToString(), (value) =>
             {
-                Options.Modifier.ScriptFileName = value.Trim();
+                float res;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    Options.BookMarkWidth = res;
+                    _plugin.Reload();
+                }
             });
-            AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -130), () =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -120), Options.ScriptFileName, (value) =>
+            {
+                Options.ScriptFileName = value.Trim();
+            });
+            AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -150), () =>
             {
                 _plugin.SettingSave();
             });
-            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -160), () =>
+            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -180), () =>
             {
                 _cameraMovementSettingMenu.SetActive(false);
             });

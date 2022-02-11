@@ -18,50 +18,61 @@ namespace ChroMapper_CameraMovement
         public static AudioTimeSyncController atsc;
         public static AutoSaveController autoSave;
         public static BookmarkManager bookmarkManager;
+        public static SpectrogramSideSwapper spectrogramSideSwapper;
+        public static EventsContainer eventContainer;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
         public static GameObject cm_Grid;
         public static GameObject cm_measureGrid4_1;
         public static GameObject cm_measureGrid1;
-        public static GameObject cm_base;
+        public static GameObject cm_NoteFrontBase;
+        public static GameObject cm_NoteBackBase;
+        public static GameObject cm_EventFrontBase;
+        public static GameObject cm_EventBackBase;
         public static GameObject cm_baseTransparent;
+        public static GameObject cm_eventLabel;
+        public static GameObject cm_BPMchangeFrontBase;
+        public static GameObject cm_BPMchangeBackBase;
+        public static GameObject cm_BPMChangeLable;
+        public static GameObject cm_MeasureLinesCanvas;
         public static GameObject avatarHead;
         public static GameObject avatarArm;
         public static GameObject avatarBody;
         public static GameObject avatarLeg;
         public static GameObject avatarHair;
 
-        protected bool dataLoaded = false;
-        protected CameraData data = new CameraData();
-        protected Vector3 StartPos = Vector3.zero;
-        protected Vector3 EndPos = Vector3.zero;
-        protected Vector3 StartRot = Vector3.zero;
-        protected Vector3 EndRot = Vector3.zero;
-        protected Vector3 StartHeadOffset = Vector3.zero;
-        protected Vector3 EndHeadOffset = Vector3.zero;
-        protected float StartFOV = 0;
-        protected float EndFOV = 0;
-        protected bool easeTransition = true;
-        protected float movePerc;
-        protected int eventID;
-        protected float movementStartTime, movementEndTime, movementNextStartTime;
-        protected DateTime movementStartDateTime, movementEndDateTime, movementDelayEndDateTime;
-        protected bool _reload = false;
-        protected DateTime _pauseTime;
-        protected bool turnToHead;
-        protected bool turnToHeadHorizontal;
-        protected float beforeSeconds;
-        protected float gridXBaseAlpha = 0.05f;
-        protected float gridXGridAlpha = 0.5f;
-        protected float interfaceOpacity = 0.2f;
-        protected float gridGridAlpha = 0.5f;
-        protected Color measureGridColor4_1;
-        protected Color measureGridColor1;
-        protected Color baseColor;
-        protected Color baseTransparentColor;
-        protected Vector3 beforePositon = Vector3.zero;
-        protected Quaternion beforeRotation = Quaternion.Euler(0,0,0);
+        public bool dataLoaded = false;
+        public CameraData data = new CameraData();
+        public Vector3 StartPos = Vector3.zero;
+        public Vector3 EndPos = Vector3.zero;
+        public Vector3 StartRot = Vector3.zero;
+        public Vector3 EndRot = Vector3.zero;
+        public Vector3 StartHeadOffset = Vector3.zero;
+        public Vector3 EndHeadOffset = Vector3.zero;
+        public float StartFOV = 0;
+        public float EndFOV = 0;
+        public bool easeTransition = true;
+        public float movePerc;
+        public int eventID;
+        public float movementStartTime, movementEndTime, movementNextStartTime;
+        public DateTime movementStartDateTime, movementEndDateTime, movementDelayEndDateTime;
+        public bool _reload = false;
+        public DateTime _pauseTime;
+        public bool turnToHead;
+        public bool turnToHeadHorizontal;
+        public float beforeSeconds;
+        public float gridXBaseAlpha = 0.05f;
+        public float gridXGridAlpha = 0.5f;
+        public float interfaceOpacity = 0.2f;
+        public float gridGridAlpha = 0.5f;
+        public Color measureGridColor4_1;
+        public Color measureGridColor1;
+        public Color baseTransparentColor;
+        public Vector3 beforePositon = Vector3.zero;
+        public Quaternion beforeRotation = Quaternion.Euler(0,0,0);
+        public bool waveFormIsNoteSide;
+        public EventsContainer.PropMode profMode;
 
         public void UI_set(UI ui)
         {
@@ -219,7 +230,7 @@ namespace ChroMapper_CameraMovement
         public void Reload()
         {
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
-            avatarHead.transform.position = new Vector3(0, Options.AvatarHeadHight, 0);
+            avatarHead.transform.position = new Vector3(0, Options.AvatarHeadHight + Options.CameraYoffset, 0 + Options.CameraZoffset);
             avatarHead.transform.localScale = new Vector3(Options.AvatarHeadSize, Options.AvatarHeadSize, Options.AvatarHeadSize);
             //首の高さ 1.43-0.25÷2=1.305m
             //胴体の中心からの高さは0.3m→1.305m÷0.3m=4.35
@@ -228,23 +239,23 @@ namespace ChroMapper_CameraMovement
             var body_size_x = body_size_y / 1.5f;
             //胴体の中心1.005は首の高さ1.305m-胴体の中心からの高さ0.3m=1.005
             var body_pos_y = Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f) - body_size_y;
-            avatarBody.transform.position = new Vector3(0, body_pos_y, 0);
+            avatarBody.transform.position = new Vector3(0, body_pos_y + Options.CameraYoffset, 0 + Options.CameraZoffset);
             avatarBody.transform.localScale = new Vector3(body_size_x, body_size_y, body_size_x * 0.8f);
             //腕の中心高さ1.25mは首の高さ1.305mの 1.305m÷1.25m=1.044
             var arm_pos_y = (Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f)) / 1.044f;
             //腕の大きさ0.06mは腕の長さ1.25m→1.25÷0.06=20.83
             var arm_size_yz = Options.AvatarArmSize / 20.83f;
-            avatarArm.transform.position = new Vector3(0, arm_pos_y, 0);
+            avatarArm.transform.position = new Vector3(0, arm_pos_y + Options.CameraYoffset, 0 + Options.CameraZoffset);
             avatarArm.transform.localScale = new Vector3(Options.AvatarArmSize, arm_size_yz, arm_size_yz);
             //足の高さは腕の中心から腕のサイズを引いたもの
             var leg_size_y = arm_pos_y - (arm_size_yz / 2.0f);
             var leg_pos_y = leg_size_y / 2.0f;
             var leg_size_xz = leg_size_y / 12f;
-            avatarLeg.transform.position = new Vector3(0, leg_pos_y, 0);
+            avatarLeg.transform.position = new Vector3(0, leg_pos_y + Options.CameraYoffset, 0 + Options.CameraZoffset);
             avatarLeg.transform.localScale = new Vector3(leg_size_xz, leg_size_y, leg_size_xz);
             //おさげ
             avatarHair.transform.localScale = new Vector3(Options.AvatarHeadSize / 1.4f, Options.AvatarHeadSize * 2.0f, Options.AvatarHeadSize / 17f);
-            avatarHair.transform.position = new Vector3(0, Options.AvatarHeadHight - Options.AvatarHeadSize, Options.AvatarHeadSize / -2.0f);
+            avatarHair.transform.position = new Vector3(0, Options.AvatarHeadHight - Options.AvatarHeadSize + Options.CameraYoffset, Options.AvatarHeadSize / -2.0f + Options.CameraZoffset);
             if (Options.Avatar)
             {
                 avatarHead.gameObject.SetActive(true);
@@ -271,12 +282,34 @@ namespace ChroMapper_CameraMovement
             {
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
-                cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0); //Gridのシェーダーを消しても床が消えない、なんでー(後回し)
+                cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
                 cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0,0,0,0));
                 cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
-                cm_base.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
                 cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", 0);
+                cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = false;
+                waveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
+                spectrogramSideSwapper.IsNoteSide = true;
+                spectrogramSideSwapper.SwapSides();
+                if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
+                {
+                    cm_NoteFrontBase.SetActive(false);
+                    cm_NoteBackBase.SetActive(false);
+                }
+                if (Settings.Instance.Load_Events)
+                {
+                    cm_EventFrontBase.SetActive(false);
+                    cm_EventBackBase.SetActive(false);
+                    cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = false;
+                    profMode = eventContainer.PropagationEditing;
+                    eventContainer.PropagationEditing = EventsContainer.PropMode.Prop;
+                }
+                if (Settings.Instance.Load_Others)
+                {
+                    cm_BPMchangeFrontBase.SetActive(false);
+                    cm_BPMchangeBackBase.SetActive(false);
+                    cm_BPMChangeLable.gameObject.GetComponent<Canvas>().enabled = false;
+                }
             }
             else
             {
@@ -285,31 +318,71 @@ namespace ChroMapper_CameraMovement
                 cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", gridGridAlpha);
                 cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor4_1);
                 cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor1);
-                cm_base.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseColor);
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseTransparentColor);
                 cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", interfaceOpacity);
+                cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = true;
+                spectrogramSideSwapper.IsNoteSide = !waveFormIsNoteSide;
+                spectrogramSideSwapper.SwapSides();
+                if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
+                {
+                    cm_NoteFrontBase.SetActive(true);
+                    cm_NoteBackBase.SetActive(true);
+                }
+                if (Settings.Instance.Load_Events)
+                {
+                    cm_EventFrontBase.SetActive(true);
+                    cm_EventBackBase.SetActive(true);
+                    cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = true;
+                    eventContainer.PropagationEditing = profMode;
+                }
+                if (Settings.Instance.Load_Others)
+                {
+                    cm_BPMchangeFrontBase.SetActive(true);
+                    cm_BPMchangeBackBase.SetActive(true);
+                    cm_BPMChangeLable.gameObject.GetComponent<Canvas>().enabled = true;
+                }
             }
         }
         private IEnumerator Start()
         {
             atsc = FindObjectOfType<AudioTimeSyncController>();
             autoSave = FindObjectOfType<AutoSaveController>();
+            spectrogramSideSwapper = FindObjectOfType<SpectrogramSideSwapper>();
+
             cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
-            cm_GridX = GameObject.Find("Grid X");
-            cm_Grid = GameObject.Find("Grid");
-            cm_interface = GameObject.Find("Interface");
             cm_measureGrid4_1 = GameObject.Find("1/4th Measure Grid");
             cm_measureGrid1 = GameObject.Find("One Measure Grid");
-            cm_base = GameObject.Find("Base");
+            cm_MeasureLinesCanvas = GameObject.Find("Measure Lines Canvas");
+            cm_interface = GameObject.Find("Interface");
+            cm_GridX = GameObject.Find("Grid X");
+            cm_Grid = GameObject.Find("Grid");
             cm_baseTransparent = GameObject.Find("Base Transparent");
+
+            measureGridColor4_1 = cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
+            measureGridColor1 = cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
+            baseTransparentColor = cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
+            interfaceOpacity = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_OPACITY");
             gridXBaseAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_BaseAlpha");
             gridXGridAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
             gridGridAlpha = cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
-            measureGridColor4_1 = cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
-            measureGridColor1 = cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
-            baseColor = cm_base.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
-            baseTransparentColor = cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
-            interfaceOpacity = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_OPACITY");
+            if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
+            {
+                cm_NoteFrontBase = GameObject.Find("Note Grid Front Scaling Offset/Base");
+                cm_NoteBackBase = GameObject.Find("Note Grid Back Scaling Offset/Base");
+            }
+            if (Settings.Instance.Load_Events)
+            {
+                eventContainer = FindObjectOfType<EventsContainer>();
+                cm_EventFrontBase = GameObject.Find("Event Grid Front Scaling Offset/Base");
+                cm_EventBackBase = GameObject.Find("Event Grid Back Scaling Offset/Base");
+                cm_eventLabel = GameObject.Find("Event Label");
+            }
+            if (Settings.Instance.Load_Others)
+            {
+                cm_BPMchangeFrontBase = GameObject.Find("BPM Changes Grid Front Scaling Offset/Base");
+                cm_BPMchangeBackBase = GameObject.Find("BPM Changes Grid Back Scaling Offset/Base");
+                cm_BPMChangeLable = GameObject.Find("BPM Change Label/");
+            }
             avatarHead = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             avatarArm = GameObject.CreatePrimitive(PrimitiveType.Cube);
             avatarLeg = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -344,6 +417,8 @@ namespace ChroMapper_CameraMovement
 
                 Vector3 cameraPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
                 Vector3 cameraRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
+                cameraPos.y += Options.CameraYoffset;
+                cameraPos.z += Options.CameraZoffset;
                 if (turnToHead)
                 {
                     Vector3 turnToTarget = new Vector3(0, Options.AvatarHeadHight, 0);  //アバターの頭の位置

@@ -18,6 +18,8 @@ namespace ChroMapper_CameraMovement
         public string scriptMapperExe = "scriptmapper.exe";
         public string scriptMapperLog = "log_latest.txt";
         public float bookmarkWidth = 10f;
+        public float cameraYoffset = -1.5f;
+        public float cameraZoffset = -0.5f;
 
         public static void SettingLoad(string setting_file)
         {
@@ -46,6 +48,8 @@ namespace ChroMapper_CameraMovement
             Options.ScriptMapperExe = data.scriptMapperExe;
             Options.ScriptMapperLog = data.scriptMapperLog;
             Options.BookMarkWidth = data.bookmarkWidth;
+            Options.CameraYoffset = data.cameraYoffset;
+            Options.CameraZoffset = data.cameraZoffset;
         }
         public void SettingSave(string setting_file)
         {
@@ -60,6 +64,8 @@ namespace ChroMapper_CameraMovement
             this.scriptMapperExe = Options.ScriptMapperExe;
             this.scriptMapperLog = Options.ScriptMapperLog;
             this.bookmarkWidth = Options.BookMarkWidth;
+            this.cameraYoffset = Options.CameraYoffset;
+            this.cameraZoffset = Options.CameraZoffset;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

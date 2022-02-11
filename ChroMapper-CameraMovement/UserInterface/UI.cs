@@ -19,7 +19,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public void CameraPosRotUpdate(Transform transform)
         {
-            _cameraPosRot.InputField.text = $"px:{transform.position.x} py:{transform.position.y} pz:{transform.position.z} rx:{transform.eulerAngles.x} ry:{transform.eulerAngles.y} rz:{transform.eulerAngles.z}";
+            _cameraPosRot.InputField.text = $"px:{transform.position.x} py:{transform.position.y - Options.CameraYoffset} pz:{transform.position.z - Options.CameraZoffset} rx:{transform.eulerAngles.x} ry:{transform.eulerAngles.y} rz:{transform.eulerAngles.z}";
         }
 
         public UI(Plugin plugin)
@@ -46,7 +46,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraMovementSettingMenu.transform.parent = parent.transform;
 
             //Main Menu
-            AttachTransform(_cameraMovementMainMenu, 170, 240, 1, 1, -50, -30, 1, 1);
+            AttachTransform(_cameraMovementMainMenu, 170, 245, 1, 1, -50, -30, 1, 1);
 
             Image imageMain = _cameraMovementMainMenu.AddComponent<Image>();
             imageMain.sprite = PersistentUI.Instance.Sprites.Background;
@@ -79,19 +79,19 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
             CameraPosRotUpdate(cm_MapEditorCamera.transform);
-            AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -125), () =>
+            AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -135), () =>
             {
                 _cameraMovementSettingMenu.SetActive(true);
             });
-            AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", new Vector2(0, -155), () =>
+            AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", new Vector2(0, -165), () =>
             {
                 _plugin.Reload();
             });
-            AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -185), () =>
+            AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -195), () =>
             {
                 _plugin.SettingSave();
             });
-            AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(0, -215), () =>
+            AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(0, -225), () =>
             {
                 _plugin.ScriptMapperRun();
             });
@@ -103,7 +103,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             };
 
             //Setting Menu
-            AttachTransform(_cameraMovementSettingMenu, 200, 210, 1, 1, -50, -120, 1, 1);
+            AttachTransform(_cameraMovementSettingMenu, 200, 240, 1, 1, -50, -120, 1, 1);
 
             Image imageSetting = _cameraMovementSettingMenu.AddComponent<Image>();
             imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
@@ -147,15 +147,33 @@ namespace ChroMapper_CameraMovement.UserInterface
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -120), Options.ScriptFileName, (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Offset Y", "Offset Y", new Vector2(0, -120), Options.CameraYoffset.ToString(), (value) =>
+            {
+                float res;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    Options.CameraYoffset = res;
+                    _plugin.Reload();
+                }
+            });
+            AddTextInput(_cameraMovementSettingMenu.transform, "Offset Z", "Offset Z", new Vector2(0, -140), Options.CameraZoffset.ToString(), (value) =>
+            {
+                float res;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    Options.CameraZoffset = res;
+                    _plugin.Reload();
+                }
+            });
+            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -160), Options.ScriptFileName, (value) =>
             {
                 Options.ScriptFileName = value.Trim();
             });
-            AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -150), () =>
+            AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -190), () =>
             {
                 _plugin.SettingSave();
             });
-            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -180), () =>
+            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -220), () =>
             {
                 _cameraMovementSettingMenu.SetActive(false);
             });

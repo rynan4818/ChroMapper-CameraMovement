@@ -19,5 +19,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public static string ScriptMapperExe { set; get; }
         public static string ScriptMapperLog { set; get; }
         public static float BookMarkWidth { set; get; }
+        public static float CameraYoffset { set; get; }
+        public static float CameraZoffset { set; get; }
     }
 }

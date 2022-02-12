@@ -365,6 +365,7 @@ namespace ChroMapper_CameraMovement
             gridXBaseAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_BaseAlpha");
             gridXGridAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
             gridGridAlpha = cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
+            waveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
             if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
             {
                 cm_NoteFrontBase = GameObject.Find("Note Grid Front Scaling Offset/Base");

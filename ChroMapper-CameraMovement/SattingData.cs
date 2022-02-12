@@ -18,8 +18,8 @@ namespace ChroMapper_CameraMovement
         public string scriptMapperExe = "scriptmapper.exe";
         public string scriptMapperLog = "log_latest.txt";
         public float bookmarkWidth = 10f;
-        public float cameraYoffset = -1.5f;
-        public float cameraZoffset = -0.5f;
+        public float cameraYoffset = -0.5f;
+        public float cameraZoffset = -1.5f;
 
         public static void SettingLoad(string setting_file)
         {

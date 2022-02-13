@@ -29,9 +29,9 @@ namespace ChroMapper_CameraMovement
             _harmony.PatchAll(Assembly.GetExecutingAssembly());
             UnityEngine.Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;
-            _ui = new UI(this);
             setting_file = (Application.persistentDataPath + "/cameramovement.json").Replace("/","\\");
             SattingData.SettingLoad(setting_file);
+            _ui = new UI(this);
         }
 
         [Exit]
@@ -61,6 +61,19 @@ namespace ChroMapper_CameraMovement
         {
             movement.UiHidden();
         }
+        public void BookmarkChange(int no,string name)
+        {
+            movement.BookmarkChange(no);
+        }
+        public void BookmarkDelete(int no)
+        {
+            movement.BookmarkDelete(no);
+        }
+        public void BookmarkNew(string name)
+        {
+            movement.BookmarkNew(name);
+        }
+
         public async void ScriptMapperRun()
         {
             if (scriptMapperAlive)

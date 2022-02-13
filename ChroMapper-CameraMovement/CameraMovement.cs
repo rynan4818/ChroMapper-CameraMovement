@@ -100,6 +100,8 @@ namespace ChroMapper_CameraMovement
         public Vector3 customEventsGridChildLocalOffset;
         public Vector3 spectrogramGridChildLocalOffset;
         public Vector3 waveformGridChildLocalOffset;
+        public List<BookmarkContainer> bookmarkContainers;
+        public bool init = false;
 
         public void UI_set(UI ui)
         {
@@ -223,26 +225,23 @@ namespace ChroMapper_CameraMovement
                 return false;
             }
         }
-        public List<BookmarkContainer> BookmarkContainerGet()
+        public void BookmarkContainerGet()
         {
             Type type = bookmarkManager.GetType();
             FieldInfo field = type.GetField("bookmarkContainers", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-            List<BookmarkContainer> bookmarkContainers = (List<BookmarkContainer>)(field.GetValue(bookmarkManager));
-            return bookmarkContainers;
+            bookmarkContainers = (List<BookmarkContainer>)(field.GetValue(bookmarkManager));
         }
         public void BookmarkTrackSet()
         {
             if (Options.BookmarkLines)
-                bookmarkLinesController.RefreshBookmarkLines(BookmarkContainerGet());
+                bookmarkLinesController.RefreshBookmarkLines(bookmarkContainers);
         }
         public void BookmarkWidthChange()
         {
-            var bookmarkContainers = BookmarkContainerGet();
-            bookmarkContainers = bookmarkContainers.ConvertAll(container =>
+            bookmarkContainers.ForEach(container =>
             {
                 var rectTransform = (RectTransform)container.transform;
                 rectTransform.sizeDelta = new Vector2(Options.BookMarkWidth, 20f);
-                return container;
             });
         }
         public string ScriptGet()
@@ -270,6 +269,68 @@ namespace ChroMapper_CameraMovement
                 beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
             Reload();
         }
+        public void BookMarkChangeUpdate()
+        {
+            BookmarkContainerGet();
+            BookmarkWidthChange();
+            BookmarkTrackSet();
+            BookMarkUpdate();
+        }
+
+        public void BookMarkUpdate()
+        {
+            if (init)
+            {
+                if (bookmarkContainers.Count > 0)
+                {
+                    var lastBookmark = bookmarkContainers.FindLast(x => x.Data.Time <= atsc.CurrentBeat);
+                    if (bookmarkContainers.IndexOf(lastBookmark) == -1)
+                    {
+                        this._ui.CurrentBookmarkUpdate("", 0);
+                    }
+                    else
+                    {
+                        this._ui.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1);
+                    }
+                }
+                else
+                {
+                    this._ui.CurrentBookmarkUpdate("", 0);
+                }
+            }
+        }
+        public void BookmarkChange(int bookmarkNo)
+        {
+            var bookmarkContainer = bookmarkContainers[bookmarkNo - 1];
+            PersistentUI.Instance.ShowInputBox("Mapper", "bookmark.update.dialog", (res) =>
+            {
+                Type type = bookmarkContainer.GetType();
+                MethodInfo method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+                method.Invoke(bookmarkContainer, new object[] { res });
+            }
+            , null, bookmarkContainer.Data.Name);
+        }
+        public void BookmarkDelete(int bookmarkNo)
+        {
+            PersistentUI.Instance.ShowDialogBox("Mapper", "bookmark.delete", (res) =>
+            {
+                if (res == 0)
+                {
+                    var bookmarkContainer = bookmarkContainers[bookmarkNo - 1];
+                    Type type = bookmarkContainer.GetType();
+                    MethodInfo method = type.GetMethod("HandleDeleteBookmark", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+                    method.Invoke(bookmarkContainer, new object[] { res });
+                }
+            }
+            , PersistentUI.DialogBoxPresetType.YesNo);
+        }
+        public void BookmarkNew(string bookmarkName)
+        {
+            Type type = bookmarkManager.GetType();
+            MethodInfo method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+            method.Invoke(bookmarkManager, new object[1] { bookmarkName });
+        }
+
         public void Reload()
         {
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
@@ -539,10 +600,12 @@ namespace ChroMapper_CameraMovement
             sub_camera.backgroundColor = new Color(0, 0, 0, 255);
 
             bookmarkManager = FindObjectOfType<BookmarkManager>();
-            bookmarkManager.BookmarksUpdated += BookmarkWidthChange;
-            bookmarkManager.BookmarksUpdated += BookmarkTrackSet;
-            BookmarkContainerPatch.OnNewBookmarkName += BookmarkTrackSet;
+
+            bookmarkManager.BookmarksUpdated += BookMarkChangeUpdate;
+            BookmarkContainerPatch.OnNewBookmarkName += BookMarkChangeUpdate;
             SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
+            init = true;
+            BookMarkChangeUpdate();
             this.Reload();
         }
         private void Update()
@@ -557,6 +620,7 @@ namespace ChroMapper_CameraMovement
                     beforeSeconds = 0;
                 }
                 beforeSeconds = atsc.CurrentSeconds;
+                BookMarkUpdate();
 
                 while (movementNextStartTime <= atsc.CurrentSeconds)
                     UpdatePosAndRot();
@@ -604,9 +668,8 @@ namespace ChroMapper_CameraMovement
 
         private void OnDisable()
         {
-            bookmarkManager.BookmarksUpdated -= BookmarkWidthChange;
-            bookmarkManager.BookmarksUpdated -= BookmarkTrackSet;
-            BookmarkContainerPatch.OnNewBookmarkName -= BookmarkTrackSet;
+            bookmarkManager.BookmarksUpdated -= BookMarkChangeUpdate;
+            BookmarkContainerPatch.OnNewBookmarkName -= BookMarkChangeUpdate;
             SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
         }
 

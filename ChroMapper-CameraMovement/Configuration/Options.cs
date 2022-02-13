@@ -23,5 +23,12 @@
         public static float SubCameraRectY { set; get; }
         public static float SubCameraRectW { set; get; }
         public static float SubCameraRectH { set; get; }
+        public static bool BookmarkEdit { set; get; }
+        public static string QuickCommand1 { set; get; }
+        public static string QuickCommand2 { set; get; }
+        public static string QuickCommand3 { set; get; }
+        public static string QuickCommand4 { set; get; }
+        public static string QuickCommand5 { set; get; }
+        public static string QuickCommand6 { set; get; }
     }
 }

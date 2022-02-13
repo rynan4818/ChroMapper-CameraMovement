@@ -28,6 +28,13 @@ namespace ChroMapper_CameraMovement
         public float subCameraRectY = 0.6f;
         public float subCameraRectW = 0.25f;
         public float subCameraRectH = 0.25f;
+        public bool bookmarkEdit = true;
+        public string quickCommand1 = "center";
+        public string quickCommand2 = "top";
+        public string quickCommand3 = "side";
+        public string quickCommand4 = "diagf";
+        public string quickCommand5 = "diagb";
+        public string quickCommand6 = "random";
 
         public static void SettingLoad(string setting_file)
         {
@@ -66,6 +73,13 @@ namespace ChroMapper_CameraMovement
             Options.SubCameraRectY = data.subCameraRectY;
             Options.SubCameraRectW = data.subCameraRectW;
             Options.SubCameraRectH = data.subCameraRectH;
+            Options.BookmarkEdit = data.bookmarkEdit;
+            Options.QuickCommand1 = data.quickCommand1;
+            Options.QuickCommand2 = data.quickCommand2;
+            Options.QuickCommand3 = data.quickCommand3;
+            Options.QuickCommand4 = data.quickCommand4;
+            Options.QuickCommand5 = data.quickCommand5;
+            Options.QuickCommand6 = data.quickCommand6;
         }
         public void SettingSave(string setting_file)
         {
@@ -90,6 +104,13 @@ namespace ChroMapper_CameraMovement
             this.subCameraRectY = Options.SubCameraRectY;
             this.subCameraRectW = Options.SubCameraRectW;
             this.subCameraRectH = Options.SubCameraRectH;
+            this.bookmarkEdit = Options.BookmarkEdit;
+            this.quickCommand1 = Options.QuickCommand1;
+            this.quickCommand2 = Options.QuickCommand2;
+            this.quickCommand3 = Options.QuickCommand3;
+            this.quickCommand4 = Options.QuickCommand4;
+            this.quickCommand5 = Options.QuickCommand5;
+            this.quickCommand6 = Options.QuickCommand6;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

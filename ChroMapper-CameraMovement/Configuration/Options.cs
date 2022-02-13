@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ChroMapper_CameraMovement.Configuration
+﻿namespace ChroMapper_CameraMovement.Configuration
 {
     static class Options
     {
@@ -21,5 +15,13 @@ namespace ChroMapper_CameraMovement.Configuration
         public static float BookMarkWidth { set; get; }
         public static float CameraYoffset { set; get; }
         public static float CameraZoffset { set; get; }
+        public static bool BookmarkLines { set; get; }
+        public static bool BookmarkLinesShowOnTop { set; get; }
+        public static float BookmarkInsertOffset { set; get; }
+        public static bool SubCamera { set; get; }
+        public static float SubCameraRectX { set; get; }
+        public static float SubCameraRectY { set; get; }
+        public static float SubCameraRectW { set; get; }
+        public static float SubCameraRectH { set; get; }
     }
 }

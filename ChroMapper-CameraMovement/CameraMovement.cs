@@ -4,8 +4,11 @@ using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using UnityEngine;
+using TMPro;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.UserInterface;
+using ChroMapper_CameraMovement.Component;
+using ChroMapper_CameraMovement.HarmonyPatches;
 using Newtonsoft.Json;
 using System.IO;
 using System.Collections;
@@ -20,6 +23,7 @@ namespace ChroMapper_CameraMovement
         public static BookmarkManager bookmarkManager;
         public static SpectrogramSideSwapper spectrogramSideSwapper;
         public static EventsContainer eventContainer;
+        public static BookmarkLinesController bookmarkLinesController;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
@@ -41,6 +45,8 @@ namespace ChroMapper_CameraMovement
         public static GameObject avatarBody;
         public static GameObject avatarLeg;
         public static GameObject avatarHair;
+        public static GameObject bookmarkLines;
+        public static Camera sub_camera;
 
         public bool dataLoaded = false;
         public CameraData data = new CameraData();
@@ -72,7 +78,28 @@ namespace ChroMapper_CameraMovement
         public Vector3 beforePositon = Vector3.zero;
         public Quaternion beforeRotation = Quaternion.Euler(0,0,0);
         public bool waveFormIsNoteSide;
+        public bool beforeWaveFormIsNoteSide;
         public EventsContainer.PropMode profMode;
+        public GridChild eventGridChild;
+        public GridChild eventLabelChild;
+        public GridChild bpmChangesChild;
+        public GridChild customEventsChild;
+        public GridChild customEventsLabelsChild;
+        public GridChild eventsGridChild;
+        public GridChild bpmChangesGridChild;
+        public GridChild customEventsGridChild;
+        public GridChild spectrogramGridChild;
+        public GridChild waveformGridChild;
+        public Vector3 eventGridChildLocalOffset;
+        public Vector3 eventLabelChildLocalOffset;
+        public Vector3 bpmChangesChildLocalOffset;
+        public Vector3 customEventsChildLocalOffset;
+        public Vector3 customEventsLabelsChildLocalOffset;
+        public Vector3 eventsGridChildLocalOffset;
+        public Vector3 bpmChangesGridChildLocalOffset;
+        public Vector3 customEventsGridChildLocalOffset;
+        public Vector3 spectrogramGridChildLocalOffset;
+        public Vector3 waveformGridChildLocalOffset;
 
         public void UI_set(UI ui)
         {
@@ -196,11 +223,21 @@ namespace ChroMapper_CameraMovement
                 return false;
             }
         }
-        public void BookMarkWidthChange()
+        public List<BookmarkContainer> BookmarkContainerGet()
         {
             Type type = bookmarkManager.GetType();
             FieldInfo field = type.GetField("bookmarkContainers", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-            List<BookmarkContainer>  bookmarkContainers = (List<BookmarkContainer>)(field.GetValue(bookmarkManager));
+            List<BookmarkContainer> bookmarkContainers = (List<BookmarkContainer>)(field.GetValue(bookmarkManager));
+            return bookmarkContainers;
+        }
+        public void BookmarkTrackSet()
+        {
+            if (Options.BookmarkLines)
+                bookmarkLinesController.RefreshBookmarkLines(BookmarkContainerGet());
+        }
+        public void BookmarkWidthChange()
+        {
+            var bookmarkContainers = BookmarkContainerGet();
             bookmarkContainers = bookmarkContainers.ConvertAll(container =>
             {
                 var rectTransform = (RectTransform)container.transform;
@@ -226,6 +263,12 @@ namespace ChroMapper_CameraMovement
             FieldInfo field = type.GetField("savingThread", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
             Thread savingThread = (Thread)(field.GetValue(autoSave));
             return savingThread != null && savingThread.IsAlive;
+        }
+        public void UiHidden()
+        {
+            if (Options.UIhidden)
+                beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
+            Reload();
         }
         public void Reload()
         {
@@ -277,7 +320,19 @@ namespace ChroMapper_CameraMovement
             beforeSeconds = 0;
             _reload = true;
             LoadCameraData(ScriptGet());
-            BookMarkWidthChange();
+            BookmarkWidthChange();
+            BookmarkTrackSet();
+            bookmarkLines.SetActive(Options.BookmarkLines);
+            if (Options.BookmarkLines)
+            {
+                EventBpmOffset(Options.BookmarkInsertOffset);
+            }
+            else
+            {
+                EventBpmOffset(0);
+            }
+            sub_camera.gameObject.SetActive(!(Options.Movement || !Options.SubCamera));
+            sub_camera.rect = new Rect(Options.SubCameraRectX, Options.SubCameraRectY, Options.SubCameraRectW, Options.SubCameraRectH);
             if (Options.UIhidden)
             {
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
@@ -288,9 +343,9 @@ namespace ChroMapper_CameraMovement
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
                 cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", 0);
                 cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = false;
-                waveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
                 spectrogramSideSwapper.IsNoteSide = true;
                 spectrogramSideSwapper.SwapSides();
+                EventBpmOffset(200f);
                 if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
                 {
                     cm_NoteFrontBase.SetActive(false);
@@ -321,7 +376,7 @@ namespace ChroMapper_CameraMovement
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseTransparentColor);
                 cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", interfaceOpacity);
                 cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = true;
-                spectrogramSideSwapper.IsNoteSide = !waveFormIsNoteSide;
+                spectrogramSideSwapper.IsNoteSide = !beforeWaveFormIsNoteSide;
                 spectrogramSideSwapper.SwapSides();
                 if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
                 {
@@ -343,6 +398,40 @@ namespace ChroMapper_CameraMovement
                 }
             }
         }
+        public void EventBpmOffset(float offset)
+        {
+            eventGridChild.LocalOffset = new Vector3(eventGridChildLocalOffset.x + offset, eventGridChildLocalOffset.y, eventGridChildLocalOffset.z);
+            eventLabelChild.LocalOffset = new Vector3(eventLabelChildLocalOffset.x + offset, eventLabelChildLocalOffset.y, eventLabelChildLocalOffset.z);
+            bpmChangesChild.LocalOffset = new Vector3(bpmChangesChildLocalOffset.x + offset, bpmChangesChildLocalOffset.y, bpmChangesChildLocalOffset.z);
+            customEventsChild.LocalOffset = new Vector3(customEventsChildLocalOffset.x + offset, customEventsChildLocalOffset.y, customEventsChildLocalOffset.z);
+            customEventsLabelsChild.LocalOffset = new Vector3(customEventsLabelsChildLocalOffset.x + offset, customEventsLabelsChildLocalOffset.y, customEventsLabelsChildLocalOffset.z);
+            eventsGridChild.LocalOffset = new Vector3(eventsGridChildLocalOffset.x + offset, eventsGridChildLocalOffset.y, eventsGridChildLocalOffset.z);
+            bpmChangesGridChild.LocalOffset = new Vector3(bpmChangesGridChildLocalOffset.x + offset, bpmChangesGridChildLocalOffset.y, bpmChangesGridChildLocalOffset.z);
+            customEventsGridChild.LocalOffset = new Vector3(customEventsGridChildLocalOffset.x + offset, customEventsGridChildLocalOffset.y, customEventsGridChildLocalOffset.z);
+        }
+        public void WaveFormOffset()
+        {
+            float offset;
+            if (Options.BookmarkLines)
+            {
+                offset = Options.BookmarkInsertOffset;
+            }
+            else
+            {
+                offset = 0;
+            }
+            if (Options.UIhidden)
+            {
+                offset = 200f;
+            }
+                waveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
+            if (!waveFormIsNoteSide)
+            {
+                spectrogramGridChild.LocalOffset = new Vector3(spectrogramGridChildLocalOffset.x + offset, spectrogramGridChildLocalOffset.y, spectrogramGridChildLocalOffset.z);
+                waveformGridChild.LocalOffset = new Vector3(waveformGridChildLocalOffset.x + offset, waveformGridChildLocalOffset.y, waveformGridChildLocalOffset.z);
+            }
+        }
+
         private IEnumerator Start()
         {
             atsc = FindObjectOfType<AudioTimeSyncController>();
@@ -365,7 +454,6 @@ namespace ChroMapper_CameraMovement
             gridXBaseAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_BaseAlpha");
             gridXGridAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
             gridGridAlpha = cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
-            waveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
             if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
             {
                 cm_NoteFrontBase = GameObject.Find("Note Grid Front Scaling Offset/Base");
@@ -390,14 +478,76 @@ namespace ChroMapper_CameraMovement
             avatarBody = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             avatarHair = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 
+            //BookMarkTrack構築
+            var measureLines = GameObject.Find("Moveable Grid/Measure Lines");
+            bookmarkLines = Instantiate(measureLines);
+            var moveableGrid = GameObject.Find("Moveable Grid");
+            bookmarkLines.name = "Bookmark Lines";
+            bookmarkLines.transform.parent = moveableGrid.transform;
+            bookmarkLines.gameObject.GetComponent<GridChild>().Order = 1;
+            bookmarkLines.gameObject.GetComponent<GridChild>().LocalOffset = new Vector3(1.6f,0,0);
+            var bookmarkLinesCanvas = bookmarkLines.transform.Find("Measure Lines Canvas").gameObject;
+            bookmarkLinesCanvas.name = "Bookmark Lines Canvas";
+            Destroy(bookmarkLinesCanvas.gameObject.GetComponent<MeasureLinesRenderingOrderController>());
+            bookmarkLinesCanvas.gameObject.GetComponent<Track>().ObjectParentTransform = bookmarkLinesCanvas.gameObject.GetComponent<RectTransform>();
+            var bookmarkLinesRenderingOrderController = bookmarkLinesCanvas.AddComponent<BookmarkLinesRenderingOrderController>();
+            bookmarkLinesRenderingOrderController.effectingCanvas = bookmarkLinesCanvas.gameObject.GetComponent<Canvas>();
+            var bookmarkLine = bookmarkLinesCanvas.transform.Find("Measure Line").gameObject;
+            bookmarkLine.name = "Bookmark Line";
+            bookmarkLinesController = moveableGrid.AddComponent<BookmarkLinesController>();
+            bookmarkLinesController.bookmarkLinePrefab = bookmarkLine.gameObject.GetComponent<TextMeshProUGUI>();
+            bookmarkLinesController.bookmarkLinePrefab.text = "";
+            bookmarkLinesController.atsc = atsc;
+            bookmarkLinesController.parent = bookmarkLinesCanvas.gameObject.GetComponent<RectTransform>();
+            bookmarkLinesController.frontNoteGridScaling = GameObject.Find("Rotating/Note Grid/Note Grid Front Scaling Offset").transform;
+            var audioTimeSyncControllerObject = GameObject.Find("Editor/Audio Time Sync Controller");
+            var audioTimeSyncController = audioTimeSyncControllerObject.gameObject.GetComponent<AudioTimeSyncController>();
+            Type type = audioTimeSyncController.GetType();
+            FieldInfo field = type.GetField("otherTracks", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+            Track[] otherTracks = (Track[])(field.GetValue(audioTimeSyncController));
+            Array.Resize(ref otherTracks, otherTracks.Length + 1);
+            otherTracks[otherTracks.Length - 1] = bookmarkLinesCanvas.gameObject.GetComponent<Track>();
+            field.SetValue(audioTimeSyncController, otherTracks);
+
             yield return new WaitForSeconds(0.5f); //Wait for time
+
+            eventGridChild = GameObject.Find("Rotating/Event Grid").GetComponent<GridChild>();
+            eventLabelChild = GameObject.Find("Rotating/Event Label").GetComponent<GridChild>();
+            bpmChangesChild = GameObject.Find("Rotating/BPM Changes Grid").GetComponent<GridChild>();
+            customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
+            customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
+            eventsGridChild = GameObject.Find("Moveable Grid/Events Grid").GetComponent<GridChild>();
+            bpmChangesGridChild = GameObject.Find("Moveable Grid/BPM Changes Grid").GetComponent<GridChild>();
+            customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
+            spectrogramGridChild = GameObject.Find("Rotating/Spectrogram Grid").GetComponent<GridChild>();
+            waveformGridChild = GameObject.Find("Moveable Grid/Waveform Chunks Grid").GetComponent<GridChild>();
+            eventGridChildLocalOffset = eventGridChild.LocalOffset;
+            eventLabelChildLocalOffset = eventLabelChild.LocalOffset;
+            bpmChangesChildLocalOffset = bpmChangesChild.LocalOffset;
+            customEventsChildLocalOffset = customEventsChild.LocalOffset; ;
+            customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
+            eventsGridChildLocalOffset = eventsGridChild.LocalOffset;
+            bpmChangesGridChildLocalOffset = bpmChangesGridChild.LocalOffset;
+            customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
+            spectrogramGridChildLocalOffset = spectrogramGridChild.LocalOffset;
+            waveformGridChildLocalOffset = waveformGridChild.LocalOffset;
+
+            beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
+
+            sub_camera = new GameObject("Sub Camera").AddComponent<Camera>();
+            sub_camera.clearFlags = CameraClearFlags.SolidColor;
+            sub_camera.backgroundColor = new Color(0, 0, 0, 255);
+
             bookmarkManager = FindObjectOfType<BookmarkManager>();
-            bookmarkManager.BookmarksUpdated += BookMarkWidthChange;
+            bookmarkManager.BookmarksUpdated += BookmarkWidthChange;
+            bookmarkManager.BookmarksUpdated += BookmarkTrackSet;
+            BookmarkContainerPatch.OnNewBookmarkName += BookmarkTrackSet;
+            SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
             this.Reload();
         }
         private void Update()
         {
-            if (dataLoaded && Options.Movement && (_reload || beforeSeconds != atsc.CurrentSeconds))
+            if (dataLoaded && (_reload || beforeSeconds != atsc.CurrentSeconds))
             {
                 _reload = false;
                 if (beforeSeconds > atsc.CurrentSeconds)
@@ -429,10 +579,18 @@ namespace ChroMapper_CameraMovement
                     if (turnToHeadHorizontal)
                         cameraRot = new Vector3(cameraRot.x, lookRotation.eulerAngles.y, cameraRot.z);
                     else
-                        cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, lookRotation);
+                    {
+                        if (Options.Movement)
+                            cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, lookRotation);
+                        sub_camera.transform.SetPositionAndRotation(cameraPos, lookRotation);
+                    }
                 }
                 if (!(turnToHead && turnToHeadHorizontal))
-                    cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
+                {
+                    if (Options.Movement)
+                        cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
+                    sub_camera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
+                }
 
                 Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
             }
@@ -446,7 +604,10 @@ namespace ChroMapper_CameraMovement
 
         private void OnDisable()
         {
-            bookmarkManager.BookmarksUpdated -= BookMarkWidthChange;
+            bookmarkManager.BookmarksUpdated -= BookmarkWidthChange;
+            bookmarkManager.BookmarksUpdated -= BookmarkTrackSet;
+            BookmarkContainerPatch.OnNewBookmarkName -= BookmarkTrackSet;
+            SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)

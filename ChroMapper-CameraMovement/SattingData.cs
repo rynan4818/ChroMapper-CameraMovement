@@ -20,6 +20,14 @@ namespace ChroMapper_CameraMovement
         public float bookmarkWidth = 10f;
         public float cameraYoffset = -0.5f;
         public float cameraZoffset = -1.5f;
+        public bool bookmarkLines = true;
+        public bool bookmarkLinesShowOnTop = false;
+        public float bookmarkInsertOffset = 12f;
+        public bool subCamera = true;
+        public float subCameraRectX = 0f;
+        public float subCameraRectY = 0.6f;
+        public float subCameraRectW = 0.25f;
+        public float subCameraRectH = 0.25f;
 
         public static void SettingLoad(string setting_file)
         {
@@ -50,6 +58,14 @@ namespace ChroMapper_CameraMovement
             Options.BookMarkWidth = data.bookmarkWidth;
             Options.CameraYoffset = data.cameraYoffset;
             Options.CameraZoffset = data.cameraZoffset;
+            Options.BookmarkLines = data.bookmarkLines;
+            Options.BookmarkLinesShowOnTop = data.bookmarkLinesShowOnTop;
+            Options.BookmarkInsertOffset = data.bookmarkInsertOffset;
+            Options.SubCamera = data.subCamera;
+            Options.SubCameraRectX = data.subCameraRectX;
+            Options.SubCameraRectY = data.subCameraRectY;
+            Options.SubCameraRectW = data.subCameraRectW;
+            Options.SubCameraRectH = data.subCameraRectH;
         }
         public void SettingSave(string setting_file)
         {
@@ -66,6 +82,14 @@ namespace ChroMapper_CameraMovement
             this.bookmarkWidth = Options.BookMarkWidth;
             this.cameraYoffset = Options.CameraYoffset;
             this.cameraZoffset = Options.CameraZoffset;
+            this.bookmarkLines = Options.BookmarkLines;
+            this.bookmarkLinesShowOnTop = Options.BookmarkLinesShowOnTop;
+            this.bookmarkInsertOffset = Options.BookmarkInsertOffset;
+            this.subCamera = Options.SubCamera;
+            this.subCameraRectX = Options.SubCameraRectX;
+            this.subCameraRectY = Options.SubCameraRectY;
+            this.subCameraRectW = Options.SubCameraRectW;
+            this.subCameraRectH = Options.SubCameraRectH;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

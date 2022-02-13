@@ -108,11 +108,19 @@
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.VRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraMovement.cs" />
+    <Compile Include="Component\BookmarkLinesController.cs" />
+    <Compile Include="Component\BookmarkLinesRenderingOrderController.cs" />
     <Compile Include="Configuration\MovementScriptJson.cs" />
     <Compile Include="Configuration\Options.cs" />
+    <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />
+    <Compile Include="HarmonyPatches\SpectrogramSideSwapperPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SattingData.cs" />
@@ -121,6 +129,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Icon.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "$(ChroMapperDir)\Plugins"</PostBuildEvent>

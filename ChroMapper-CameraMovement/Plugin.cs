@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using HarmonyLib;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Configuration;
 using System.IO;
 using System;
+using System.Reflection;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
@@ -17,10 +19,14 @@ namespace ChroMapper_CameraMovement
         private UI _ui;
         public bool scriptMapperAlive;
         public static string setting_file;
+        private static Harmony _harmony;
+        public const string HARMONY_ID = "com.github.rynan4818.ChroMapper-CameraMovement";
 
         [Init]
         private void Init()
         {
+            _harmony = new Harmony(HARMONY_ID);
+            _harmony.PatchAll(Assembly.GetExecutingAssembly());
             UnityEngine.Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;
             _ui = new UI(this);
@@ -31,6 +37,7 @@ namespace ChroMapper_CameraMovement
         [Exit]
         private void Exit()
         {
+            _harmony.UnpatchAll(HARMONY_ID);
             UnityEngine.Debug.Log("Camera Movement:Application has closed!");
         }
         private void SceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -49,6 +56,10 @@ namespace ChroMapper_CameraMovement
         public void Reload()
         {
             movement.Reload();
+        }
+        public void UiHidden()
+        {
+            movement.UiHidden();
         }
         public async void ScriptMapperRun()
         {

@@ -30,7 +30,7 @@ namespace ChroMapper_CameraMovement
             UnityEngine.Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;
             setting_file = (Application.persistentDataPath + "/cameramovement.json").Replace("/","\\");
-            SattingData.SettingLoad(setting_file);
+            SettingData.SettingLoad(setting_file);
             _ui = new UI(this);
         }
 
@@ -130,7 +130,7 @@ namespace ChroMapper_CameraMovement
         }
         public void SettingSave()
         {
-            var setting = new SattingData();
+            var setting = new SettingData();
             setting.SettingSave(setting_file);
         }
     }

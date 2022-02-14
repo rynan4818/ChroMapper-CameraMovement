@@ -28,6 +28,8 @@ namespace ChroMapper_CameraMovement
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
         public static GameObject cm_Grid;
+        public static GameObject cm_measureGrid16_1;
+        public static GameObject cm_measureGrid8_1;
         public static GameObject cm_measureGrid4_1;
         public static GameObject cm_measureGrid1;
         public static GameObject cm_NoteFrontBase;
@@ -47,6 +49,7 @@ namespace ChroMapper_CameraMovement
         public static GameObject avatarHair;
         public static GameObject bookmarkLines;
         public static Camera sub_camera;
+        public static GameObject avatarModel;
 
         public bool dataLoaded = false;
         public CameraData data = new CameraData();
@@ -72,6 +75,8 @@ namespace ChroMapper_CameraMovement
         public float gridXGridAlpha = 0.5f;
         public float interfaceOpacity = 0.2f;
         public float gridGridAlpha = 0.5f;
+        public Color measureGridColor16_1;
+        public Color measureGridColor8_1;
         public Color measureGridColor4_1;
         public Color measureGridColor1;
         public Color baseTransparentColor;
@@ -102,6 +107,8 @@ namespace ChroMapper_CameraMovement
         public Vector3 waveformGridChildLocalOffset;
         public List<BookmarkContainer> bookmarkContainers;
         public bool init = false;
+        public bool customEventsObject = false;
+        public string currentAvatarFile = "";
 
         public void UI_set(UI ui)
         {
@@ -333,6 +340,7 @@ namespace ChroMapper_CameraMovement
 
         public void Reload()
         {
+            StartCoroutine("CustomAvatarLoad");
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
             avatarHead.transform.position = new Vector3(0, Options.AvatarHeadHight + Options.CameraYoffset, 0 + Options.CameraZoffset);
             avatarHead.transform.localScale = new Vector3(Options.AvatarHeadSize, Options.AvatarHeadSize, Options.AvatarHeadSize);
@@ -360,7 +368,7 @@ namespace ChroMapper_CameraMovement
             //おさげ
             avatarHair.transform.localScale = new Vector3(Options.AvatarHeadSize / 1.4f, Options.AvatarHeadSize * 2.0f, Options.AvatarHeadSize / 17f);
             avatarHair.transform.position = new Vector3(0, Options.AvatarHeadHight - Options.AvatarHeadSize + Options.CameraYoffset, Options.AvatarHeadSize / -2.0f + Options.CameraZoffset);
-            if (Options.Avatar)
+            if (Options.SimpleAvatar && Options.Avatar)
             {
                 avatarHead.gameObject.SetActive(true);
                 avatarArm.gameObject.SetActive(true);
@@ -399,6 +407,8 @@ namespace ChroMapper_CameraMovement
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
                 cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
+                cm_measureGrid16_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
+                cm_measureGrid8_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
                 cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0,0,0,0));
                 cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
@@ -432,6 +442,8 @@ namespace ChroMapper_CameraMovement
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", gridXBaseAlpha);
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", gridXGridAlpha);
                 cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", gridGridAlpha);
+                cm_measureGrid16_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor16_1);
+                cm_measureGrid8_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor8_1);
                 cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor4_1);
                 cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor1);
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseTransparentColor);
@@ -464,11 +476,14 @@ namespace ChroMapper_CameraMovement
             eventGridChild.LocalOffset = new Vector3(eventGridChildLocalOffset.x + offset, eventGridChildLocalOffset.y, eventGridChildLocalOffset.z);
             eventLabelChild.LocalOffset = new Vector3(eventLabelChildLocalOffset.x + offset, eventLabelChildLocalOffset.y, eventLabelChildLocalOffset.z);
             bpmChangesChild.LocalOffset = new Vector3(bpmChangesChildLocalOffset.x + offset, bpmChangesChildLocalOffset.y, bpmChangesChildLocalOffset.z);
-            customEventsChild.LocalOffset = new Vector3(customEventsChildLocalOffset.x + offset, customEventsChildLocalOffset.y, customEventsChildLocalOffset.z);
-            customEventsLabelsChild.LocalOffset = new Vector3(customEventsLabelsChildLocalOffset.x + offset, customEventsLabelsChildLocalOffset.y, customEventsLabelsChildLocalOffset.z);
             eventsGridChild.LocalOffset = new Vector3(eventsGridChildLocalOffset.x + offset, eventsGridChildLocalOffset.y, eventsGridChildLocalOffset.z);
             bpmChangesGridChild.LocalOffset = new Vector3(bpmChangesGridChildLocalOffset.x + offset, bpmChangesGridChildLocalOffset.y, bpmChangesGridChildLocalOffset.z);
-            customEventsGridChild.LocalOffset = new Vector3(customEventsGridChildLocalOffset.x + offset, customEventsGridChildLocalOffset.y, customEventsGridChildLocalOffset.z);
+            if (customEventsObject)
+            {
+                customEventsChild.LocalOffset = new Vector3(customEventsChildLocalOffset.x + offset, customEventsChildLocalOffset.y, customEventsChildLocalOffset.z);
+                customEventsLabelsChild.LocalOffset = new Vector3(customEventsLabelsChildLocalOffset.x + offset, customEventsLabelsChildLocalOffset.y, customEventsLabelsChildLocalOffset.z);
+                customEventsGridChild.LocalOffset = new Vector3(customEventsGridChildLocalOffset.x + offset, customEventsGridChildLocalOffset.y, customEventsGridChildLocalOffset.z);
+            }
         }
         public void WaveFormOffset()
         {
@@ -493,6 +508,67 @@ namespace ChroMapper_CameraMovement
             }
         }
 
+        public IEnumerator CustomAvatarLoad()
+        {
+            if (currentAvatarFile != Options.CustomAvatarFileName)
+            {
+                currentAvatarFile = "";
+                if (avatarModel != null)
+                    Destroy(avatarModel);
+                var avatarFullPath = Path.Combine(Environment.CurrentDirectory, Options.CustomAvatarFileName);
+                if (File.Exists(avatarFullPath))
+                {
+                    var request = AssetBundle.LoadFromFileAsync(avatarFullPath);
+                    yield return request;
+                    if (request.isDone && request.assetBundle)
+                    {
+                        var assetBundleRequest = request.assetBundle.LoadAssetWithSubAssetsAsync<GameObject>("_CustomAvatar");
+                        yield return assetBundleRequest;
+                        if (assetBundleRequest.isDone && assetBundleRequest.asset != null)
+                        {
+                            request.assetBundle.Unload(false);
+                            try
+                            {
+                                avatarModel = (GameObject)Instantiate(assetBundleRequest.asset);
+                                currentAvatarFile = Options.CustomAvatarFileName;
+                            }
+                            catch
+                            {
+                                Debug.LogError("Avatar Instantiate ERR!");
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError("Avatar Load2 ERR!");
+                            request.assetBundle.Unload(false);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("Avatar Load1 ERR!");
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Avatar File ERR!");
+                }
+            }
+            if (avatarModel != null)
+            {
+                avatarModel.transform.localScale = new Vector3(Options.AvatarScale, Options.AvatarScale, Options.AvatarScale);
+                avatarModel.transform.localPosition = new Vector3(0, Options.CameraYoffset + Options.AvatarYoffset, Options.CameraZoffset);
+                if (Options.CustomAvatar && Options.Avatar)
+                {
+                    avatarModel.SetActive(true);
+                }
+                else
+                {
+                    avatarModel.SetActive(false);
+                }
+            }
+
+        }
+
         private IEnumerator Start()
         {
             atsc = FindObjectOfType<AudioTimeSyncController>();
@@ -500,6 +576,8 @@ namespace ChroMapper_CameraMovement
             spectrogramSideSwapper = FindObjectOfType<SpectrogramSideSwapper>();
 
             cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
+            cm_measureGrid16_1 = GameObject.Find("1/16th Measure Grid");
+            cm_measureGrid8_1 = GameObject.Find("1/8th Measure Grid");
             cm_measureGrid4_1 = GameObject.Find("1/4th Measure Grid");
             cm_measureGrid1 = GameObject.Find("One Measure Grid");
             cm_MeasureLinesCanvas = GameObject.Find("Measure Lines Canvas");
@@ -508,6 +586,8 @@ namespace ChroMapper_CameraMovement
             cm_Grid = GameObject.Find("Grid");
             cm_baseTransparent = GameObject.Find("Base Transparent");
 
+            measureGridColor16_1 = cm_measureGrid16_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
+            measureGridColor8_1 = cm_measureGrid8_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
             measureGridColor4_1 = cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
             measureGridColor1 = cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
             baseTransparentColor = cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
@@ -570,28 +650,37 @@ namespace ChroMapper_CameraMovement
             otherTracks[otherTracks.Length - 1] = bookmarkLinesCanvas.gameObject.GetComponent<Track>();
             field.SetValue(audioTimeSyncController, otherTracks);
 
-            yield return new WaitForSeconds(0.5f); //Wait for time
-
             eventGridChild = GameObject.Find("Rotating/Event Grid").GetComponent<GridChild>();
             eventLabelChild = GameObject.Find("Rotating/Event Label").GetComponent<GridChild>();
-            bpmChangesChild = GameObject.Find("Rotating/BPM Changes Grid").GetComponent<GridChild>();
-            customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
-            customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
             eventsGridChild = GameObject.Find("Moveable Grid/Events Grid").GetComponent<GridChild>();
+            bpmChangesChild = GameObject.Find("Rotating/BPM Changes Grid").GetComponent<GridChild>();
             bpmChangesGridChild = GameObject.Find("Moveable Grid/BPM Changes Grid").GetComponent<GridChild>();
-            customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
             spectrogramGridChild = GameObject.Find("Rotating/Spectrogram Grid").GetComponent<GridChild>();
             waveformGridChild = GameObject.Find("Moveable Grid/Waveform Chunks Grid").GetComponent<GridChild>();
             eventGridChildLocalOffset = eventGridChild.LocalOffset;
             eventLabelChildLocalOffset = eventLabelChild.LocalOffset;
-            bpmChangesChildLocalOffset = bpmChangesChild.LocalOffset;
-            customEventsChildLocalOffset = customEventsChild.LocalOffset; ;
-            customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
             eventsGridChildLocalOffset = eventsGridChild.LocalOffset;
+            bpmChangesChildLocalOffset = bpmChangesChild.LocalOffset;
             bpmChangesGridChildLocalOffset = bpmChangesGridChild.LocalOffset;
-            customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
             spectrogramGridChildLocalOffset = spectrogramGridChild.LocalOffset;
             waveformGridChildLocalOffset = waveformGridChild.LocalOffset;
+
+            try
+            {
+                customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
+                customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
+                customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
+                customEventsChildLocalOffset = customEventsChild.LocalOffset; ;
+                customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
+                customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
+                customEventsObject = true;
+            }
+            catch
+            {
+                Debug.LogWarning("CameraMovement:customEvents object err");
+                customEventsObject = false;
+            }
+
 
             beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
 
@@ -599,6 +688,7 @@ namespace ChroMapper_CameraMovement
             sub_camera.clearFlags = CameraClearFlags.SolidColor;
             sub_camera.backgroundColor = new Color(0, 0, 0, 255);
 
+            yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             bookmarkManager = FindObjectOfType<BookmarkManager>();
 
             bookmarkManager.BookmarksUpdated += BookMarkChangeUpdate;

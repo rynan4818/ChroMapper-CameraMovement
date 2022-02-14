@@ -4,9 +4,9 @@ using ChroMapper_CameraMovement.Configuration;
 
 namespace ChroMapper_CameraMovement
 {
-    public class SattingData
+    public class SettingData
     {
-        public static SattingData Instance;
+        public static SettingData Instance;
         public bool movement = false;
         public bool turnToHead = false;
         public bool avatar = true;
@@ -35,21 +35,26 @@ namespace ChroMapper_CameraMovement
         public string quickCommand4 = "diagf";
         public string quickCommand5 = "diagb";
         public string quickCommand6 = "random";
+        public bool simpleAvatar = true;
+        public bool customAvatar = false;
+        public string customAvatarFileName = "Sour Miku Black v2.avatar";
+        public float avatarScale = 1f;
+        public float avatarYoffset = 0f;
 
         public static void SettingLoad(string setting_file)
         {
-            SattingData data;
+            SettingData data;
             try
             {
                 if (File.Exists(setting_file))
-                    data = JsonConvert.DeserializeObject<SattingData>(File.ReadAllText(setting_file));
+                    data = JsonConvert.DeserializeObject<SettingData>(File.ReadAllText(setting_file));
                 else
-                    data = new SattingData();
+                    data = new SettingData();
 
             }
             catch
             {
-                data = new SattingData();
+                data = new SettingData();
             }
             Instance = data;
             Options.Movement = data.movement;
@@ -80,6 +85,11 @@ namespace ChroMapper_CameraMovement
             Options.QuickCommand4 = data.quickCommand4;
             Options.QuickCommand5 = data.quickCommand5;
             Options.QuickCommand6 = data.quickCommand6;
+            Options.SimpleAvatar = data.simpleAvatar;
+            Options.CustomAvatar = data.customAvatar;
+            Options.CustomAvatarFileName = data.customAvatarFileName;
+            Options.AvatarScale = data.avatarScale;
+            Options.AvatarYoffset = data.avatarYoffset;
         }
         public void SettingSave(string setting_file)
         {
@@ -111,6 +121,11 @@ namespace ChroMapper_CameraMovement
             this.quickCommand4 = Options.QuickCommand4;
             this.quickCommand5 = Options.QuickCommand5;
             this.quickCommand6 = Options.QuickCommand6;
+            this.simpleAvatar = Options.SimpleAvatar;
+            this.customAvatar = Options.CustomAvatar;
+            this.customAvatarFileName = Options.CustomAvatarFileName;
+            this.avatarScale = Options.AvatarScale;
+            this.avatarYoffset = Options.AvatarYoffset;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

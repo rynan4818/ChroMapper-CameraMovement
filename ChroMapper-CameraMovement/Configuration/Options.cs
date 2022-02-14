@@ -30,5 +30,10 @@
         public static string QuickCommand4 { set; get; }
         public static string QuickCommand5 { set; get; }
         public static string QuickCommand6 { set; get; }
+        public static bool SimpleAvatar { set; get; }
+        public static bool CustomAvatar { set; get; }
+        public static string CustomAvatarFileName { set; get; }
+        public static float AvatarScale { set; get; }
+        public static float AvatarYoffset { set; get; }
     }
 }

@@ -173,7 +173,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     _plugin.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Z offset", "Avatar Z offset", new Vector2(0, -95), Options.AvatarYoffset.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Y offset", "Avatar Y offset", new Vector2(0, -95), Options.AvatarYoffset.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))

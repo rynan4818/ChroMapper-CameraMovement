@@ -510,7 +510,7 @@ namespace ChroMapper_CameraMovement
 
         public IEnumerator CustomAvatarLoad()
         {
-            if (currentAvatarFile != Options.CustomAvatarFileName)
+            if (currentAvatarFile != Options.CustomAvatarFileName && Options.CustomAvatar)
             {
                 currentAvatarFile = "";
                 if (avatarModel != null)

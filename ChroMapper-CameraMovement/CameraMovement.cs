@@ -746,7 +746,9 @@ namespace ChroMapper_CameraMovement
                     sub_camera.transform.SetPositionAndRotation(cameraPos, Quaternion.Euler(cameraRot));
                 }
 
-                Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
+                if (Options.Movement)
+                    Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
+                sub_camera.fieldOfView = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
             }
             if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation)
             {

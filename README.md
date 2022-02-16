@@ -39,7 +39,7 @@
 * Avatar File ： [*.avatar] [カスタムアバターのファイル](https://modelsaber.com/Avatars/)をChroMapper.exeと同じフォルダに置いてファイル名を設定して下さい。デフォルト設定は[Sour Miku Black v2](https://modelsaber.com/Avatars/?id=1564625718&pc)になっています
 * Avatar Scale ： アバターのサイズ調整用です。実際のアバターのサイズはBeatSaber内でキャリブレーション後に何らかの方法で測定する必要があります。
 * Avatar Y offset ： アバターのY位置調整用です。
-* Simple Avatar: 従来のピンクの棒人間アバターを表示します。本プラグインで読み込んだカスタムアバターのサイズ測定に使えます。(Head Hight + Head Size/2 = 身長[m]です。)
+* Simple Avatar: 従来のピンクの棒人間アバターを表示します。本プラグインで読み込んだカスタムアバターのサイズ測定に使えます。(Head Hight + Head Size/2 = 身長[m]です。) ※Sour Miku Black v2は1.72m
 * Head Hight ： アバターの頭の高さ（球の中心）[単位 m]
 * Head Size ： アバターの頭の大きさ(球の直径) [単位 m]
 * Arm Size ： アバターの両手の長さ [単位 m]

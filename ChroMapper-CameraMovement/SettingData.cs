@@ -40,6 +40,7 @@ namespace ChroMapper_CameraMovement
         public string customAvatarFileName = "Sour Miku Black v2.avatar";
         public float avatarScale = 1f;
         public float avatarYoffset = 0f;
+        public float avatarCameraScale = 1.5f;
 
         public static void SettingLoad(string setting_file)
         {
@@ -90,6 +91,7 @@ namespace ChroMapper_CameraMovement
             Options.CustomAvatarFileName = data.customAvatarFileName;
             Options.AvatarScale = data.avatarScale;
             Options.AvatarYoffset = data.avatarYoffset;
+            Options.AvatarCameraScale = data.avatarCameraScale;
         }
         public void SettingSave(string setting_file)
         {
@@ -126,6 +128,7 @@ namespace ChroMapper_CameraMovement
             this.customAvatarFileName = Options.CustomAvatarFileName;
             this.avatarScale = Options.AvatarScale;
             this.avatarYoffset = Options.AvatarYoffset;
+            this.avatarCameraScale = Options.AvatarCameraScale;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

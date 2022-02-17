@@ -35,5 +35,6 @@
         public static string CustomAvatarFileName { set; get; }
         public static float AvatarScale { set; get; }
         public static float AvatarYoffset { set; get; }
+        public static float AvatarCameraScale { set; get; }
     }
 }

@@ -18,8 +18,6 @@ namespace ChroMapper_CameraMovement
         public string scriptMapperExe = "scriptmapper.exe";
         public string scriptMapperLog = "log_latest.txt";
         public float bookmarkWidth = 10f;
-        public float cameraYoffset = -0.5f;
-        public float cameraZoffset = -1.5f;
         public bool bookmarkLines = true;
         public bool bookmarkLinesShowOnTop = false;
         public float bookmarkInsertOffset = 12f;
@@ -41,6 +39,11 @@ namespace ChroMapper_CameraMovement
         public float avatarScale = 1f;
         public float avatarYoffset = 0f;
         public float avatarCameraScale = 1.5f;
+        public float origenMatchOffsetY = -0.5f;
+        public float origenMatchOffsetZ = -1.5f;
+        public float originXoffset = 0;
+        public float originYoffset = 0;
+        public float originZoffset = 0;
 
         public static void SettingLoad(string setting_file)
         {
@@ -69,8 +72,6 @@ namespace ChroMapper_CameraMovement
             Options.ScriptMapperExe = data.scriptMapperExe;
             Options.ScriptMapperLog = data.scriptMapperLog;
             Options.BookMarkWidth = data.bookmarkWidth;
-            Options.CameraYoffset = data.cameraYoffset;
-            Options.CameraZoffset = data.cameraZoffset;
             Options.BookmarkLines = data.bookmarkLines;
             Options.BookmarkLinesShowOnTop = data.bookmarkLinesShowOnTop;
             Options.BookmarkInsertOffset = data.bookmarkInsertOffset;
@@ -92,6 +93,11 @@ namespace ChroMapper_CameraMovement
             Options.AvatarScale = data.avatarScale;
             Options.AvatarYoffset = data.avatarYoffset;
             Options.AvatarCameraScale = data.avatarCameraScale;
+            Options.OrigenMatchOffsetY = data.origenMatchOffsetY;
+            Options.OrigenMatchOffsetZ = data.origenMatchOffsetZ;
+            Options.OriginXoffset = data.originXoffset;
+            Options.OriginYoffset = data.originYoffset;
+            Options.OriginZoffset = data.originZoffset;
         }
         public void SettingSave(string setting_file)
         {
@@ -106,8 +112,6 @@ namespace ChroMapper_CameraMovement
             this.scriptMapperExe = Options.ScriptMapperExe;
             this.scriptMapperLog = Options.ScriptMapperLog;
             this.bookmarkWidth = Options.BookMarkWidth;
-            this.cameraYoffset = Options.CameraYoffset;
-            this.cameraZoffset = Options.CameraZoffset;
             this.bookmarkLines = Options.BookmarkLines;
             this.bookmarkLinesShowOnTop = Options.BookmarkLinesShowOnTop;
             this.bookmarkInsertOffset = Options.BookmarkInsertOffset;
@@ -129,6 +133,11 @@ namespace ChroMapper_CameraMovement
             this.avatarScale = Options.AvatarScale;
             this.avatarYoffset = Options.AvatarYoffset;
             this.avatarCameraScale = Options.AvatarCameraScale;
+            this.origenMatchOffsetY = Options.OrigenMatchOffsetY;
+            this.origenMatchOffsetZ = Options.OrigenMatchOffsetZ;
+            this.originXoffset = Options.OriginXoffset;
+            this.originYoffset = Options.OriginYoffset;
+            this.originZoffset = Options.OriginZoffset;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

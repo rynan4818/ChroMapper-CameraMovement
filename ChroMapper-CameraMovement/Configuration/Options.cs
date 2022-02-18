@@ -13,8 +13,6 @@
         public static string ScriptMapperExe { set; get; }
         public static string ScriptMapperLog { set; get; }
         public static float BookMarkWidth { set; get; }
-        public static float CameraYoffset { set; get; }
-        public static float CameraZoffset { set; get; }
         public static bool BookmarkLines { set; get; }
         public static bool BookmarkLinesShowOnTop { set; get; }
         public static float BookmarkInsertOffset { set; get; }
@@ -35,6 +33,11 @@
         public static string CustomAvatarFileName { set; get; }
         public static float AvatarScale { set; get; }
         public static float AvatarYoffset { set; get; }
-        public static float AvatarCameraScale { set; get; }
+        public static float AvatarCameraScale { set; get; }  //ChroMapperとBeatSaberの1単位のスケール違いを補正するためのアバターサイズとカメラ位置の倍数
+        public static float OrigenMatchOffsetY { set; get; }  //ChroMapperとBeatSaberの原点をあわせるためのオフセット値Y
+        public static float OrigenMatchOffsetZ { set; get; }  //ChroMapperとBeatSaberの原点をあわせるためのオフセット値Z
+        public static float OriginXoffset { set; get; }  //原点の補正値(BeatSaberスケール)
+        public static float OriginYoffset { set; get; }
+        public static float OriginZoffset { set; get; }
     }
 }

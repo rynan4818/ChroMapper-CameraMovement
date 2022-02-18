@@ -109,8 +109,6 @@ namespace ChroMapper_CameraMovement
         public bool init = false;
         public bool customEventsObject = false;
         public string currentAvatarFile = "";
-        public static float zOffset = -1.5f;
-        public static float yOffset = -0.5f;
 
         public void UI_set(UI ui)
         {
@@ -344,9 +342,9 @@ namespace ChroMapper_CameraMovement
         {
             StartCoroutine("CustomAvatarLoad");
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
-            var avatarHeadPosition = new Vector3(0, Options.AvatarHeadHight + Options.CameraYoffset, 0 + Options.CameraZoffset) * Options.AvatarCameraScale;
-            avatarHeadPosition.y += yOffset;
-            avatarHeadPosition.z += zOffset;
+            var avatarHeadPosition = new Vector3(Options.OriginXoffset, Options.AvatarHeadHight + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
+            avatarHeadPosition.y += Options.OrigenMatchOffsetY;
+            avatarHeadPosition.z += Options.OrigenMatchOffsetZ;
             avatarHead.transform.position = avatarHeadPosition;
             avatarHead.transform.localScale = new Vector3(Options.AvatarHeadSize, Options.AvatarHeadSize, Options.AvatarHeadSize) * Options.AvatarCameraScale;
             //首の高さ 1.43-0.25÷2=1.305m
@@ -356,33 +354,33 @@ namespace ChroMapper_CameraMovement
             var body_size_x = body_size_y / 1.5f;
             //胴体の中心1.005は首の高さ1.305m-胴体の中心からの高さ0.3m=1.005
             var body_pos_y = Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f) - body_size_y;
-            var avatarBodyPosition = new Vector3(0, body_pos_y + Options.CameraYoffset, 0 + Options.CameraZoffset) * Options.AvatarCameraScale;
-            avatarBodyPosition.y += yOffset;
-            avatarBodyPosition.z += zOffset;
+            var avatarBodyPosition = new Vector3(Options.OriginXoffset, body_pos_y + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
+            avatarBodyPosition.y += Options.OrigenMatchOffsetY;
+            avatarBodyPosition.z += Options.OrigenMatchOffsetZ;
             avatarBody.transform.position = avatarBodyPosition;
             avatarBody.transform.localScale = new Vector3(body_size_x, body_size_y, body_size_x * 0.8f) * Options.AvatarCameraScale;
             //腕の中心高さ1.25mは首の高さ1.305mの 1.305m÷1.25m=1.044
             var arm_pos_y = (Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f)) / 1.044f;
             //腕の大きさ0.06mは腕の長さ1.25m→1.25÷0.06=20.83
             var arm_size_yz = Options.AvatarArmSize / 20.83f;
-            var avatarArmPosition = new Vector3(0, arm_pos_y + Options.CameraYoffset, 0 + Options.CameraZoffset) * Options.AvatarCameraScale;
-            avatarArmPosition.y += yOffset;
-            avatarArmPosition.z += zOffset;
+            var avatarArmPosition = new Vector3(Options.OriginXoffset, arm_pos_y + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
+            avatarArmPosition.y += Options.OrigenMatchOffsetY;
+            avatarArmPosition.z += Options.OrigenMatchOffsetZ;
             avatarArm.transform.position = avatarArmPosition;
             avatarArm.transform.localScale = new Vector3(Options.AvatarArmSize, arm_size_yz, arm_size_yz) * Options.AvatarCameraScale;
             //足の高さは腕の中心から腕のサイズを引いたもの
             var leg_size_y = arm_pos_y - (arm_size_yz / 2.0f);
             var leg_pos_y = leg_size_y / 2.0f;
             var leg_size_xz = leg_size_y / 12f;
-            var avatarLegPosition = new Vector3(0, leg_pos_y + Options.CameraYoffset, 0 + Options.CameraZoffset) * Options.AvatarCameraScale;
-            avatarLegPosition.y += yOffset;
-            avatarLegPosition.z += zOffset;
+            var avatarLegPosition = new Vector3(Options.OriginXoffset, leg_pos_y + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
+            avatarLegPosition.y += Options.OrigenMatchOffsetY;
+            avatarLegPosition.z += Options.OrigenMatchOffsetZ;
             avatarLeg.transform.position = avatarLegPosition;
             avatarLeg.transform.localScale = new Vector3(leg_size_xz, leg_size_y, leg_size_xz) * Options.AvatarCameraScale;
             //おさげ
-            var avatarHairPosition = new Vector3(0, Options.AvatarHeadHight - Options.AvatarHeadSize + Options.CameraYoffset, Options.AvatarHeadSize / -2.0f + Options.CameraZoffset) * Options.AvatarCameraScale;
-            avatarHairPosition.y += yOffset;
-            avatarHairPosition.z += zOffset;
+            var avatarHairPosition = new Vector3(Options.OriginXoffset, Options.AvatarHeadHight - Options.AvatarHeadSize + Options.OriginYoffset, Options.AvatarHeadSize / -2.0f + Options.OriginZoffset) * Options.AvatarCameraScale;
+            avatarHairPosition.y += Options.OrigenMatchOffsetY;
+            avatarHairPosition.z += Options.OrigenMatchOffsetZ;
             avatarHair.transform.position = avatarHairPosition;
             avatarHair.transform.localScale = new Vector3(Options.AvatarHeadSize / 1.4f, Options.AvatarHeadSize * 2.0f, Options.AvatarHeadSize / 17f) * Options.AvatarCameraScale;
             if (Options.SimpleAvatar && Options.Avatar)
@@ -573,9 +571,9 @@ namespace ChroMapper_CameraMovement
             if (avatarModel != null)
             {
                 avatarModel.transform.localScale = new Vector3(Options.AvatarScale, Options.AvatarScale, Options.AvatarScale) * Options.AvatarCameraScale;
-                var avatarPosition = new Vector3(0, (Options.CameraYoffset + Options.AvatarYoffset) * Options.AvatarCameraScale, Options.CameraZoffset * Options.AvatarCameraScale);
-                avatarPosition.y = yOffset;
-                avatarPosition.z = zOffset;
+                var avatarPosition = new Vector3(Options.OriginXoffset, Options.OriginYoffset + Options.AvatarYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
+                avatarPosition.y = Options.OrigenMatchOffsetY;
+                avatarPosition.z = Options.OrigenMatchOffsetZ;
                 avatarModel.transform.localPosition = avatarPosition;
                 if (Options.CustomAvatar && Options.Avatar)
                 {
@@ -742,16 +740,17 @@ namespace ChroMapper_CameraMovement
 
                 Vector3 cameraPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
                 Vector3 cameraRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
-                cameraPos.y += Options.CameraYoffset;
-                cameraPos.z += Options.CameraZoffset;
+                cameraPos.x += Options.OriginXoffset;
+                cameraPos.y += Options.OriginYoffset;
+                cameraPos.z += Options.OriginZoffset;
                 var cameraPosSet = cameraPos * Options.AvatarCameraScale;
-                cameraPosSet.y += yOffset;
-                cameraPosSet.z += zOffset;
+                cameraPosSet.y += Options.OrigenMatchOffsetY;
+                cameraPosSet.z += Options.OrigenMatchOffsetZ;
                 if (turnToHead)
                 {
-                    var turnToTarget = new Vector3(0, Options.AvatarHeadHight + Options.CameraYoffset, 0 + Options.CameraZoffset);//アバターの頭の位置
-                    turnToTarget.y += yOffset;
-                    turnToTarget.z += zOffset;
+                    var turnToTarget = new Vector3(Options.OriginXoffset, Options.AvatarHeadHight + Options.OriginYoffset, Options.OriginZoffset);//アバターの頭の位置
+                    turnToTarget.y += Options.OrigenMatchOffsetY;
+                    turnToTarget.z += Options.OrigenMatchOffsetZ;
                     turnToTarget += LerpVector3(StartHeadOffset, EndHeadOffset, Ease(movePerc));
                     var direction = turnToTarget - cameraPos;
                     var lookRotation = Quaternion.LookRotation(direction);

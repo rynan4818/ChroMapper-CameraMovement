@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.IO;
-using ChroMapper_CameraMovement.Configuration;
 
-namespace ChroMapper_CameraMovement
+namespace ChroMapper_CameraMovement.Configuration
 {
     public class SettingData
     {

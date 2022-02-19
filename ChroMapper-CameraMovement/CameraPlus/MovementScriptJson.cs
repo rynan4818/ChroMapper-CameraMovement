@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ChroMapper_CameraMovement.Configuration
+namespace ChroMapper_CameraMovement.CameraPlus
 {
     public class AxizWithFoVElements
     {

@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Configuration;
 using System.IO;
@@ -15,7 +16,7 @@ namespace ChroMapper_CameraMovement
     [Plugin("Camera Movement")]
     public class Plugin
     {
-        public static CameraMovement movement;
+        public static CameraMovementController movement;
         private UI _ui;
         public bool scriptMapperAlive;
         public static string setting_file;
@@ -47,7 +48,7 @@ namespace ChroMapper_CameraMovement
                 if (movement != null && movement.isActiveAndEnabled)
                     return;
 
-                movement = new GameObject("CameraMovement").AddComponent<CameraMovement>();
+                movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
                 movement.UI_set(_ui);
                 MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
                 _ui.AddMenu(mapEditorUI);

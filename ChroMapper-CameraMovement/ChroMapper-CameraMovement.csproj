@@ -80,6 +80,10 @@
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>

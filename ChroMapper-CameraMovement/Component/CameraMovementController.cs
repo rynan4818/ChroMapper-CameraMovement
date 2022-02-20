@@ -125,6 +125,28 @@ namespace ChroMapper_CameraMovement.Component
         {
             autoSave.Save();
         }
+        public void CameraPositionAndRotationSet(Vector3 position,Vector3 rotation)
+        {
+            position += new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
+            position *= Options.AvatarCameraScale;
+            position += new Vector3(0, Options.OrigenMatchOffsetY, Options.OrigenMatchOffsetZ);
+            cm_MapEditorCamera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
+        }
+        public Vector3 CameraPositionGet()
+        {
+            var cameraPosition = new Vector3(cm_MapEditorCamera.transform.position.x, cm_MapEditorCamera.transform.position.y - Options.OrigenMatchOffsetY, cm_MapEditorCamera.transform.position.z - Options.OrigenMatchOffsetZ);
+            cameraPosition /= Options.AvatarCameraScale;
+            cameraPosition -= new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
+            return cameraPosition;
+        }
+        public Vector3 CameraRotationGet()
+        {
+            return cm_MapEditorCamera.transform.eulerAngles;
+        }
+        public Vector3 AvatarPositionGet()
+        {
+            return new Vector3(Options.OriginXoffset, Options.AvatarHeadHight + Options.OriginYoffset, Options.OriginZoffset);
+        }
         public bool SavingThread()
         {
             Type type = autoSave.GetType();
@@ -602,11 +624,11 @@ namespace ChroMapper_CameraMovement.Component
                 }
                 beforeSeconds = atsc.CurrentSeconds;
                 BookMarkUpdate();
-                _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, sub_camera);
+                _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, sub_camera , AvatarPositionGet());
             }
             if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation)
             {
-                _ui.CameraPosRotUpdate(cm_MapEditorCamera.transform);
+                _ui.CameraPosRotUpdate();
                 beforePositon = cm_MapEditorCamera.transform.position;
                 beforeRotation = cm_MapEditorCamera.transform.rotation;
             }

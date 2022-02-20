@@ -148,7 +148,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
             }
         }
 
-        public void CameraUpdate(float currentSeconds, GameObject cm_MapEditorCamera, Camera sub_camera)
+        public void CameraUpdate(float currentSeconds, GameObject cm_MapEditorCamera, Camera sub_camera, Vector3 turnToTarget)
         {
             if (!dataLoaded) return;
 
@@ -170,7 +170,6 @@ namespace ChroMapper_CameraMovement.CameraPlus
             cameraPosSet.z += Options.OrigenMatchOffsetZ;
             if (turnToHead)
             {
-                var turnToTarget = new Vector3(Options.OriginXoffset, Options.AvatarHeadHight + Options.OriginYoffset, Options.OriginZoffset);//アバターの頭の位置
                 turnToTarget.y += Options.OrigenMatchOffsetY;
                 turnToTarget.z += Options.OrigenMatchOffsetZ;
                 turnToTarget += LerpVector3(StartHeadOffset, EndHeadOffset, Ease(movePerc));

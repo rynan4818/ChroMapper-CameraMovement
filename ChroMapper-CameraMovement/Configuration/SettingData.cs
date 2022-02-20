@@ -6,6 +6,7 @@ namespace ChroMapper_CameraMovement.Configuration
     public class SettingData
     {
         public static SettingData Instance;
+        public static string setting_file;
         public bool movement = false;
         public bool turnToHead = false;
         public bool avatar = true;
@@ -45,7 +46,11 @@ namespace ChroMapper_CameraMovement.Configuration
         public float originZoffset = 0;
         public bool cameraControl = false;
 
-        public static void SettingLoad(string setting_file)
+        public static void SettingFileSet(string filename)
+        {
+            setting_file = filename;
+        }
+        public static void SettingLoad()
         {
             SettingData data;
             try
@@ -54,7 +59,6 @@ namespace ChroMapper_CameraMovement.Configuration
                     data = JsonConvert.DeserializeObject<SettingData>(File.ReadAllText(setting_file));
                 else
                     data = new SettingData();
-
             }
             catch
             {
@@ -100,47 +104,50 @@ namespace ChroMapper_CameraMovement.Configuration
             Options.OriginZoffset = data.originZoffset;
             Options.CameraControl = data.cameraControl;
         }
-        public void SettingSave(string setting_file)
+        public static void SettingSave()
         {
-            this.movement = Options.Movement;
-            this.turnToHead = Options.TurnToHead;
-            this.avatar = Options.Avatar;
-            this.uIhidden = Options.UIhidden;
-            this.avatarHeadHight = Options.AvatarHeadHight;
-            this.avatarHeadSize = Options.AvatarHeadSize;
-            this.avatarArmSize = Options.AvatarArmSize;
-            this.scriptFileName = Options.ScriptFileName;
-            this.scriptMapperExe = Options.ScriptMapperExe;
-            this.scriptMapperLog = Options.ScriptMapperLog;
-            this.bookmarkWidth = Options.BookMarkWidth;
-            this.bookmarkLines = Options.BookmarkLines;
-            this.bookmarkLinesShowOnTop = Options.BookmarkLinesShowOnTop;
-            this.bookmarkInsertOffset = Options.BookmarkInsertOffset;
-            this.subCamera = Options.SubCamera;
-            this.subCameraRectX = Options.SubCameraRectX;
-            this.subCameraRectY = Options.SubCameraRectY;
-            this.subCameraRectW = Options.SubCameraRectW;
-            this.subCameraRectH = Options.SubCameraRectH;
-            this.bookmarkEdit = Options.BookmarkEdit;
-            this.quickCommand1 = Options.QuickCommand1;
-            this.quickCommand2 = Options.QuickCommand2;
-            this.quickCommand3 = Options.QuickCommand3;
-            this.quickCommand4 = Options.QuickCommand4;
-            this.quickCommand5 = Options.QuickCommand5;
-            this.quickCommand6 = Options.QuickCommand6;
-            this.simpleAvatar = Options.SimpleAvatar;
-            this.customAvatar = Options.CustomAvatar;
-            this.customAvatarFileName = Options.CustomAvatarFileName;
-            this.avatarScale = Options.AvatarScale;
-            this.avatarYoffset = Options.AvatarYoffset;
-            this.avatarCameraScale = Options.AvatarCameraScale;
-            this.origenMatchOffsetY = Options.OrigenMatchOffsetY;
-            this.origenMatchOffsetZ = Options.OrigenMatchOffsetZ;
-            this.originXoffset = Options.OriginXoffset;
-            this.originYoffset = Options.OriginYoffset;
-            this.originZoffset = Options.OriginZoffset;
-            this.cameraControl = Options.CameraControl;
-            File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
+            SettingData data = new SettingData
+            {
+                movement = Options.Movement,
+                turnToHead = Options.TurnToHead,
+                avatar = Options.Avatar,
+                uIhidden = Options.UIhidden,
+                avatarHeadHight = Options.AvatarHeadHight,
+                avatarHeadSize = Options.AvatarHeadSize,
+                avatarArmSize = Options.AvatarArmSize,
+                scriptFileName = Options.ScriptFileName,
+                scriptMapperExe = Options.ScriptMapperExe,
+                scriptMapperLog = Options.ScriptMapperLog,
+                bookmarkWidth = Options.BookMarkWidth,
+                bookmarkLines = Options.BookmarkLines,
+                bookmarkLinesShowOnTop = Options.BookmarkLinesShowOnTop,
+                bookmarkInsertOffset = Options.BookmarkInsertOffset,
+                subCamera = Options.SubCamera,
+                subCameraRectX = Options.SubCameraRectX,
+                subCameraRectY = Options.SubCameraRectY,
+                subCameraRectW = Options.SubCameraRectW,
+                subCameraRectH = Options.SubCameraRectH,
+                bookmarkEdit = Options.BookmarkEdit,
+                quickCommand1 = Options.QuickCommand1,
+                quickCommand2 = Options.QuickCommand2,
+                quickCommand3 = Options.QuickCommand3,
+                quickCommand4 = Options.QuickCommand4,
+                quickCommand5 = Options.QuickCommand5,
+                quickCommand6 = Options.QuickCommand6,
+                simpleAvatar = Options.SimpleAvatar,
+                customAvatar = Options.CustomAvatar,
+                customAvatarFileName = Options.CustomAvatarFileName,
+                avatarScale = Options.AvatarScale,
+                avatarYoffset = Options.AvatarYoffset,
+                avatarCameraScale = Options.AvatarCameraScale,
+                origenMatchOffsetY = Options.OrigenMatchOffsetY,
+                origenMatchOffsetZ = Options.OrigenMatchOffsetZ,
+                originXoffset = Options.OriginXoffset,
+                originYoffset = Options.OriginYoffset,
+                originZoffset = Options.OriginZoffset,
+                cameraControl = Options.CameraControl
+            };
+        File.WriteAllText(setting_file, JsonConvert.SerializeObject(data, Formatting.Indented));
         }
     }
 }

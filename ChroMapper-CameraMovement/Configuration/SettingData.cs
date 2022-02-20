@@ -43,6 +43,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public float originXoffset = 0;
         public float originYoffset = 0;
         public float originZoffset = 0;
+        public bool cameraControl = false;
 
         public static void SettingLoad(string setting_file)
         {
@@ -97,6 +98,7 @@ namespace ChroMapper_CameraMovement.Configuration
             Options.OriginXoffset = data.originXoffset;
             Options.OriginYoffset = data.originYoffset;
             Options.OriginZoffset = data.originZoffset;
+            Options.CameraControl = data.cameraControl;
         }
         public void SettingSave(string setting_file)
         {
@@ -137,6 +139,7 @@ namespace ChroMapper_CameraMovement.Configuration
             this.originXoffset = Options.OriginXoffset;
             this.originYoffset = Options.OriginYoffset;
             this.originZoffset = Options.OriginZoffset;
+            this.cameraControl = Options.CameraControl;
             File.WriteAllText(setting_file, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
     }

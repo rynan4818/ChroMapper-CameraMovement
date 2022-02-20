@@ -13,9 +13,17 @@ namespace ChroMapper_CameraMovement.UserInterface
         private GameObject _cameraMovementMainMenu;
         private GameObject _cameraMovementSettingMenu;
         private GameObject _cameraMovementBookmarkMenu;
+        private GameObject _cameraMovementCameraControlMenu;
         private readonly Plugin _plugin;
         private readonly ExtensionButton _extensionBtn = new ExtensionButton();
-        private UITextInput _cameraPosRot;
+        private TMP_InputField _cameraPosXinput;
+        private TMP_InputField _cameraPosYinput;
+        private TMP_InputField _cameraPosZinput;
+        private TMP_InputField _cameraRotXinput;
+        private TMP_InputField _cameraRotYinput;
+        private TMP_InputField _cameraRotZinput;
+        private TMP_InputField _cameraFOVinput;
+        private TMP_InputField _cameraDistanceinput;
         public static GameObject cm_MapEditorCamera;
         public TextMeshProUGUI currentBookmarkLabelText;
         public UITextInput bookmarkMenuInputText;
@@ -34,7 +42,16 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             var cameraPosition = new Vector3(transform.position.x, transform.position.y - Options.OrigenMatchOffsetY, transform.position.z - Options.OrigenMatchOffsetZ);
             cameraPosition /= Options.AvatarCameraScale;
-            _cameraPosRot.InputField.text = $"px:{cameraPosition.x - Options.OriginXoffset} py:{cameraPosition.y - Options.OriginYoffset} pz:{cameraPosition.z - Options.OriginZoffset} rx:{transform.eulerAngles.x} ry:{transform.eulerAngles.y} rz:{transform.eulerAngles.z}";
+            cameraPosition -= new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
+            _cameraPosXinput.text = cameraPosition.x.ToString("0.##");
+            _cameraPosYinput.text = cameraPosition.y.ToString("0.##");
+            _cameraPosZinput.text = cameraPosition.z.ToString("0.##");
+            _cameraRotXinput.text = transform.eulerAngles.x.ToString("0.#");
+            _cameraRotYinput.text = transform.eulerAngles.y.ToString("0.#");
+            _cameraRotZinput.text = transform.eulerAngles.z.ToString("0.#");
+            _cameraFOVinput.text = Settings.Instance.CameraFOV.ToString("0.#");
+            var avatarPosition = new Vector3(Options.OriginXoffset, Options.AvatarHeadHight + Options.OriginYoffset, Options.OriginZoffset);
+            _cameraDistanceinput.text = Vector3.Distance(avatarPosition, cameraPosition).ToString("0.#");
         }
 
         public void CurrentBookmarkUpdate(string bookmarkName,int bookmarkNo)
@@ -72,12 +89,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraMovementMainMenu = new GameObject("CameraMovement Menu");
             _cameraMovementSettingMenu = new GameObject("CameraMovement Setting Menu");
             _cameraMovementBookmarkMenu = new GameObject("CameraMovement Bookmark");
+            _cameraMovementCameraControlMenu = new GameObject("Camera Control");
             _cameraMovementMainMenu.transform.parent = parent.transform;
-            _cameraMovementSettingMenu.transform.parent = parent.transform;
             _cameraMovementBookmarkMenu.transform.parent = parent.transform;
+            _cameraMovementCameraControlMenu.transform.parent = parent.transform;
+            _cameraMovementSettingMenu.transform.parent = parent.transform;
 
             //Main Menu
-            AttachTransform(_cameraMovementMainMenu, 170, 295, 1, 1, -50, -30, 1, 1);
+            AttachTransform(_cameraMovementMainMenu, 170, 225, 1, 1, -50, -30, 1, 1);
 
             Image imageMain = _cameraMovementMainMenu.AddComponent<Image>();
             imageMain.sprite = PersistentUI.Instance.Sprites.Background;
@@ -120,27 +139,34 @@ namespace ChroMapper_CameraMovement.UserInterface
                 Options.BookmarkEdit = check;
                 _cameraMovementBookmarkMenu.SetActive(check);
             });
-            _cameraPosRot = AddTextInput(_cameraMovementMainMenu.transform, "Cam Pos Rot", "Cam Pos Rot", new Vector2(0, -150), "", (value) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -145), Options.CameraControl, (check) =>
             {
-            }).Item3;
-            cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
-            CameraPosRotUpdate(cm_MapEditorCamera.transform);
-            AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -180), () =>
+                Options.CameraControl = check;
+                _cameraMovementCameraControlMenu.SetActive(check);
+            });
+            var mainMenuMoreSettingsButton = AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -170), () =>
             {
                 _cameraMovementSettingMenu.SetActive(true);
             });
-            AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", new Vector2(0, -210), () =>
+            MoveTransform(mainMenuMoreSettingsButton.transform, 70, 25, 0.28f, 1, 0, -170);
+
+            var mainMenuReloadButton = AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", new Vector2(0, -170), () =>
             {
                 _plugin.Reload();
             });
-            AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -240), () =>
+            MoveTransform(mainMenuReloadButton.transform, 70, 25, 0.72f, 1, 0, -170);
+
+            var mainMenuSettingSaveButton = AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -200), () =>
             {
                 _plugin.SettingSave();
             });
-            AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(0, -270), () =>
+            MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -200);
+
+            var mainMenuScriptMapperRunButton = AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(0, -200), () =>
             {
                 _plugin.ScriptMapperRun();
             });
+            MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -200);
 
             _cameraMovementMainMenu.SetActive(false);
             _extensionBtn.Click = () =>
@@ -190,7 +216,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 _plugin.Reload();
             });
 
-            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight", new Vector2(0, -140), Options.AvatarHeadHight.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight lookat point", new Vector2(0, -140), Options.AvatarHeadHight.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -459,6 +485,92 @@ namespace ChroMapper_CameraMovement.UserInterface
             MoveTransform(quickCommand6Button.transform, 50, 20, 0.1f, 1, 580, -15);
 
             _cameraMovementBookmarkMenu.SetActive(Options.BookmarkEdit);
+
+            // Camera Control
+            AttachTransform(_cameraMovementCameraControlMenu, 500, 55, 0.7f, 0.2f, 310, 40, 1, 1);
+
+            Image imageCameraControl = _cameraMovementCameraControlMenu.AddComponent<Image>();
+            imageCameraControl.sprite = PersistentUI.Instance.Sprites.Background;
+            imageCameraControl.type = Image.Type.Sliced;
+            imageCameraControl.color = new Color(0.24f, 0.24f, 0.24f);
+
+            var cameraControlMenuPosXinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos X", "Pos X", new Vector2(0, -15), "", (value) =>
+            {
+            });
+            MoveTransform(cameraControlMenuPosXinput.Item1, 30, 16, 0f, 1, 15, -15);
+            MoveTransform(cameraControlMenuPosXinput.Item3.transform, 40, 20, 0.1f, 1, 5, -15);
+            _cameraPosXinput = cameraControlMenuPosXinput.Item3.InputField;
+            _cameraPosXinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuPosYinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos Y", "Pos Y", new Vector2(0, -15), "", (value) =>
+            {
+            });
+            MoveTransform(cameraControlMenuPosYinput.Item1, 30, 16, 0f, 1, 85, -15);
+            MoveTransform(cameraControlMenuPosYinput.Item3.transform, 40, 20, 0.1f, 1, 75, -15);
+            _cameraPosYinput = cameraControlMenuPosYinput.Item3.InputField;
+            _cameraPosYinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuPosZinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos Z", "Pos Z", new Vector2(0, -15), "", (value) =>
+            {
+            });
+            MoveTransform(cameraControlMenuPosZinput.Item1, 30, 16, 0f, 1, 155, -15);
+            MoveTransform(cameraControlMenuPosZinput.Item3.transform, 40, 20, 0.1f, 1, 145, -15);
+            _cameraPosZinput = cameraControlMenuPosZinput.Item3.InputField;
+            _cameraPosZinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuRotXinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot X", "Rot X", new Vector2(0, -15), "", (value) =>
+            {
+            });
+            MoveTransform(cameraControlMenuRotXinput.Item1, 30, 16, 0f, 1, 230, -15);
+            MoveTransform(cameraControlMenuRotXinput.Item3.transform, 40, 20, 0.1f, 1, 220, -15);
+            _cameraRotXinput = cameraControlMenuRotXinput.Item3.InputField;
+            _cameraRotXinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuRotYinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot Y", "Rot Y", new Vector2(0, -15), "", (value) =>
+            {
+            });
+            MoveTransform(cameraControlMenuRotYinput.Item1, 30, 16, 0f, 1, 300, -15);
+            MoveTransform(cameraControlMenuRotYinput.Item3.transform, 40, 20, 0.1f, 1, 290, -15);
+            _cameraRotYinput = cameraControlMenuRotYinput.Item3.InputField;
+            _cameraRotYinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuRotZinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot Z", "Rot Z", new Vector2(0, -15), "", (value) =>
+            {
+            });
+            MoveTransform(cameraControlMenuRotZinput.Item1, 30, 16, 0f, 1, 370, -15);
+            MoveTransform(cameraControlMenuRotZinput.Item3.transform, 40, 20, 0.1f, 1, 360, -15);
+            _cameraRotZinput = cameraControlMenuRotZinput.Item3.InputField;
+            _cameraRotZinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuFOVinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "FOV", "FOV", new Vector2(0, -15), Settings.Instance.CameraFOV.ToString(), (value) =>
+            {
+                float res;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    Settings.Instance.CameraFOV = res;
+                    _plugin.Reload();
+                }
+            });
+            MoveTransform(cameraControlMenuFOVinput.Item1, 25, 16, 0f, 1, 440, -15);
+            MoveTransform(cameraControlMenuFOVinput.Item3.transform, 35, 20, 0.1f, 1, 425, -15);
+            _cameraFOVinput = cameraControlMenuFOVinput.Item3.InputField;
+            _cameraFOVinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuDistanceinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Dist", "Dist", new Vector2(0, -40), "", (value) =>
+            {
+            });
+            MoveTransform(cameraControlMenuDistanceinput.Item1, 30, 16, 0f, 1, 15, -40);
+            MoveTransform(cameraControlMenuDistanceinput.Item3.transform, 40, 20, 0.1f, 1, 5, -40);
+            _cameraDistanceinput = cameraControlMenuDistanceinput.Item3.InputField;
+            _cameraDistanceinput.textComponent.fontSize = 14;
+
+            var cameraControlMenuCopyButton = AddButton(_cameraMovementCameraControlMenu.transform, "Copy", "Copy", new Vector2(0, -40), () =>
+            {
+
+            });
+            MoveTransform(cameraControlMenuCopyButton.transform, 50, 20, 0, 1, 470, -40);
+
+            _cameraMovementCameraControlMenu.SetActive(Options.CameraControl);
 
         }
 

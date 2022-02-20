@@ -39,5 +39,6 @@
         public static float OriginXoffset { set; get; }  //原点の補正値(BeatSaberスケール)
         public static float OriginYoffset { set; get; }
         public static float OriginZoffset { set; get; }
+        public static bool CameraControl { set; get; }
     }
 }

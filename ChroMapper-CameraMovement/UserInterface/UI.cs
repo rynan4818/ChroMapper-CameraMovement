@@ -18,14 +18,14 @@ namespace ChroMapper_CameraMovement.UserInterface
         private GameObject _cameraMovementCameraControlMenu;
         public static CameraMovementController movementController;
         private readonly ExtensionButton _extensionBtn = new ExtensionButton();
-        private TMP_InputField _cameraPosXinput;
-        private TMP_InputField _cameraPosYinput;
-        private TMP_InputField _cameraPosZinput;
-        private TMP_InputField _cameraRotXinput;
-        private TMP_InputField _cameraRotYinput;
-        private TMP_InputField _cameraRotZinput;
-        private TMP_InputField _cameraFOVinput;
-        private TMP_InputField _cameraDistanceinput;
+        private UITextInput _cameraPosXinput;
+        private UITextInput _cameraPosYinput;
+        private UITextInput _cameraPosZinput;
+        private UITextInput _cameraRotXinput;
+        private UITextInput _cameraRotYinput;
+        private UITextInput _cameraRotZinput;
+        private UITextInput _cameraFOVinput;
+        private UITextInput _cameraDistanceinput;
         public static GameObject cm_MapEditorCamera;
         public TextMeshProUGUI currentBookmarkLabelText;
         public UITextInput bookmarkMenuInputText;
@@ -40,6 +40,15 @@ namespace ChroMapper_CameraMovement.UserInterface
         public UIButton quickCommand5Button;
         public UIButton quickCommand6Button;
 
+        UnityAction<string> posXChange;
+        UnityAction<string> posYChange;
+        UnityAction<string> posZChange;
+        UnityAction<string> rotXChange;
+        UnityAction<string> rotYChange;
+        UnityAction<string> rotZChange;
+        UnityAction<string> fovChange;
+        UnityAction<string> distanceChange;
+
         public enum CameraItem
         {
             PosX,
@@ -49,23 +58,45 @@ namespace ChroMapper_CameraMovement.UserInterface
             RotY,
             RotZ
         }
+        public void CameraPosRotTextSet(Vector3 position,Vector3 rotation)
+        {
+            _cameraPosXinput.InputField.text = position.x.ToString("0.##");
+            _cameraPosYinput.InputField.text = position.y.ToString("0.##");
+            _cameraPosZinput.InputField.text = position.z.ToString("0.##");
+            _cameraRotXinput.InputField.text = rotation.x.ToString("0.#");
+            _cameraRotYinput.InputField.text = rotation.y.ToString("0.#");
+            _cameraRotZinput.InputField.text = rotation.z.ToString("0.#");
+        }
         public void CameraPosRotUpdate()
         {
+            _cameraPosXinput.InputField.onValueChanged.RemoveAllListeners();
+            _cameraPosYinput.InputField.onValueChanged.RemoveAllListeners();
+            _cameraPosZinput.InputField.onValueChanged.RemoveAllListeners();
+            _cameraRotXinput.InputField.onValueChanged.RemoveAllListeners();
+            _cameraRotYinput.InputField.onValueChanged.RemoveAllListeners();
+            _cameraRotZinput.InputField.onValueChanged.RemoveAllListeners();
+            _cameraFOVinput.InputField.onValueChanged.RemoveAllListeners();
+            _cameraDistanceinput.InputField.onValueChanged.RemoveAllListeners();
+
             var cameraPosition = movementController.CameraPositionGet();
-            _cameraPosXinput.text = cameraPosition.x.ToString("0.##");
-            _cameraPosYinput.text = cameraPosition.y.ToString("0.##");
-            _cameraPosZinput.text = cameraPosition.z.ToString("0.##");
-            var cameraRotation = movementController.CameraRotationGet();
-            _cameraRotXinput.text = cameraRotation.x.ToString("0.#");
-            _cameraRotYinput.text = cameraRotation.y.ToString("0.#");
-            _cameraRotZinput.text = cameraRotation.z.ToString("0.#");
-            _cameraFOVinput.text = Settings.Instance.CameraFOV.ToString("0.#");
-            _cameraDistanceinput.text = Vector3.Distance(movementController.AvatarPositionGet(), cameraPosition).ToString("0.#");
+            CameraPosRotTextSet(cameraPosition, movementController.CameraTransformGet().eulerAngles);
+            _cameraFOVinput.InputField.text = Settings.Instance.CameraFOV.ToString("0.#");
+            var distance = Vector3.Distance(movementController.AvatarPositionGet(), cameraPosition).ToString("0.#");
+            _cameraDistanceinput.InputField.text = distance;
+
+            _cameraPosXinput.InputField.onValueChanged.AddListener(posXChange);
+            _cameraPosYinput.InputField.onValueChanged.AddListener(posYChange);
+            _cameraPosZinput.InputField.onValueChanged.AddListener(posZChange);
+            _cameraRotXinput.InputField.onValueChanged.AddListener(rotXChange);
+            _cameraRotYinput.InputField.onValueChanged.AddListener(rotYChange);
+            _cameraRotZinput.InputField.onValueChanged.AddListener(rotZChange);
+            _cameraFOVinput.InputField.onValueChanged.AddListener(fovChange);
+            _cameraDistanceinput.InputField.onValueChanged.AddListener(distanceChange);
         }
         public void CameraPosRotSet(CameraItem item,float value)
         {
             var position = movementController.CameraPositionGet();
-            var rotation = movementController.CameraRotationGet();
+            var rotation = movementController.CameraTransformGet().eulerAngles;
             switch (item)
             {
                 case CameraItem.PosX:
@@ -88,6 +119,8 @@ namespace ChroMapper_CameraMovement.UserInterface
                     break;
             }
             movementController.CameraPositionAndRotationSet(position, rotation);
+            movementController.beforePositon = position;
+            movementController.beforeRotation = Quaternion.Euler(rotation);
         }
 
         public void CurrentBookmarkUpdate(string bookmarkName,int bookmarkNo)
@@ -533,109 +566,127 @@ namespace ChroMapper_CameraMovement.UserInterface
             imageCameraControl.type = Image.Type.Sliced;
             imageCameraControl.color = new Color(0.24f, 0.24f, 0.24f);
 
-            var cameraControlMenuPosXinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos X", "Pos X", new Vector2(0, -15), "", (value) =>
+            posXChange = (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     CameraPosRotSet(CameraItem.PosX, res);
                 }
-            });
+            };
+            var cameraControlMenuPosXinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos X", "Pos X", new Vector2(0, -15), "", posXChange);
             MoveTransform(cameraControlMenuPosXinput.Item1, 30, 16, 0f, 1, 15, -15);
             MoveTransform(cameraControlMenuPosXinput.Item3.transform, 40, 20, 0.1f, 1, 5, -15);
-            _cameraPosXinput = cameraControlMenuPosXinput.Item3.InputField;
-            _cameraPosXinput.textComponent.fontSize = 14;
+            _cameraPosXinput = cameraControlMenuPosXinput.Item3;
+            _cameraPosXinput.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuPosYinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos Y", "Pos Y", new Vector2(0, -15), "", (value) =>
+            posYChange = (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     CameraPosRotSet(CameraItem.PosY, res);
                 }
-            });
+            };
+            var cameraControlMenuPosYinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos Y", "Pos Y", new Vector2(0, -15), "", posYChange);
             MoveTransform(cameraControlMenuPosYinput.Item1, 30, 16, 0f, 1, 85, -15);
             MoveTransform(cameraControlMenuPosYinput.Item3.transform, 40, 20, 0.1f, 1, 75, -15);
-            _cameraPosYinput = cameraControlMenuPosYinput.Item3.InputField;
-            _cameraPosYinput.textComponent.fontSize = 14;
+            _cameraPosYinput = cameraControlMenuPosYinput.Item3;
+            _cameraPosYinput.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuPosZinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos Z", "Pos Z", new Vector2(0, -15), "", (value) =>
+            posZChange = (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     CameraPosRotSet(CameraItem.PosZ, res);
                 }
-            });
+            };
+            var cameraControlMenuPosZinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Pos Z", "Pos Z", new Vector2(0, -15), "", posZChange);
             MoveTransform(cameraControlMenuPosZinput.Item1, 30, 16, 0f, 1, 155, -15);
             MoveTransform(cameraControlMenuPosZinput.Item3.transform, 40, 20, 0.1f, 1, 145, -15);
-            _cameraPosZinput = cameraControlMenuPosZinput.Item3.InputField;
-            _cameraPosZinput.textComponent.fontSize = 14;
+            _cameraPosZinput = cameraControlMenuPosZinput.Item3;
+            _cameraPosZinput.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuRotXinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot X", "Rot X", new Vector2(0, -15), "", (value) =>
+            rotXChange = (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     CameraPosRotSet(CameraItem.RotX, res);
                 }
-            });
+            };
+            var cameraControlMenuRotXinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot X", "Rot X", new Vector2(0, -15), "", rotXChange);
             MoveTransform(cameraControlMenuRotXinput.Item1, 30, 16, 0f, 1, 230, -15);
             MoveTransform(cameraControlMenuRotXinput.Item3.transform, 40, 20, 0.1f, 1, 220, -15);
-            _cameraRotXinput = cameraControlMenuRotXinput.Item3.InputField;
-            _cameraRotXinput.textComponent.fontSize = 14;
+            _cameraRotXinput = cameraControlMenuRotXinput.Item3;
+            _cameraRotXinput.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuRotYinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot Y", "Rot Y", new Vector2(0, -15), "", (value) =>
+            rotYChange = (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     CameraPosRotSet(CameraItem.RotY, res);
                 }
-            });
+            };
+            var cameraControlMenuRotYinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot Y", "Rot Y", new Vector2(0, -15), "", rotYChange);
             MoveTransform(cameraControlMenuRotYinput.Item1, 30, 16, 0f, 1, 300, -15);
             MoveTransform(cameraControlMenuRotYinput.Item3.transform, 40, 20, 0.1f, 1, 290, -15);
-            _cameraRotYinput = cameraControlMenuRotYinput.Item3.InputField;
-            _cameraRotYinput.textComponent.fontSize = 14;
+            _cameraRotYinput = cameraControlMenuRotYinput.Item3;
+            _cameraRotYinput.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuRotZinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot Z", "Rot Z", new Vector2(0, -15), "", (value) =>
+            rotZChange = (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     CameraPosRotSet(CameraItem.RotZ, res);
                 }
-            });
+            };
+            var cameraControlMenuRotZinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Rot Z", "Rot Z", new Vector2(0, -15), "", rotZChange);
             MoveTransform(cameraControlMenuRotZinput.Item1, 30, 16, 0f, 1, 370, -15);
             MoveTransform(cameraControlMenuRotZinput.Item3.transform, 40, 20, 0.1f, 1, 360, -15);
-            _cameraRotZinput = cameraControlMenuRotZinput.Item3.InputField;
-            _cameraRotZinput.textComponent.fontSize = 14;
+            _cameraRotZinput = cameraControlMenuRotZinput.Item3;
+            _cameraRotZinput.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuFOVinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "FOV", "FOV", new Vector2(0, -15), Settings.Instance.CameraFOV.ToString(), (value) =>
+            fovChange = (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Settings.Instance.CameraFOV = res;
                 }
-            });
+            };
+            var cameraControlMenuFOVinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "FOV", "FOV", new Vector2(0, -15), Settings.Instance.CameraFOV.ToString(), fovChange);
             MoveTransform(cameraControlMenuFOVinput.Item1, 25, 16, 0f, 1, 440, -15);
             MoveTransform(cameraControlMenuFOVinput.Item3.transform, 35, 20, 0.1f, 1, 425, -15);
-            _cameraFOVinput = cameraControlMenuFOVinput.Item3.InputField;
-            _cameraFOVinput.textComponent.fontSize = 14;
+            _cameraFOVinput = cameraControlMenuFOVinput.Item3;
+            _cameraFOVinput.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuDistanceinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Dist", "Dist", new Vector2(0, -40), "", (value) =>
+            distanceChange = (string value) =>
             {
-            });
+                float res;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    var new_position = movementController.AvatarPositionGet() - movementController.CameraTransformGet().forward * res;
+                    var rotation = movementController.CameraTransformGet().eulerAngles;
+                    movementController.CameraPositionAndRotationSet(new_position, rotation);
+                    CameraPosRotTextSet(new_position, rotation);
+                    movementController.beforePositon = new_position;
+                    movementController.beforeRotation = Quaternion.Euler(rotation);
+                }
+            };
+            var cameraControlMenuDistanceinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Dist", "Dist", new Vector2(0, -40), "", distanceChange);
             MoveTransform(cameraControlMenuDistanceinput.Item1, 30, 16, 0f, 1, 15, -40);
             MoveTransform(cameraControlMenuDistanceinput.Item3.transform, 40, 20, 0.1f, 1, 5, -40);
-            _cameraDistanceinput = cameraControlMenuDistanceinput.Item3.InputField;
-            _cameraDistanceinput.textComponent.fontSize = 14;
+            _cameraDistanceinput = cameraControlMenuDistanceinput.Item3;
+            _cameraDistanceinput.InputField.textComponent.fontSize = 14;
 
             var cameraControlMenuCopyButton = AddButton(_cameraMovementCameraControlMenu.transform, "Copy", "Copy", new Vector2(0, -40), () =>
             {
                 var positon = movementController.CameraPositionGet();
-                var rotation = movementController.CameraRotationGet();
+                var rotation = movementController.CameraTransformGet().eulerAngles;
                 var text = $"{positon.x.ToString("0.###")}\t{positon.y.ToString("0.###")}\t{positon.z.ToString("0.###")}\tFALSE\t{rotation.x.ToString("0.##")}\t{rotation.y.ToString("0.##")}\t{rotation.z.ToString("0.##")}\t{Settings.Instance.CameraFOV.ToString("0.##")}";
                 GUIUtility.systemCopyBuffer = text;
             });

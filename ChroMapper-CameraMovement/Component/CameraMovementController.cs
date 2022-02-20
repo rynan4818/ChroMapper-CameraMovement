@@ -61,8 +61,8 @@ namespace ChroMapper_CameraMovement.Component
         public Color measureGridColor4_1;
         public Color measureGridColor1;
         public Color baseTransparentColor;
-        public Vector3 beforePositon = Vector3.zero;
-        public Quaternion beforeRotation = Quaternion.Euler(0, 0, 0);
+        public Vector3 beforePositon { get; set; } = Vector3.zero;
+        public Quaternion beforeRotation { get; set; } = Quaternion.Euler(0, 0, 0);
         public bool waveFormIsNoteSide;
         public bool beforeWaveFormIsNoteSide;
         public EventsContainer.PropMode profMode;
@@ -139,9 +139,9 @@ namespace ChroMapper_CameraMovement.Component
             cameraPosition -= new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
             return cameraPosition;
         }
-        public Vector3 CameraRotationGet()
+        public Transform CameraTransformGet()
         {
-            return cm_MapEditorCamera.transform.eulerAngles;
+            return cm_MapEditorCamera.transform;
         }
         public Vector3 AvatarPositionGet()
         {
@@ -221,13 +221,11 @@ namespace ChroMapper_CameraMovement.Component
             MethodInfo method;
             try
             {
-                Debug.Log("HandleNewBookmarkName");
                 method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
                 method.Invoke(bookmarkManager, new object[1] { bookmarkName });
             }
             catch
             {
-                Debug.Log("CreateNewBookmark");
                 //2022.2.7 "New bookmark dialog remade with CMUI"  SHA-1:795115393a1fb265ee6b77f7616941ce62b0e208 での変更対応
                 method = type.GetMethod("CreateNewBookmark", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
                 method.Invoke(bookmarkManager, new object[2] { bookmarkName, null });

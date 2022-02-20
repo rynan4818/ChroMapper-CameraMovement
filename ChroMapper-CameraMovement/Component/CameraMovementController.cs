@@ -196,8 +196,20 @@ namespace ChroMapper_CameraMovement.Component
         public void BookmarkNew(string bookmarkName)
         {
             Type type = bookmarkManager.GetType();
-            MethodInfo method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-            method.Invoke(bookmarkManager, new object[1] { bookmarkName });
+            MethodInfo method;
+            try
+            {
+                Debug.Log("HandleNewBookmarkName");
+                method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+                method.Invoke(bookmarkManager, new object[1] { bookmarkName });
+            }
+            catch
+            {
+                Debug.Log("CreateNewBookmark");
+                //2022.2.7 "New bookmark dialog remade with CMUI"  SHA-1:795115393a1fb265ee6b77f7616941ce62b0e208 での変更対応
+                method = type.GetMethod("CreateNewBookmark", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+                method.Invoke(bookmarkManager, new object[2] { bookmarkName, null });
+            }
         }
 
         public void Reload()

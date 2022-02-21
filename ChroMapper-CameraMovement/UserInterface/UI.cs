@@ -39,6 +39,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public UIButton quickCommand4Button;
         public UIButton quickCommand5Button;
         public UIButton quickCommand6Button;
+        public RectTransform _cameraMovementCameraControlMenuRect;
 
         UnityAction<string> posXChange;
         UnityAction<string> posYChange;
@@ -155,6 +156,18 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             movementController = GameObject.Find("CameraMovement").gameObject.GetComponent<CameraMovementController>();
         }
+        public void CameraControlPanelPosition()
+        {
+            if (Options.BookmarkEdit)
+            {
+                _cameraMovementCameraControlMenuRect.anchorMin = _cameraMovementCameraControlMenuRect.anchorMax = new Vector2(0.7f, 0.2f);
+            }
+            else
+            {
+                _cameraMovementCameraControlMenuRect.anchorMin = _cameraMovementCameraControlMenuRect.anchorMax = new Vector2(0.55f, 0.09f);
+            }
+        }
+
         public void AddMenu(MapEditorUI mapEditorUI)
         {
             CanvasGroup parent = mapEditorUI.MainUIGroup[5];
@@ -210,11 +223,13 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 Options.BookmarkEdit = check;
                 _cameraMovementBookmarkMenu.SetActive(check);
+                CameraControlPanelPosition();
             });
             AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -145), Options.CameraControl, (check) =>
             {
                 Options.CameraControl = check;
                 _cameraMovementCameraControlMenu.SetActive(check);
+                CameraControlPanelPosition();
             });
             var mainMenuMoreSettingsButton = AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -170), () =>
             {
@@ -559,7 +574,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraMovementBookmarkMenu.SetActive(Options.BookmarkEdit);
 
             // Camera Control
-            AttachTransform(_cameraMovementCameraControlMenu, 500, 55, 0.7f, 0.2f, 310, 40, 1, 1);
+            _cameraMovementCameraControlMenuRect = AttachTransform(_cameraMovementCameraControlMenu, 500, 55, 0.7f, 0.2f, 310, 40, 1, 1);
 
             Image imageCameraControl = _cameraMovementCameraControlMenu.AddComponent<Image>();
             imageCameraControl.sprite = PersistentUI.Instance.Sprites.Background;
@@ -682,6 +697,18 @@ namespace ChroMapper_CameraMovement.UserInterface
             MoveTransform(cameraControlMenuDistanceinput.Item3.transform, 40, 20, 0.1f, 1, 5, -40);
             _cameraDistanceinput = cameraControlMenuDistanceinput.Item3;
             _cameraDistanceinput.InputField.textComponent.fontSize = 14;
+
+            var cameraControlMenuMoveSpeed = AddTextInput(_cameraMovementCameraControlMenu.transform, "Move Speed", "Move Speed", new Vector2(0, -15), Settings.Instance.Camera_MovementSpeed.ToString(), (value) =>
+            {
+                float res;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    Settings.Instance.Camera_MovementSpeed = res;
+                }
+            });
+            MoveTransform(cameraControlMenuMoveSpeed.Item1, 30, 16, 0f, 1, 85, -40);
+            MoveTransform(cameraControlMenuMoveSpeed.Item3.transform, 40, 20, 0.1f, 1, 75, -40);
+            cameraControlMenuMoveSpeed.Item3.InputField.textComponent.fontSize = 14;
 
             var cameraControlMenuCopyButton = AddButton(_cameraMovementCameraControlMenu.transform, "Copy", "Copy", new Vector2(0, -40), () =>
             {

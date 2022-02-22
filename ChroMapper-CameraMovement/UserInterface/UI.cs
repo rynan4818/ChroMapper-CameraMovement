@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -714,6 +715,96 @@ namespace ChroMapper_CameraMovement.UserInterface
             MoveTransform(cameraControlMenuMoveSpeed.Item1, 30, 16, 0f, 1, 85, -40);
             MoveTransform(cameraControlMenuMoveSpeed.Item3.transform, 40, 20, 0.1f, 1, 75, -40);
             cameraControlMenuMoveSpeed.Item3.InputField.textComponent.fontSize = 14;
+
+            var cameraControlMenuPasteButton = AddButton(_cameraMovementCameraControlMenu.transform, "Paste", "Paste", new Vector2(0, -40), () =>
+            {
+                var positon = movementController.CameraPositionGet();
+                var rotation = movementController.CameraTransformGet().eulerAngles;
+                var text = Regex.Split(GUIUtility.systemCopyBuffer, "\t");
+                float res, px, py, pz, rx, ry, rz, fov;
+                int i = 0;
+                if (text.Length > 8 || !(text.Length > 4 && float.TryParse(text[4], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res)))
+                    i++;
+                if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    px = res;
+                }
+                else
+                {
+                    px = positon.x;
+                }
+                i++;
+                if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    py = res;
+                }
+                else
+                {
+                    py = positon.y;
+                }
+                i++;
+                if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    pz = res;
+                }
+                else
+                {
+                    pz = positon.z;
+                }
+                i++;
+                var new_position = new Vector3(px, py, pz) + new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
+                Vector3 new_rotation;
+                if (text.Length > i && Regex.IsMatch(text[i], "true", RegexOptions.IgnoreCase))
+                {
+                    var direction = movementController.AvatarPositionGet() - new_position;
+                    var lookRotation = Quaternion.LookRotation(direction);
+                    new_rotation = lookRotation.eulerAngles;
+                    i += 3;
+                }
+                else
+                {
+                    i++;
+                    if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                    {
+                        rx = res;
+                    }
+                    else
+                    {
+                        rx = rotation.x;
+                    }
+                    i++;
+                    if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                    {
+                        ry = res;
+                    }
+                    else
+                    {
+                        ry = rotation.y;
+                    }
+                    i++;
+                    if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                    {
+                        rz = res;
+                    }
+                    else
+                    {
+                        rz = rotation.z;
+                    }
+                    new_rotation = new Vector3(rx, ry, rz);
+                }
+                i++;
+                if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    fov = res;
+                }
+                else
+                {
+                    fov = Settings.Instance.CameraFOV;
+                }
+                movementController.CameraPositionAndRotationSet(new_position, new_rotation);
+                Settings.Instance.CameraFOV = fov;
+            });
+            MoveTransform(cameraControlMenuPasteButton.transform, 50, 20, 0, 1, 410, -40);
 
             var cameraControlMenuCopyButton = AddButton(_cameraMovementCameraControlMenu.transform, "Copy", "Copy", new Vector2(0, -40), () =>
             {

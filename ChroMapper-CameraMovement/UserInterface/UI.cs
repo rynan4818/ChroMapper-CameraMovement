@@ -40,6 +40,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public UIButton quickCommand5Button;
         public UIButton quickCommand6Button;
         public RectTransform _cameraMovementCameraControlMenuRect;
+        public bool cameraPosRotNoUpdate = false;
 
         UnityAction<string> posXChange;
         UnityAction<string> posYChange;
@@ -70,6 +71,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         }
         public void CameraPosRotUpdate()
         {
+            if (!cameraPosRotNoUpdate)
+            {
             _cameraPosXinput.InputField.onValueChanged.RemoveAllListeners();
             _cameraPosYinput.InputField.onValueChanged.RemoveAllListeners();
             _cameraPosZinput.InputField.onValueChanged.RemoveAllListeners();
@@ -93,6 +96,11 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraRotZinput.InputField.onValueChanged.AddListener(rotZChange);
             _cameraFOVinput.InputField.onValueChanged.AddListener(fovChange);
             _cameraDistanceinput.InputField.onValueChanged.AddListener(distanceChange);
+            }
+            else
+            {
+                cameraPosRotNoUpdate = false;
+            }
         }
         public void CameraPosRotSet(CameraItem item,float value)
         {
@@ -120,8 +128,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     break;
             }
             movementController.CameraPositionAndRotationSet(position, rotation);
-            movementController.beforePositon = position;
-            movementController.beforeRotation = Quaternion.Euler(rotation);
+            cameraPosRotNoUpdate = true;
         }
 
         public void CurrentBookmarkUpdate(string bookmarkName,int bookmarkNo)
@@ -671,6 +678,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Settings.Instance.CameraFOV = res;
+                    cameraPosRotNoUpdate = true;
                 }
             };
             var cameraControlMenuFOVinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "FOV", "FOV", new Vector2(0, -15), Settings.Instance.CameraFOV.ToString(), fovChange);
@@ -687,9 +695,6 @@ namespace ChroMapper_CameraMovement.UserInterface
                     var new_position = movementController.AvatarPositionGet() - movementController.CameraTransformGet().forward * res;
                     var rotation = movementController.CameraTransformGet().eulerAngles;
                     movementController.CameraPositionAndRotationSet(new_position, rotation);
-                    CameraPosRotTextSet(new_position, rotation);
-                    movementController.beforePositon = new_position;
-                    movementController.beforeRotation = Quaternion.Euler(rotation);
                 }
             };
             var cameraControlMenuDistanceinput = AddTextInput(_cameraMovementCameraControlMenu.transform, "Dist", "Dist", new Vector2(0, -40), "", distanceChange);

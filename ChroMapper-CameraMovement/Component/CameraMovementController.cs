@@ -61,8 +61,9 @@ namespace ChroMapper_CameraMovement.Component
         public Color measureGridColor4_1;
         public Color measureGridColor1;
         public Color baseTransparentColor;
-        public Vector3 beforePositon { get; set; } = Vector3.zero;
-        public Quaternion beforeRotation { get; set; } = Quaternion.Euler(0, 0, 0);
+        public Vector3 beforePositon = Vector3.zero;
+        public Quaternion beforeRotation = Quaternion.Euler(0, 0, 0);
+        public float beforeFOV = Settings.Instance.CameraFOV;
         public bool waveFormIsNoteSide;
         public bool beforeWaveFormIsNoteSide;
         public EventsContainer.PropMode profMode;
@@ -624,11 +625,12 @@ namespace ChroMapper_CameraMovement.Component
                 BookMarkUpdate();
                 _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, sub_camera , AvatarPositionGet());
             }
-            if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation)
+            if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation || beforeFOV != Settings.Instance.CameraFOV)
             {
                 _ui.CameraPosRotUpdate();
                 beforePositon = cm_MapEditorCamera.transform.position;
                 beforeRotation = cm_MapEditorCamera.transform.rotation;
+                beforeFOV = Settings.Instance.CameraFOV;
             }
         }
 

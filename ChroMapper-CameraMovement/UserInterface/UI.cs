@@ -132,17 +132,17 @@ namespace ChroMapper_CameraMovement.UserInterface
             cameraPosRotNoUpdate = true;
         }
 
-        public void CurrentBookmarkUpdate(string bookmarkName,int bookmarkNo)
+        public void CurrentBookmarkUpdate(string bookmarkName,int bookmarkNo, float time)
         {
             currentBookmarkNo = bookmarkNo;
             currentBookmarkLabelText.text = bookmarkName;
             if (bookmarkNo == 0)
             {
-                bookmarkMenuInputLabel.text = "Current Bookmark  No.-";
+                bookmarkMenuInputLabel.text = "Current No.-";
             }
             else
             {
-                bookmarkMenuInputLabel.text = $"Current Bookmark  No.{bookmarkNo}";
+                bookmarkMenuInputLabel.text = $"Current No.{bookmarkNo} [{time.ToString("0.####")}]";
             }
         }
 
@@ -270,7 +270,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             };
 
             //Setting Menu
-            AttachTransform(_cameraMovementSettingMenu, 200, 410, 1, 1, -50, -55, 1, 1);
+            AttachTransform(_cameraMovementSettingMenu, 200, 440, 1, 1, -50, -55, 1, 1);
 
             Image imageSetting = _cameraMovementSettingMenu.AddComponent<Image>();
             imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
@@ -400,7 +400,21 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 SettingData.SettingSave();
             });
-            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -385), () =>
+            var settingMenuBookmarkExportButton = AddButton(_cameraMovementSettingMenu.transform, "Bookmark Export", "Bookmark Export", new Vector2(0, -385), () =>
+            {
+                movementController.BookmarkExport();
+            });
+            MoveTransform(settingMenuBookmarkExportButton.transform, 70, 25, 0.28f, 1, 0, -385);
+
+            /*
+            var settingMenuBookmarkImportButton = AddButton(_cameraMovementSettingMenu.transform, "Bookmark Import", "Bookmark Import", new Vector2(0, -385), () =>
+            {
+                movementController.BookmarkImport();
+            });
+            MoveTransform(settingMenuBookmarkImportButton.transform, 70, 25, 0.72f, 1, 0, -385);
+            */
+
+            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -415), () =>
             {
                 _cameraMovementSettingMenu.SetActive(false);
             });
@@ -429,10 +443,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0.1f, 1, -10, -37);
             bookmarkSetCheckboxToggle = bookmarkSetCheckbox.Item3;
 
-            var bookmarkMenuInput = AddTextInput(_cameraMovementBookmarkMenu.transform, "Current Bookmark  No.-", "Current Bookmark  No.-", new Vector2(0, -22), "", (value) =>
+            var bookmarkMenuInput = AddTextInput(_cameraMovementBookmarkMenu.transform, "Current No.-", "Current No.-", new Vector2(0, -22), "", (value) =>
             {
             });
-            MoveTransform(bookmarkMenuInput.Item1, 100, 16, 0.1f, 1, 0f, -15);
+            MoveTransform(bookmarkMenuInput.Item1, 150, 16, 0.1f, 1, -20, -15);
             bookmarkMenuInputLabel = bookmarkMenuInput.Item2;
             MoveTransform(bookmarkMenuInput.Item3.transform, 350, 20, 0.1f, 1, 250f, -35);
             bookmarkMenuInputText = bookmarkMenuInput.Item3;
@@ -716,9 +730,19 @@ namespace ChroMapper_CameraMovement.UserInterface
             MoveTransform(cameraControlMenuMoveSpeed.Item3.transform, 40, 20, 0.1f, 1, 75, -40);
             cameraControlMenuMoveSpeed.Item3.InputField.textComponent.fontSize = 14;
 
+            var cameraControlMenuLookAtButton = AddButton(_cameraMovementCameraControlMenu.transform, "Look At", "Look At", new Vector2(0, -40), () =>
+            {
+                var position = movementController.CameraPositionGet();
+                var direction = movementController.AvatarPositionGet() - position;
+                var lookRotation = Quaternion.LookRotation(direction);
+                var new_rotation = lookRotation.eulerAngles;
+                movementController.CameraPositionAndRotationSet(position, new_rotation);
+            });
+            MoveTransform(cameraControlMenuLookAtButton.transform, 50, 20, 0, 1, 175, -40);
+
             var cameraControlMenuPasteButton = AddButton(_cameraMovementCameraControlMenu.transform, "Paste", "Paste", new Vector2(0, -40), () =>
             {
-                var positon = movementController.CameraPositionGet();
+                var position = movementController.CameraPositionGet();
                 var rotation = movementController.CameraTransformGet().eulerAngles;
                 var text = Regex.Split(GUIUtility.systemCopyBuffer, "\t");
                 float res, px, py, pz, rx, ry, rz, fov;
@@ -731,7 +755,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 else
                 {
-                    px = positon.x;
+                    px = position.x;
                 }
                 i++;
                 if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -740,7 +764,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 else
                 {
-                    py = positon.y;
+                    py = position.y;
                 }
                 i++;
                 if (text.Length > i && float.TryParse(text[i], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -749,7 +773,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 else
                 {
-                    pz = positon.z;
+                    pz = position.z;
                 }
                 i++;
                 var new_position = new Vector3(px, py, pz) + new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);

@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FileBrowser">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\FileBrowser.dll</HintPath>
+    </Reference>
     <Reference Include="Main">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\Main.dll</HintPath>
     </Reference>

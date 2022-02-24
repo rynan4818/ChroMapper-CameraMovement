@@ -11,11 +11,12 @@
 
 3. [Script Mapper](https://github.com/hibit-at/Scriptmapper)をダウンロードして、ChroMapperのインストールフォルダ(ChroMapper.exeがあるフォルダ)に`scriptmapper.exe`をコピーします。
 
-# カスタムアバターについて
+# アバターについて
 [カスタムアバター](https://modelsaber.com/Avatars/)の3Dアバターを読み込んで表示できます。
-独自のアバターを読み込ませるには[カスタムアバターの作成方法](https://github.com/rynan4818/ChroMapper-CameraMovement/wiki/%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%82%A2%E3%83%90%E3%82%BF%E3%83%BC%E3%81%AE%E4%BD%9C%E6%88%90%E6%96%B9%E6%B3%95)を参考にして下さい。
 
-[VRMの対応は検討している](https://github.com/rynan4818/ChroMapper-VRMAvatar)のですが、上手く行かず難航しています。ちょっと自力では無理そうな感じ。
+VRM、VRChat用のUnityプロジェクト・パッケージなど他のアバター形式を読み込ませるには[CameraMovementAvatarExporterパッケージ](https://github.com/rynan4818/CameraMovementAvatarExporter)を使用してUnityからCameraMovement専用のカスタムアバターを出力して下さい。
+
+[VRMを直接読み込む検討](https://github.com/rynan4818/ChroMapper-VRMAvatar)はしましたが断念しました。
 
 # 使用法
 譜面を読み込んでエディタ画面を出して下さい。Tabキーを押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。

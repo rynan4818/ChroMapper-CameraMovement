@@ -132,9 +132,9 @@
     <Compile Include="Component\CameraMovementController.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Configuration\SettingData.cs" />
     <Compile Include="UserInterface\UI.cs" />
     <Compile Include="Util\ScriptMapperController.cs" />
+    <Compile Include="Util\SimpleJSON.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.png" />

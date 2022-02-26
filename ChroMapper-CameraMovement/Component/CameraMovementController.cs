@@ -105,7 +105,7 @@ namespace ChroMapper_CameraMovement.Component
         }
         public void BookmarkTrackSet()
         {
-            if (Options.BookmarkLines)
+            if (Options.Instance.bookmarkLines)
                 bookmarkLinesController.RefreshBookmarkLines(bookmarkContainers);
         }
         public void BookmarkWidthChange()
@@ -113,12 +113,12 @@ namespace ChroMapper_CameraMovement.Component
             bookmarkContainers.ForEach(container =>
             {
                 var rectTransform = (RectTransform)container.transform;
-                rectTransform.sizeDelta = new Vector2(Options.BookMarkWidth, 20f);
+                rectTransform.sizeDelta = new Vector2(Options.Instance.bookmarkWidth, 20f);
             });
         }
         public string ScriptGet()
         {
-            return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.ScriptFileName).Replace("/", "\\");
+            return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
         }
         public string MapGet()
         {
@@ -130,16 +130,16 @@ namespace ChroMapper_CameraMovement.Component
         }
         public void CameraPositionAndRotationSet(Vector3 position,Vector3 rotation)
         {
-            position += new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
-            position *= Options.AvatarCameraScale;
-            position += new Vector3(0, Options.OrigenMatchOffsetY, Options.OrigenMatchOffsetZ);
+            position += new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
+            position *= Options.Instance.avatarCameraScale;
+            position += new Vector3(0, Options.Instance.originMatchOffsetY, Options.Instance.originMatchOffsetZ);
             cm_MapEditorCamera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
         }
         public Vector3 CameraPositionGet()
         {
-            var cameraPosition = new Vector3(cm_MapEditorCamera.transform.position.x, cm_MapEditorCamera.transform.position.y - Options.OrigenMatchOffsetY, cm_MapEditorCamera.transform.position.z - Options.OrigenMatchOffsetZ);
-            cameraPosition /= Options.AvatarCameraScale;
-            cameraPosition -= new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
+            var cameraPosition = new Vector3(cm_MapEditorCamera.transform.position.x, cm_MapEditorCamera.transform.position.y - Options.Instance.originMatchOffsetY, cm_MapEditorCamera.transform.position.z - Options.Instance.originMatchOffsetZ);
+            cameraPosition /= Options.Instance.avatarCameraScale;
+            cameraPosition -= new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
             return cameraPosition;
         }
         public Transform CameraTransformGet()
@@ -148,7 +148,7 @@ namespace ChroMapper_CameraMovement.Component
         }
         public Vector3 AvatarPositionGet()
         {
-            return new Vector3(Options.OriginXoffset, Options.AvatarHeadHight + Options.OriginYoffset, Options.OriginZoffset);
+            return new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset);
         }
         public bool SavingThread()
         {
@@ -159,7 +159,7 @@ namespace ChroMapper_CameraMovement.Component
         }
         public void UiHidden()
         {
-            if (Options.UIhidden)
+            if (Options.Instance.uIhidden)
                 beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
             Reload();
         }
@@ -325,48 +325,48 @@ namespace ChroMapper_CameraMovement.Component
         {
             StartCoroutine("CustomAvatarLoad");
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
-            var avatarHeadPosition = new Vector3(Options.OriginXoffset, Options.AvatarHeadHight + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
-            avatarHeadPosition.y += Options.OrigenMatchOffsetY;
-            avatarHeadPosition.z += Options.OrigenMatchOffsetZ;
+            var avatarHeadPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
+            avatarHeadPosition.y += Options.Instance.originMatchOffsetY;
+            avatarHeadPosition.z += Options.Instance.originMatchOffsetZ;
             avatarHead.transform.position = avatarHeadPosition;
-            avatarHead.transform.localScale = new Vector3(Options.AvatarHeadSize, Options.AvatarHeadSize, Options.AvatarHeadSize) * Options.AvatarCameraScale;
+            avatarHead.transform.localScale = new Vector3(Options.Instance.avatarHeadSize, Options.Instance.avatarHeadSize, Options.Instance.avatarHeadSize) * Options.Instance.avatarCameraScale;
             //首の高さ 1.43-0.25÷2=1.305m
             //胴体の中心からの高さは0.3m→1.305m÷0.3m=4.35
-            var body_size_y = (Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f)) / 4.35f;
+            var body_size_y = (Options.Instance.avatarHeadHight - (Options.Instance.avatarHeadSize / 2.0f)) / 4.35f;
             //胴体の直径0.2mは胴体の中心からの高さの1/3
             var body_size_x = body_size_y / 1.5f;
             //胴体の中心1.005は首の高さ1.305m-胴体の中心からの高さ0.3m=1.005
-            var body_pos_y = Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f) - body_size_y;
-            var avatarBodyPosition = new Vector3(Options.OriginXoffset, body_pos_y + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
-            avatarBodyPosition.y += Options.OrigenMatchOffsetY;
-            avatarBodyPosition.z += Options.OrigenMatchOffsetZ;
+            var body_pos_y = Options.Instance.avatarHeadHight - (Options.Instance.avatarHeadSize / 2.0f) - body_size_y;
+            var avatarBodyPosition = new Vector3(Options.Instance.originXoffset, body_pos_y + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
+            avatarBodyPosition.y += Options.Instance.originMatchOffsetY;
+            avatarBodyPosition.z += Options.Instance.originMatchOffsetZ;
             avatarBody.transform.position = avatarBodyPosition;
-            avatarBody.transform.localScale = new Vector3(body_size_x, body_size_y, body_size_x * 0.8f) * Options.AvatarCameraScale;
+            avatarBody.transform.localScale = new Vector3(body_size_x, body_size_y, body_size_x * 0.8f) * Options.Instance.avatarCameraScale;
             //腕の中心高さ1.25mは首の高さ1.305mの 1.305m÷1.25m=1.044
-            var arm_pos_y = (Options.AvatarHeadHight - (Options.AvatarHeadSize / 2.0f)) / 1.044f;
+            var arm_pos_y = (Options.Instance.avatarHeadHight - (Options.Instance.avatarHeadSize / 2.0f)) / 1.044f;
             //腕の大きさ0.06mは腕の長さ1.25m→1.25÷0.06=20.83
-            var arm_size_yz = Options.AvatarArmSize / 20.83f;
-            var avatarArmPosition = new Vector3(Options.OriginXoffset, arm_pos_y + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
-            avatarArmPosition.y += Options.OrigenMatchOffsetY;
-            avatarArmPosition.z += Options.OrigenMatchOffsetZ;
+            var arm_size_yz = Options.Instance.avatarArmSize / 20.83f;
+            var avatarArmPosition = new Vector3(Options.Instance.originXoffset, arm_pos_y + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
+            avatarArmPosition.y += Options.Instance.originMatchOffsetY;
+            avatarArmPosition.z += Options.Instance.originMatchOffsetZ;
             avatarArm.transform.position = avatarArmPosition;
-            avatarArm.transform.localScale = new Vector3(Options.AvatarArmSize, arm_size_yz, arm_size_yz) * Options.AvatarCameraScale;
+            avatarArm.transform.localScale = new Vector3(Options.Instance.avatarArmSize, arm_size_yz, arm_size_yz) * Options.Instance.avatarCameraScale;
             //足の高さは腕の中心から腕のサイズを引いたもの
             var leg_size_y = arm_pos_y - (arm_size_yz / 2.0f);
             var leg_pos_y = leg_size_y / 2.0f;
             var leg_size_xz = leg_size_y / 12f;
-            var avatarLegPosition = new Vector3(Options.OriginXoffset, leg_pos_y + Options.OriginYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
-            avatarLegPosition.y += Options.OrigenMatchOffsetY;
-            avatarLegPosition.z += Options.OrigenMatchOffsetZ;
+            var avatarLegPosition = new Vector3(Options.Instance.originXoffset, leg_pos_y + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
+            avatarLegPosition.y += Options.Instance.originMatchOffsetY;
+            avatarLegPosition.z += Options.Instance.originMatchOffsetZ;
             avatarLeg.transform.position = avatarLegPosition;
-            avatarLeg.transform.localScale = new Vector3(leg_size_xz, leg_size_y, leg_size_xz) * Options.AvatarCameraScale;
+            avatarLeg.transform.localScale = new Vector3(leg_size_xz, leg_size_y, leg_size_xz) * Options.Instance.avatarCameraScale;
             //おさげ
-            var avatarHairPosition = new Vector3(Options.OriginXoffset, Options.AvatarHeadHight - Options.AvatarHeadSize + Options.OriginYoffset, Options.AvatarHeadSize / -2.0f + Options.OriginZoffset) * Options.AvatarCameraScale;
-            avatarHairPosition.y += Options.OrigenMatchOffsetY;
-            avatarHairPosition.z += Options.OrigenMatchOffsetZ;
+            var avatarHairPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight - Options.Instance.avatarHeadSize + Options.Instance.originYoffset, Options.Instance.avatarHeadSize / -2.0f + Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
+            avatarHairPosition.y += Options.Instance.originMatchOffsetY;
+            avatarHairPosition.z += Options.Instance.originMatchOffsetZ;
             avatarHair.transform.position = avatarHairPosition;
-            avatarHair.transform.localScale = new Vector3(Options.AvatarHeadSize / 1.4f, Options.AvatarHeadSize * 2.0f, Options.AvatarHeadSize / 17f) * Options.AvatarCameraScale;
-            if (Options.SimpleAvatar && Options.Avatar)
+            avatarHair.transform.localScale = new Vector3(Options.Instance.avatarHeadSize / 1.4f, Options.Instance.avatarHeadSize * 2.0f, Options.Instance.avatarHeadSize / 17f) * Options.Instance.avatarCameraScale;
+            if (Options.Instance.simpleAvatar && Options.Instance.avatar)
             {
                 avatarHead.gameObject.SetActive(true);
                 avatarArm.gameObject.SetActive(true);
@@ -388,18 +388,18 @@ namespace ChroMapper_CameraMovement.Component
             _cameraMovement.MovementPositionReset();
             BookmarkWidthChange();
             BookmarkTrackSet();
-            bookmarkLines.SetActive(Options.BookmarkLines);
-            if (Options.BookmarkLines)
+            bookmarkLines.SetActive(Options.Instance.bookmarkLines);
+            if (Options.Instance.bookmarkLines)
             {
-                EventBpmOffset(Options.BookmarkInsertOffset);
+                EventBpmOffset(Options.Instance.bookmarkInsertOffset);
             }
             else
             {
                 EventBpmOffset(0);
             }
-            sub_camera.gameObject.SetActive(!(Options.Movement || !Options.SubCamera));
-            sub_camera.rect = new Rect(Options.SubCameraRectX, Options.SubCameraRectY, Options.SubCameraRectW, Options.SubCameraRectH);
-            if (Options.UIhidden)
+            sub_camera.gameObject.SetActive(!(Options.Instance.movement || !Options.Instance.subCamera));
+            sub_camera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
+            if (Options.Instance.uIhidden)
             {
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
@@ -485,15 +485,15 @@ namespace ChroMapper_CameraMovement.Component
         public void WaveFormOffset()
         {
             float offset;
-            if (Options.BookmarkLines)
+            if (Options.Instance.bookmarkLines)
             {
-                offset = Options.BookmarkInsertOffset;
+                offset = Options.Instance.bookmarkInsertOffset;
             }
             else
             {
                 offset = 0;
             }
-            if (Options.UIhidden)
+            if (Options.Instance.uIhidden)
             {
                 offset = 200f;
             }
@@ -507,12 +507,12 @@ namespace ChroMapper_CameraMovement.Component
 
         public IEnumerator CustomAvatarLoad()
         {
-            if (currentAvatarFile != Options.CustomAvatarFileName && Options.CustomAvatar)
+            if (currentAvatarFile != Options.Instance.customAvatarFileName && Options.Instance.customAvatar)
             {
                 currentAvatarFile = "";
                 if (avatarModel != null)
                     Destroy(avatarModel);
-                var avatarFullPath = Path.Combine(Environment.CurrentDirectory, Options.CustomAvatarFileName);
+                var avatarFullPath = Path.Combine(Environment.CurrentDirectory, Options.Instance.customAvatarFileName);
                 if (File.Exists(avatarFullPath))
                 {
                     var request = AssetBundle.LoadFromFileAsync(avatarFullPath);
@@ -527,7 +527,7 @@ namespace ChroMapper_CameraMovement.Component
                             try
                             {
                                 avatarModel = (GameObject)Instantiate(assetBundleRequest.asset);
-                                currentAvatarFile = Options.CustomAvatarFileName;
+                                currentAvatarFile = Options.Instance.customAvatarFileName;
                             }
                             catch
                             {
@@ -552,12 +552,12 @@ namespace ChroMapper_CameraMovement.Component
             }
             if (avatarModel != null)
             {
-                avatarModel.transform.localScale = new Vector3(Options.AvatarScale, Options.AvatarScale, Options.AvatarScale) * Options.AvatarCameraScale;
-                var avatarPosition = new Vector3(Options.OriginXoffset, Options.OriginYoffset + Options.AvatarYoffset, Options.OriginZoffset) * Options.AvatarCameraScale;
-                avatarPosition.y = Options.OrigenMatchOffsetY;
-                avatarPosition.z = Options.OrigenMatchOffsetZ;
+                avatarModel.transform.localScale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
+                var avatarPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset + Options.Instance.avatarYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
+                avatarPosition.y = Options.Instance.originMatchOffsetY;
+                avatarPosition.z = Options.Instance.originMatchOffsetZ;
                 avatarModel.transform.localPosition = avatarPosition;
-                if (Options.CustomAvatar && Options.Avatar)
+                if (Options.Instance.customAvatar && Options.Instance.avatar)
                 {
                     avatarModel.SetActive(true);
                 }

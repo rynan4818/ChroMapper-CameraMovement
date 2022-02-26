@@ -162,16 +162,16 @@ namespace ChroMapper_CameraMovement.CameraPlus
 
             Vector3 cameraPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
             Vector3 cameraRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
-            cameraPos.x += Options.OriginXoffset;
-            cameraPos.y += Options.OriginYoffset;
-            cameraPos.z += Options.OriginZoffset;
-            var cameraPosSet = cameraPos * Options.AvatarCameraScale;
-            cameraPosSet.y += Options.OrigenMatchOffsetY;
-            cameraPosSet.z += Options.OrigenMatchOffsetZ;
+            cameraPos.x += Options.Instance.originXoffset;
+            cameraPos.y += Options.Instance.originYoffset;
+            cameraPos.z += Options.Instance.originZoffset;
+            var cameraPosSet = cameraPos * Options.Instance.avatarCameraScale;
+            cameraPosSet.y += Options.Instance.originMatchOffsetY;
+            cameraPosSet.z += Options.Instance.originMatchOffsetZ;
             if (turnToHead)
             {
-                turnToTarget.y += Options.OrigenMatchOffsetY;
-                turnToTarget.z += Options.OrigenMatchOffsetZ;
+                turnToTarget.y += Options.Instance.originMatchOffsetY;
+                turnToTarget.z += Options.Instance.originMatchOffsetZ;
                 turnToTarget += LerpVector3(StartHeadOffset, EndHeadOffset, Ease(movePerc));
                 var direction = turnToTarget - cameraPos;
                 var lookRotation = Quaternion.LookRotation(direction);
@@ -179,19 +179,19 @@ namespace ChroMapper_CameraMovement.CameraPlus
                     cameraRot = new Vector3(cameraRot.x, lookRotation.eulerAngles.y, cameraRot.z);
                 else
                 {
-                    if (Options.Movement)
+                    if (Options.Instance.movement)
                         cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPosSet, lookRotation);
                     sub_camera.transform.SetPositionAndRotation(cameraPosSet, lookRotation);
                 }
             }
             if (!(turnToHead && turnToHeadHorizontal))
             {
-                if (Options.Movement)
+                if (Options.Instance.movement)
                     cm_MapEditorCamera.transform.SetPositionAndRotation(cameraPosSet, Quaternion.Euler(cameraRot));
                 sub_camera.transform.SetPositionAndRotation(cameraPosSet, Quaternion.Euler(cameraRot));
             }
 
-            if (Options.Movement)
+            if (Options.Instance.movement)
                 Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
             sub_camera.fieldOfView = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
         }
@@ -242,7 +242,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
             if (eventID >= data.Movements.Count)
                 eventID = 0;
 
-            turnToHead = data.TurnToHeadUseCameraSetting ? Options.TurnToHead : data.Movements[eventID].TurnToHead;
+            turnToHead = data.TurnToHeadUseCameraSetting ? Options.instance.turnToHead : data.Movements[eventID].TurnToHead;
             turnToHeadHorizontal = data.Movements[eventID].TurnToHeadHorizontal;
 
             easeTransition = data.Movements[eventID].EaseTransition;

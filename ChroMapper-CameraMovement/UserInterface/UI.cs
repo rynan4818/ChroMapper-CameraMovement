@@ -162,11 +162,11 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public void CameraMovementControllerSet()
         {
-            movementController = GameObject.Find("CameraMovement").gameObject.GetComponent<CameraMovementController>();
+            movementController = GameObject.Find("/CameraMovement").gameObject.GetComponent<CameraMovementController>();
         }
         public void CameraControlPanelPosition()
         {
-            if (Options.BookmarkEdit)
+            if (Options.Instance.bookmarkEdit)
             {
                 _cameraMovementCameraControlMenuRect.anchorMin = _cameraMovementCameraControlMenuRect.anchorMax = new Vector2(0.7f, 0.2f);
             }
@@ -197,45 +197,45 @@ namespace ChroMapper_CameraMovement.UserInterface
             imageMain.color = new Color(0.24f, 0.24f, 0.24f);
 
             AddLabel(_cameraMovementMainMenu.transform, "CameraMovement", "CameraMovement", new Vector2(0, -15));
-            AddCheckbox(_cameraMovementMainMenu.transform, "Movement Enable", "Movement Enable", new Vector2(0, -40), Options.Movement, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Movement Enable", "Movement Enable", new Vector2(0, -40), Options.Instance.movement, (check) =>
             {
-                Options.Movement = check;
+                Options.Instance.movement = check;
                 movementController.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.UIhidden, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.Instance.uIhidden, (check) =>
             {
-                Options.UIhidden = check;
+                Options.Instance.uIhidden = check;
                 movementController.UiHidden();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.TurnToHead, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.Instance.turnToHead, (check) =>
             {
-                Options.TurnToHead = check;
+                Options.Instance.turnToHead = check;
                 movementController.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Avatar", "Avatar", new Vector2(0, -85), Options.Avatar, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Avatar", "Avatar", new Vector2(0, -85), Options.Instance.avatar, (check) =>
             {
-                Options.Avatar = check;
+                Options.Instance.avatar = check;
                 movementController.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Bookmark Lines", "Bookmark Lines", new Vector2(0, -100), Options.BookmarkLines, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Bookmark Lines", "Bookmark Lines", new Vector2(0, -100), Options.Instance.bookmarkLines, (check) =>
             {
-                Options.BookmarkLines = check;
+                Options.Instance.bookmarkLines = check;
                 movementController.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Sub Camera", "Sub Camera", new Vector2(0, -115), Options.SubCamera, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Sub Camera", "Sub Camera", new Vector2(0, -115), Options.Instance.subCamera, (check) =>
             {
-                Options.SubCamera = check;
+                Options.Instance.subCamera = check;
                 movementController.Reload();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Bookmark Edit", "Bookmark Edit", new Vector2(0, -130), Options.BookmarkEdit, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Bookmark Edit", "Bookmark Edit", new Vector2(0, -130), Options.Instance.bookmarkEdit, (check) =>
             {
-                Options.BookmarkEdit = check;
+                Options.Instance.bookmarkEdit = check;
                 _cameraMovementBookmarkMenu.SetActive(check);
                 CameraControlPanelPosition();
             });
-            AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -145), Options.CameraControl, (check) =>
+            AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -145), Options.Instance.cameraControl, (check) =>
             {
-                Options.CameraControl = check;
+                Options.Instance.cameraControl = check;
                 _cameraMovementCameraControlMenu.SetActive(check);
                 CameraControlPanelPosition();
             });
@@ -253,7 +253,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var mainMenuSettingSaveButton = AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -200), () =>
             {
-                SettingData.SettingSave();
+                Options.Instance.SettingSave();
             });
             MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -200);
 
@@ -278,127 +278,127 @@ namespace ChroMapper_CameraMovement.UserInterface
             imageSetting.color = new Color(0.24f, 0.24f, 0.24f);
 
             AddLabel(_cameraMovementSettingMenu.transform, "More Settings", "More Settings", new Vector2(0, -15));
-            AddCheckbox(_cameraMovementSettingMenu.transform, "Custom Avatar", "Custom Avatar", new Vector2(0, -40), Options.CustomAvatar, (check) =>
+            AddCheckbox(_cameraMovementSettingMenu.transform, "Custom Avatar", "Custom Avatar", new Vector2(0, -40), Options.Instance.customAvatar, (check) =>
             {
-                Options.CustomAvatar = check;
+                Options.Instance.customAvatar = check;
                 movementController.Reload();
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar File", "Avatar File", new Vector2(0, -55), Options.CustomAvatarFileName, (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar File", "Avatar File", new Vector2(0, -55), Options.Instance.customAvatarFileName, (value) =>
             {
-                Options.CustomAvatarFileName = value.Trim();
+                Options.Instance.customAvatarFileName = value.Trim();
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Scale", "Avatar Scale", new Vector2(0, -75), Options.AvatarScale.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Scale", "Avatar Scale", new Vector2(0, -75), Options.Instance.avatarScale.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.AvatarScale = res;
+                    Options.Instance.avatarScale = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Y offset", "Avatar Y offset", new Vector2(0, -95), Options.AvatarYoffset.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Y offset", "Avatar Y offset", new Vector2(0, -95), Options.Instance.avatarYoffset.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.AvatarYoffset = res;
+                    Options.Instance.avatarYoffset = res;
                     movementController.Reload();
                 }
             });
-            AddCheckbox(_cameraMovementSettingMenu.transform, "Simple Avatar", "Simple Avatar", new Vector2(0, -125), Options.SimpleAvatar, (check) =>
+            AddCheckbox(_cameraMovementSettingMenu.transform, "Simple Avatar", "Simple Avatar", new Vector2(0, -125), Options.Instance.simpleAvatar, (check) =>
             {
-                Options.SimpleAvatar = check;
+                Options.Instance.simpleAvatar = check;
                 movementController.Reload();
             });
 
-            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight lookat point", new Vector2(0, -140), Options.AvatarHeadHight.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight lookat point", new Vector2(0, -140), Options.Instance.avatarHeadHight.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.AvatarHeadHight = res;
+                    Options.Instance.avatarHeadHight = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Head Size", "Head Size", new Vector2(0, -160), Options.AvatarHeadSize.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Head Size", "Head Size", new Vector2(0, -160), Options.Instance.avatarHeadSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.AvatarHeadSize = res;
+                    Options.Instance.avatarHeadSize = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -180), Options.AvatarArmSize.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -180), Options.Instance.avatarArmSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.AvatarArmSize = res;
+                    Options.Instance.avatarArmSize = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Width", "Bookmark Width", new Vector2(0, -205), Options.BookMarkWidth.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Width", "Bookmark Width", new Vector2(0, -205), Options.Instance.bookmarkWidth.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.BookMarkWidth = res;
+                    Options.Instance.bookmarkWidth = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Area", "Bookmark Area", new Vector2(0, -225), Options.BookmarkInsertOffset.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Area", "Bookmark Area", new Vector2(0, -225), Options.Instance.bookmarkInsertOffset.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.BookmarkInsertOffset = res;
+                    Options.Instance.bookmarkInsertOffset = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub Rect X", new Vector2(0, -245), Options.SubCameraRectX.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub Rect X", new Vector2(0, -245), Options.Instance.subCameraRectX.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.SubCameraRectX = res;
+                    Options.Instance.subCameraRectX = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect Y", "Sub Rect Y", new Vector2(0, -265), Options.SubCameraRectY.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect Y", "Sub Rect Y", new Vector2(0, -265), Options.Instance.subCameraRectY.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.SubCameraRectY = res;
+                    Options.Instance.subCameraRectY = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect W", "Sub Rect W", new Vector2(0, -285), Options.SubCameraRectW.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect W", "Sub Rect W", new Vector2(0, -285), Options.Instance.subCameraRectW.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.SubCameraRectW = res;
+                    Options.Instance.subCameraRectW = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect H", "Sub Rect H", new Vector2(0, -305), Options.SubCameraRectH.ToString(), (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect H", "Sub Rect H", new Vector2(0, -305), Options.Instance.subCameraRectH.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    Options.SubCameraRectH = res;
+                    Options.Instance.subCameraRectH = res;
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -325), Options.ScriptFileName, (value) =>
+            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -325), Options.Instance.scriptFileName, (value) =>
             {
-                Options.ScriptFileName = value.Trim();
+                Options.Instance.scriptFileName = value.Trim();
             });
             AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -355), () =>
             {
-                SettingData.SettingSave();
+                Options.instance.SettingSave();
             });
             var settingMenuBookmarkExportButton = AddButton(_cameraMovementSettingMenu.transform, "Bookmark Export", "Bookmark Export", new Vector2(0, -385), () =>
             {
@@ -479,7 +479,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             MoveTransform(bookmarkMenuDeleteButton.transform, 50, 20, 0.1f, 1, 580, -35);
 
-            quickCommand1Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command1", Options.QuickCommand1, new Vector2(460, -22), () =>
+            quickCommand1Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command1", Options.Instance.quickCommand1, new Vector2(460, -22), () =>
             {
                 if (commandSet)
                 {
@@ -487,18 +487,18 @@ namespace ChroMapper_CameraMovement.UserInterface
                     bookmarkSetCheckboxToggle.isOn = false;
                     if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     {
-                        Options.QuickCommand1 = bookmarkMenuInputText.InputField.text.Trim();
-                        quickCommand1Button.SetText(Options.QuickCommand1);
+                        Options.Instance.quickCommand1 = bookmarkMenuInputText.InputField.text.Trim();
+                        quickCommand1Button.SetText(Options.Instance.quickCommand1);
                     }
                 }
                 else
                 {
-                    bookmarkMenuInputText.InputField.text += Options.QuickCommand1;
+                    bookmarkMenuInputText.InputField.text += Options.Instance.quickCommand1;
                 }
             });
             MoveTransform(quickCommand1Button.transform, 50, 20, 0.1f, 1, 280, -15);
 
-            quickCommand2Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command2", Options.QuickCommand2, new Vector2(460, -22), () =>
+            quickCommand2Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command2", Options.Instance.quickCommand2, new Vector2(460, -22), () =>
             {
                 if (commandSet)
                 {
@@ -506,18 +506,18 @@ namespace ChroMapper_CameraMovement.UserInterface
                     bookmarkSetCheckboxToggle.isOn = false;
                     if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     {
-                        Options.QuickCommand2 = bookmarkMenuInputText.InputField.text.Trim();
-                        quickCommand2Button.SetText(Options.QuickCommand2);
+                        Options.Instance.quickCommand2 = bookmarkMenuInputText.InputField.text.Trim();
+                        quickCommand2Button.SetText(Options.Instance.quickCommand2);
                     }
                 }
                 else
                 {
-                    bookmarkMenuInputText.InputField.text += Options.QuickCommand2;
+                    bookmarkMenuInputText.InputField.text += Options.Instance.quickCommand2;
                 }
             });
             MoveTransform(quickCommand2Button.transform, 50, 20, 0.1f, 1, 340, -15);
 
-            quickCommand3Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command3", Options.QuickCommand3, new Vector2(460, -22), () =>
+            quickCommand3Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command3", Options.Instance.quickCommand3, new Vector2(460, -22), () =>
             {
                 if (commandSet)
                 {
@@ -525,18 +525,18 @@ namespace ChroMapper_CameraMovement.UserInterface
                     bookmarkSetCheckboxToggle.isOn = false;
                     if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     {
-                        Options.QuickCommand3 = bookmarkMenuInputText.InputField.text.Trim();
-                        quickCommand3Button.SetText(Options.QuickCommand3);
+                        Options.Instance.quickCommand3 = bookmarkMenuInputText.InputField.text.Trim();
+                        quickCommand3Button.SetText(Options.Instance.quickCommand3);
                     }
                 }
                 else
                 {
-                    bookmarkMenuInputText.InputField.text += Options.QuickCommand3;
+                    bookmarkMenuInputText.InputField.text += Options.Instance.quickCommand3;
                 }
             });
             MoveTransform(quickCommand3Button.transform, 50, 20, 0.1f, 1, 400, -15);
 
-            quickCommand4Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command4", Options.QuickCommand4, new Vector2(460, -22), () =>
+            quickCommand4Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command4", Options.Instance.quickCommand4, new Vector2(460, -22), () =>
             {
                 if (commandSet)
                 {
@@ -544,18 +544,18 @@ namespace ChroMapper_CameraMovement.UserInterface
                     bookmarkSetCheckboxToggle.isOn = false;
                     if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     {
-                        Options.QuickCommand4 = bookmarkMenuInputText.InputField.text.Trim();
-                        quickCommand4Button.SetText(Options.QuickCommand4);
+                        Options.Instance.quickCommand4 = bookmarkMenuInputText.InputField.text.Trim();
+                        quickCommand4Button.SetText(Options.Instance.quickCommand4);
                     }
                 }
                 else
                 {
-                    bookmarkMenuInputText.InputField.text += Options.QuickCommand4;
+                    bookmarkMenuInputText.InputField.text += Options.Instance.quickCommand4;
                 }
             });
             MoveTransform(quickCommand4Button.transform, 50, 20, 0.1f, 1, 460, -15);
 
-            quickCommand5Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command5", Options.QuickCommand5, new Vector2(460, -22), () =>
+            quickCommand5Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command5", Options.Instance.quickCommand5, new Vector2(460, -22), () =>
             {
                 if (commandSet)
                 {
@@ -563,18 +563,18 @@ namespace ChroMapper_CameraMovement.UserInterface
                     bookmarkSetCheckboxToggle.isOn = false;
                     if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     {
-                        Options.QuickCommand5 = bookmarkMenuInputText.InputField.text.Trim();
-                        quickCommand5Button.SetText(Options.QuickCommand5);
+                        Options.Instance.quickCommand5 = bookmarkMenuInputText.InputField.text.Trim();
+                        quickCommand5Button.SetText(Options.Instance.quickCommand5);
                     }
                 }
                 else
                 {
-                    bookmarkMenuInputText.InputField.text += Options.QuickCommand5;
+                    bookmarkMenuInputText.InputField.text += Options.Instance.quickCommand5;
                 }
             });
             MoveTransform(quickCommand5Button.transform, 50, 20, 0.1f, 1, 520, -15);
 
-            quickCommand6Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command6", Options.QuickCommand6, new Vector2(460, -22), () =>
+            quickCommand6Button = AddButton(_cameraMovementBookmarkMenu.transform, "Command6", Options.Instance.quickCommand6, new Vector2(460, -22), () =>
             {
                 if (commandSet)
                 {
@@ -582,18 +582,18 @@ namespace ChroMapper_CameraMovement.UserInterface
                     bookmarkSetCheckboxToggle.isOn = false;
                     if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     {
-                        Options.QuickCommand6 = bookmarkMenuInputText.InputField.text.Trim();
-                        quickCommand6Button.SetText(Options.QuickCommand6);
+                        Options.Instance.quickCommand6 = bookmarkMenuInputText.InputField.text.Trim();
+                        quickCommand6Button.SetText(Options.Instance.quickCommand6);
                     }
                 }
                 else
                 {
-                    bookmarkMenuInputText.InputField.text += Options.QuickCommand6;
+                    bookmarkMenuInputText.InputField.text += Options.Instance.quickCommand6;
                 }
             });
             MoveTransform(quickCommand6Button.transform, 50, 20, 0.1f, 1, 580, -15);
 
-            _cameraMovementBookmarkMenu.SetActive(Options.BookmarkEdit);
+            _cameraMovementBookmarkMenu.SetActive(Options.Instance.bookmarkEdit);
 
             // Camera Control
             _cameraMovementCameraControlMenuRect = AttachTransform(_cameraMovementCameraControlMenu, 500, 55, 0.7f, 0.2f, 310, 40, 1, 1);
@@ -776,7 +776,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     pz = position.z;
                 }
                 i++;
-                var new_position = new Vector3(px, py, pz) + new Vector3(Options.OriginXoffset, Options.OriginYoffset, Options.OriginZoffset);
+                var new_position = new Vector3(px, py, pz) + new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
                 Vector3 new_rotation;
                 if (text.Length > i && Regex.IsMatch(text[i], "true", RegexOptions.IgnoreCase))
                 {
@@ -839,7 +839,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             MoveTransform(cameraControlMenuCopyButton.transform, 50, 20, 0, 1, 470, -40);
 
-            _cameraMovementCameraControlMenu.SetActive(Options.CameraControl);
+            _cameraMovementCameraControlMenu.SetActive(Options.Instance.cameraControl);
 
         }
 

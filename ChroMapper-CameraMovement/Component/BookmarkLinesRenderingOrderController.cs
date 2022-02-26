@@ -10,7 +10,7 @@ namespace ChroMapper_CameraMovement.Component
         // Start is called before the first frame update
         private void Start()
         {
-            UpdateCanvasOrder(Options.BookmarkLinesShowOnTop);
+            UpdateCanvasOrder(Options.Instance.bookmarkLinesShowOnTop);
         }
 
         // Update is called once per frame

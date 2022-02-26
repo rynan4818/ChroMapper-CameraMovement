@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.UserInterface;
-using ChroMapper_CameraMovement.Configuration;
 using System.Reflection;
 
 namespace ChroMapper_CameraMovement
@@ -11,6 +10,7 @@ namespace ChroMapper_CameraMovement
     [Plugin("Camera Movement")]
     public class Plugin
     {
+        public static GameObject cameraMovement;
         public static CameraMovementController movement;
         private UI _ui;
         public static string setting_file;
@@ -24,9 +24,6 @@ namespace ChroMapper_CameraMovement
             _harmony.PatchAll(Assembly.GetExecutingAssembly());
             Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;
-            setting_file = (Application.persistentDataPath + "/cameramovement.json").Replace("/","\\");
-            SettingData.SettingFileSet(setting_file);
-            SettingData.SettingLoad();
             _ui = new UI();
         }
 
@@ -36,14 +33,17 @@ namespace ChroMapper_CameraMovement
             _harmony.UnpatchAll(HARMONY_ID);
             Debug.Log("Camera Movement:Application has closed!");
         }
+
         private void SceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
+            if (cameraMovement == null)
+                cameraMovement = new GameObject("CameraMovement");
             if (arg0.buildIndex == 3) // Mapper scene
             {
                 if (movement != null && movement.isActiveAndEnabled)
                     return;
 
-                movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
+                movement = cameraMovement.AddComponent<CameraMovementController>();
                 movement.UI_set(_ui);
                 _ui.CameraMovementControllerSet();
                 MapEditorUI mapEditorUI = Object.FindObjectOfType<MapEditorUI>();

@@ -130,6 +130,8 @@ ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイ
 </Project>
 ```
 # 添付ライブラリについて
+
+### UniVRM
 以下のファイルは [UniVRM](https://github.com/vrm-c/UniVRM) の `UniVRM-0.95.1_6465.unitypackage`でビルドしたDLLファイルを使用しています。`vrmavatar.shaders`は同パッケージのアセットから `UniUnlit.shader`をアセットバンドルで出力した物です。
 - UniGLTF.dll
 - UniHumanoid.dll
@@ -138,14 +140,21 @@ ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイ
 - VRMShaders.GLTF.UniUnlit.Runtime.dll
 - vrmavatar.shaders
 - netstandard.dll
-### UniVRMのライセンスは以下です。
-https://github.com/vrm-c/UniVRM/blob/master/LICENSE.txt
 
+ライセンス : https://github.com/vrm-c/UniVRM/blob/master/LICENSE.txt
+
+### Newtonsoft.Json
+Movementスクリプトの読込に使用しています。
 Newtonsoft.Json.dll の配布先・ライセンスは以下です。
-### 配布先
-https://www.newtonsoft.com/json
-### ライセンス
-https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
+
+配布先 : https://www.newtonsoft.com/json
+
+ライセンス : https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
+
+### SimpleJSON
+設定ファイルのJSONパースに[SimpleJSON](https://github.com/Bunny83/SimpleJSON)を使用しています。
+
+ライセンス： https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE
 
 ## プラグイン製作の参考
 `CameraMovement.cs`の大半は、すのーさん製作のCameraPlusの[CameraMovement.cs](https://github.com/Snow1226/CameraPlus/blob/master/CameraPlus/Behaviours/CameraMovement.cs)をコピーして作成しています。カメラ移動部分は全く同じです。

@@ -42,10 +42,6 @@
     <Reference Include="Input">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\Input.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(ChroMapperDir)\Plugins\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="Plugins">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\Plugins.dll</HintPath>
     </Reference>
@@ -137,6 +133,10 @@
     </Reference>
     <Reference Include="VRMShaders.GLTF.IO.Runtime">
       <HintPath>DLL\VRMShaders.GLTF.IO.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

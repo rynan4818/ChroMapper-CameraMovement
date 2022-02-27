@@ -8,7 +8,7 @@
 1. [リリースページ](https://github.com/rynan4818/ChroMapper-CameraMovement/releases)から、最新版のプラグインのzipファイルをダウンロードして下さい。
 
 2. ダウンロードしたzipファイルを解凍して以下の通りファイルをコピーして下さい。
-    - `ChroMapperのインストールフォルダ`(※CML.exeでは無いです)に以下の８つのライブラリファイルをコピーします。
+    - `ChroMapperのインストールフォルダ`(ChroMapper.exeがあるフォルダ ※CML.exeでは無いです)に以下の８つのライブラリファイルをコピーします。
         - netstandard.dll
         - Newtonsoft.Json.dll ・・・ (以前はPluginsフォルダに入れていましたが変更しました)
         - UniGLTF.dll
@@ -52,7 +52,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 ![image](https://user-images.githubusercontent.com/14249877/155874730-eca4ba00-9d26-43e6-a7d8-ae9b97b44f52.png)
 
 * Custom or VRM Avatar ： 読み込んだカスタムアバター・VRMアバターモデルを表示します。
-* Avatar File ： `*.vrm` VRMファイルもしくは、`*.avatar` [カスタムアバターのファイル](https://modelsaber.com/Avatars/)を`Select`ボタンでデフォルト設定はChroMapper.exeと同じフォルダにある[Sour Miku Black v2](https://modelsaber.com/Avatars/?id=1564625718&pc)になっています。
+* Avatar File ： `*.vrm` VRMファイルもしくは、`*.avatar` [カスタムアバターのファイル](https://modelsaber.com/Avatars/)を`Select`ボタンで選択します。デフォルト設定はChroMapper.exeと同じフォルダにある[Sour Miku Black v2](https://modelsaber.com/Avatars/?id=1564625718&pc)になっています。
 * Reload ： アバターファイルを変更した場合の再読み込みボタンです。
 * Select ： アバターファイルを選択します。
 * Avatar Scale ： アバターのサイズ調整用です。実際のアバターのサイズはBeatSaber内でキャリブレーション後に何らかの方法で測定する必要があります。(アバターの半身が映るぐらいの画角で、ゲーム内でスクリプトを動かした録画ファイルと、本プラグインで同じサイズになるように調整するのが一番楽だと思います)

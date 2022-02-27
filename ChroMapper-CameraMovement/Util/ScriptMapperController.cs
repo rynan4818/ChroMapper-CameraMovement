@@ -37,7 +37,7 @@ namespace ChroMapper_CameraMovement.Util
                     return;
                 }
                 bool err = false;
-                var logfile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.instance.scriptMapperLog).Replace("/", "\\");
+                var logfile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptMapperLog).Replace("/", "\\");
                 if (File.Exists(logfile))
                 {
                     using (StreamReader results = File.OpenText(logfile))

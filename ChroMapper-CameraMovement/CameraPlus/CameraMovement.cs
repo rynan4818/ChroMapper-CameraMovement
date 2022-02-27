@@ -242,7 +242,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
             if (eventID >= data.Movements.Count)
                 eventID = 0;
 
-            turnToHead = data.TurnToHeadUseCameraSetting ? Options.instance.turnToHead : data.Movements[eventID].TurnToHead;
+            turnToHead = data.TurnToHeadUseCameraSetting ? Options.Instance.turnToHead : data.Movements[eventID].TurnToHead;
             turnToHeadHorizontal = data.Movements[eventID].TurnToHeadHorizontal;
 
             easeTransition = data.Movements[eventID].EaseTransition;

@@ -8,9 +8,13 @@ namespace ChroMapper_CameraMovement.Configuration
 {
     public class Options
     {
-        public static Options instance;
+        private static Options instance;
         public static readonly string settingJsonFile = Application.persistentDataPath + "/cameramovement.json";
 
+        public string avatarFileName = Path.Combine(Environment.CurrentDirectory, "Sour Miku Black v2.avatar");
+        public bool avatarBlinker = true;
+        public bool avatarLookAt = true;
+        public bool avatarAnimation = true;
         public bool movement = false;
         public bool turnToHead = false;
         public bool avatar = true;
@@ -39,7 +43,6 @@ namespace ChroMapper_CameraMovement.Configuration
         public string quickCommand6 = "random";
         public bool simpleAvatar = true;
         public bool customAvatar = false;
-        public string customAvatarFileName = "Sour Miku Black v2.avatar";
         public float avatarScale = 1f;
         public float avatarYoffset = 0f;
         public float avatarCameraScale = 1.5f;   //ChroMapperとBeatSaberの1単位のスケール違いを補正するためのアバターサイズとカメラ位置の倍数
@@ -49,6 +52,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public float originYoffset = 0;
         public float originZoffset = 0;
         public bool cameraControl = false;
+        public bool vrmAvatarSetting = false;
         public static Options Instance {
             get {
                 if (instance is null)

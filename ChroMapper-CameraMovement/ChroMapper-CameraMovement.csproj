@@ -49,6 +49,7 @@
     <Reference Include="Plugins">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\Plugins.dll</HintPath>
     </Reference>
+    <Reference Include="netstandard" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -67,6 +68,10 @@
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
@@ -120,6 +125,19 @@
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UniGLTF">
+      <HintPath>DLL\UniGLTF.dll</HintPath>
+    </Reference>
+    <Reference Include="UniHumanoid">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\UniHumanoid.dll</HintPath>
+    </Reference>
+    <Reference Include="VRM">
+      <HintPath>DLL\VRM.dll</HintPath>
+    </Reference>
+    <Reference Include="VRMShaders.GLTF.IO.Runtime">
+      <HintPath>DLL\VRMShaders.GLTF.IO.Runtime.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraPlus\CameraMovement.cs" />
@@ -128,13 +146,16 @@
     <Compile Include="CameraPlus\MovementScriptJson.cs" />
     <Compile Include="Configuration\Options.cs" />
     <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />
+    <Compile Include="HarmonyPatches\ShaderPatch.cs" />
     <Compile Include="HarmonyPatches\SpectrogramSideSwapperPatch.cs" />
     <Compile Include="Component\CameraMovementController.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInterface\UI.cs" />
+    <Compile Include="Util\AddVRMShaders.cs" />
     <Compile Include="Util\ScriptMapperController.cs" />
     <Compile Include="Util\SimpleJSON.cs" />
+    <Compile Include="Util\VRMAvatarController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.png" />

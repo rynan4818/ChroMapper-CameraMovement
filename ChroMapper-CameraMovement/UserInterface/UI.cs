@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Util;
+using SFB;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -19,6 +20,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         private GameObject _cameraMovementCameraControlMenu;
         public static CameraMovementController movementController;
         private readonly ExtensionButton _extensionBtn = new ExtensionButton();
+        private UITextInput _avatarFileInputText;
         private UITextInput _cameraPosXinput;
         private UITextInput _cameraPosYinput;
         private UITextInput _cameraPosZinput;
@@ -269,8 +271,8 @@ namespace ChroMapper_CameraMovement.UserInterface
                 _cameraMovementMainMenu.SetActive(!_cameraMovementMainMenu.activeSelf);
             };
 
-            //Setting Menu
-            AttachTransform(_cameraMovementSettingMenu, 200, 440, 1, 1, -50, -55, 1, 1);
+            //More Settings Menu
+            AttachTransform(_cameraMovementSettingMenu, 500, 210, 1, 1, 0, 0, 1, 1);
 
             Image imageSetting = _cameraMovementSettingMenu.AddComponent<Image>();
             imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
@@ -278,16 +280,42 @@ namespace ChroMapper_CameraMovement.UserInterface
             imageSetting.color = new Color(0.24f, 0.24f, 0.24f);
 
             AddLabel(_cameraMovementSettingMenu.transform, "More Settings", "More Settings", new Vector2(0, -15));
-            AddCheckbox(_cameraMovementSettingMenu.transform, "Custom Avatar", "Custom Avatar", new Vector2(0, -40), Options.Instance.customAvatar, (check) =>
+
+            var avatarCheck = AddCheckbox(_cameraMovementSettingMenu.transform, "Custom VRM Avatar", "Custom or VRM Avatar", new Vector2(0, -40), Options.Instance.customAvatar, (check) =>
             {
                 Options.Instance.customAvatar = check;
                 movementController.Reload();
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar File", "Avatar File", new Vector2(0, -55), Options.Instance.customAvatarFileName, (value) =>
+            MoveTransform(avatarCheck.Item3.transform, 30, 25, 0, 1, 30, -45);
+            MoveTransform(avatarCheck.Item1, 160, 16, 0, 1, 120, -40);
+
+            var reloadButton = AddButton(_cameraMovementSettingMenu.transform, "Reload", "Reload", new Vector2(0, -190), () =>
             {
-                Options.Instance.customAvatarFileName = value.Trim();
+                movementController.Reload();
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Scale", "Avatar Scale", new Vector2(0, -75), Options.Instance.avatarScale.ToString(), (value) =>
+            MoveTransform(reloadButton.transform, 40, 20, 1, 1, -80, -40);
+
+            var selectButton = AddButton(_cameraMovementSettingMenu.transform, "Select", "Select", new Vector2(0, -190), () =>
+            {
+                var ext = new ExtensionFilter[] { new ExtensionFilter("Avatar File", new string[] { "avatar", "vrm" }) };
+                var paths = StandaloneFileBrowser.OpenFilePanel("Avatar File", Path.GetDirectoryName(Options.Instance.avatarFileName), ext, false);
+                if (paths.Length > 0 && File.Exists(paths[0]))
+                {
+                    Options.Instance.avatarFileName = paths[0];
+                    _avatarFileInputText.InputField.text = paths[0];
+                }
+            });
+            MoveTransform(selectButton.transform, 40, 20, 1, 1, -35, -40);
+
+            var vrmFileInput = AddTextInput(_cameraMovementSettingMenu.transform, "Avatar File", "Avatar File", new Vector2(0, -75), Options.Instance.avatarFileName, (value) =>
+            {
+                Options.Instance.avatarFileName = value;
+            });
+            _avatarFileInputText = vrmFileInput.Item3;
+            MoveTransform(vrmFileInput.Item1, 60, 16, 0, 1, 25, -60);
+            MoveTransform(vrmFileInput.Item3.transform, 425, 20, 0.1f, 1, 220, -60);
+
+            var scaleInput = AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Scale", "Avatar Scale", new Vector2(0, -175), Options.Instance.avatarScale.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -296,7 +324,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Y offset", "Avatar Y offset", new Vector2(0, -95), Options.Instance.avatarYoffset.ToString(), (value) =>
+            MoveTransform(scaleInput.Item1, 60, 16, 0, 1, 30, -85);
+            MoveTransform(scaleInput.Item3.transform, 40, 20, 0.1f, 1, 35, -85);
+
+            var yOffsetInput = AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Y offset", "Avatar Y offset", new Vector2(0, -195), Options.Instance.avatarYoffset.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -305,13 +336,42 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddCheckbox(_cameraMovementSettingMenu.transform, "Simple Avatar", "Simple Avatar", new Vector2(0, -125), Options.Instance.simpleAvatar, (check) =>
+            MoveTransform(yOffsetInput.Item1, 60, 16, 0, 1, 140, -85);
+            MoveTransform(yOffsetInput.Item3.transform, 40, 20, 0.1f, 1, 145, -85);
+
+            var blinkerCheck = AddCheckbox(_cameraMovementSettingMenu.transform, "VRM Blinker", "VRM Blinker", new Vector2(0, -190), Options.Instance.avatarBlinker, (check) =>
+            {
+                Options.Instance.avatarBlinker = check;
+                movementController.Reload();
+            });
+            MoveTransform(blinkerCheck.Item3.transform, 30, 16, 0, 1, 250, -85);
+            MoveTransform(blinkerCheck.Item1, 50, 16, 0, 1, 280, -85);
+
+            var lookAtCheck = AddCheckbox(_cameraMovementSettingMenu.transform, "VRM LookAt", "VRM LookAt", new Vector2(0, -190), Options.Instance.avatarLookAt, (check) =>
+            {
+                Options.Instance.avatarLookAt = check;
+                movementController.Reload();
+            });
+            MoveTransform(lookAtCheck.Item3.transform, 30, 16, 0, 1, 330, -85);
+            MoveTransform(lookAtCheck.Item1, 70, 16, 0, 1, 370, -85);
+
+            var animationCheck = AddCheckbox(_cameraMovementSettingMenu.transform, "VRM Animation", "VRM Animation", new Vector2(0, -190), Options.Instance.avatarAnimation, (check) =>
+            {
+                Options.Instance.avatarAnimation = check;
+                movementController.Reload();
+            });
+            MoveTransform(animationCheck.Item3.transform, 30, 16, 0, 1, 410, -85);
+            MoveTransform(animationCheck.Item1, 70, 16, 0, 1, 450, -85);
+
+            var simpleAvatarCheck = AddCheckbox(_cameraMovementSettingMenu.transform, "Simple Avatar", "Simple Avatar", new Vector2(0, -140), Options.Instance.simpleAvatar, (check) =>
             {
                 Options.Instance.simpleAvatar = check;
                 movementController.Reload();
             });
+            MoveTransform(simpleAvatarCheck.Item3.transform, 30, 16, 0, 1, 30, -110);
+            MoveTransform(simpleAvatarCheck.Item1, 70, 16, 0, 1, 70, -110);
 
-            AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight lookat point", new Vector2(0, -140), Options.Instance.avatarHeadHight.ToString(), (value) =>
+            var headHightInput = AddTextInput(_cameraMovementSettingMenu.transform, "Head Hight", "Head Hight lookat point", new Vector2(0, -140), Options.Instance.avatarHeadHight.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -320,7 +380,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Head Size", "Head Size", new Vector2(0, -160), Options.Instance.avatarHeadSize.ToString(), (value) =>
+            MoveTransform(headHightInput.Item1, 60, 16, 0, 1, 130, -110);
+            MoveTransform(headHightInput.Item3.transform, 40, 20, 0.1f, 1, 135, -110);
+
+            var headSizeInput = AddTextInput(_cameraMovementSettingMenu.transform, "Head Size", "Head Size", new Vector2(0, -160), Options.Instance.avatarHeadSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -329,7 +392,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -180), Options.Instance.avatarArmSize.ToString(), (value) =>
+            MoveTransform(headSizeInput.Item1, 60, 16, 0, 1, 230, -110);
+            MoveTransform(headSizeInput.Item3.transform, 40, 20, 0.1f, 1, 235, -110);
+
+            var armSizeInput = AddTextInput(_cameraMovementSettingMenu.transform, "Arm Size", "Arm Size", new Vector2(0, -180), Options.Instance.avatarArmSize.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -338,7 +404,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Width", "Bookmark Width", new Vector2(0, -205), Options.Instance.bookmarkWidth.ToString(), (value) =>
+            MoveTransform(armSizeInput.Item1, 60, 16, 0, 1, 320, -110);
+            MoveTransform(armSizeInput.Item3.transform, 40, 20, 0.1f, 1, 325, -110);
+
+            var bookmarkWidthInput = AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Width", "Bookmark Width", new Vector2(0, -205), Options.Instance.bookmarkWidth.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -347,7 +416,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Area", "Bookmark Area", new Vector2(0, -225), Options.Instance.bookmarkInsertOffset.ToString(), (value) =>
+            MoveTransform(bookmarkWidthInput.Item1, 60, 16, 0, 1, 30, -135);
+            MoveTransform(bookmarkWidthInput.Item3.transform, 40, 20, 0.1f, 1, 35, -135);
+
+            var bookmarkAreaInput = AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Area", "Bookmark Area", new Vector2(0, -225), Options.Instance.bookmarkInsertOffset.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -356,7 +428,24 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub Rect X", new Vector2(0, -245), Options.Instance.subCameraRectX.ToString(), (value) =>
+            MoveTransform(bookmarkAreaInput.Item1, 60, 16, 0, 1, 140, -135);
+            MoveTransform(bookmarkAreaInput.Item3.transform, 40, 20, 0.1f, 1, 145, -135);
+
+            var settingMenuBookmarkExportButton = AddButton(_cameraMovementSettingMenu.transform, "Bookmark Export", "Bookmark Export", new Vector2(0, -385), () =>
+            {
+                movementController.BookmarkExport();
+            });
+            MoveTransform(settingMenuBookmarkExportButton.transform, 70, 25, 0, 1, 280, -135);
+
+            /*
+            var settingMenuBookmarkImportButton = AddButton(_cameraMovementSettingMenu.transform, "Bookmark Import", "Bookmark Import", new Vector2(0, -385), () =>
+            {
+                movementController.BookmarkImport();
+            });
+            MoveTransform(settingMenuBookmarkImportButton.transform, 70, 25, 0, 1, 370, -135);
+            */
+
+            var rectXInput = AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub Rect X", new Vector2(0, -245), Options.Instance.subCameraRectX.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -365,7 +454,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect Y", "Sub Rect Y", new Vector2(0, -265), Options.Instance.subCameraRectY.ToString(), (value) =>
+            MoveTransform(rectXInput.Item1, 60, 16, 0, 1, 30, -160);
+            MoveTransform(rectXInput.Item3.transform, 40, 20, 0.1f, 1, 35, -160);
+
+            var rectYInput = AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect Y", "Sub Rect Y", new Vector2(0, -265), Options.Instance.subCameraRectY.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -374,7 +466,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect W", "Sub Rect W", new Vector2(0, -285), Options.Instance.subCameraRectW.ToString(), (value) =>
+            MoveTransform(rectYInput.Item1, 60, 16, 0, 1, 140, -160);
+            MoveTransform(rectYInput.Item3.transform, 40, 20, 0.1f, 1, 145, -160);
+
+            var rectWInput = AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect W", "Sub Rect W", new Vector2(0, -285), Options.Instance.subCameraRectW.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -383,7 +478,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect H", "Sub Rect H", new Vector2(0, -305), Options.Instance.subCameraRectH.ToString(), (value) =>
+            MoveTransform(rectWInput.Item1, 60, 16, 0, 1, 250, -160);
+            MoveTransform(rectWInput.Item3.transform, 40, 20, 0.1f, 1, 255, -160);
+
+            var rectHInput = AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect H", "Sub Rect H", new Vector2(0, -305), Options.Instance.subCameraRectH.ToString(), (value) =>
             {
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
@@ -392,32 +490,27 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -325), Options.Instance.scriptFileName, (value) =>
+            MoveTransform(rectHInput.Item1, 60, 16, 0, 1, 360, -160);
+            MoveTransform(rectHInput.Item3.transform, 40, 20, 0.1f, 1, 365, -160);
+
+            var scriptFileInput = AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -325), Options.Instance.scriptFileName, (value) =>
             {
                 Options.Instance.scriptFileName = value.Trim();
             });
-            AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -355), () =>
-            {
-                Options.instance.SettingSave();
-            });
-            var settingMenuBookmarkExportButton = AddButton(_cameraMovementSettingMenu.transform, "Bookmark Export", "Bookmark Export", new Vector2(0, -385), () =>
-            {
-                movementController.BookmarkExport();
-            });
-            MoveTransform(settingMenuBookmarkExportButton.transform, 70, 25, 0.28f, 1, 0, -385);
+            MoveTransform(scriptFileInput.Item1, 60, 16, 0, 1, 30, -185);
+            MoveTransform(scriptFileInput.Item3.transform, 80, 20, 0.1f, 1, 55, -185);
 
-            /*
-            var settingMenuBookmarkImportButton = AddButton(_cameraMovementSettingMenu.transform, "Bookmark Import", "Bookmark Import", new Vector2(0, -385), () =>
+            var saveButton = AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -250), () =>
             {
-                movementController.BookmarkImport();
+                Options.Instance.SettingSave();
             });
-            MoveTransform(settingMenuBookmarkImportButton.transform, 70, 25, 0.72f, 1, 0, -385);
-            */
+            MoveTransform(saveButton.transform, 70, 25, 0, 1, 350, -190);
 
-            AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -415), () =>
+            var closeButton = AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -415), () =>
             {
                 _cameraMovementSettingMenu.SetActive(false);
             });
+            MoveTransform(closeButton.transform, 70, 25, 0, 1, 440, -190);
 
             _cameraMovementSettingMenu.SetActive(false);
 

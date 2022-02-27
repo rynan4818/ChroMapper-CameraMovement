@@ -1,16 +1,18 @@
 ﻿using HarmonyLib;
+using System;
+using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.UserInterface;
-using System.Reflection;
+using ChroMapper_CameraMovement.Util;
 
 namespace ChroMapper_CameraMovement
 {
     [Plugin("Camera Movement")]
     public class Plugin
     {
-        public static GameObject cameraMovement;
         public static CameraMovementController movement;
         private UI _ui;
         public static string setting_file;
@@ -36,18 +38,16 @@ namespace ChroMapper_CameraMovement
 
         private void SceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
-            if (cameraMovement == null)
-                cameraMovement = new GameObject("CameraMovement");
             if (arg0.buildIndex == 3) // Mapper scene
             {
                 if (movement != null && movement.isActiveAndEnabled)
                     return;
-
-                movement = cameraMovement.AddComponent<CameraMovementController>();
+                movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
                 movement.UI_set(_ui);
                 _ui.CameraMovementControllerSet();
-                MapEditorUI mapEditorUI = Object.FindObjectOfType<MapEditorUI>();
+                MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
                 _ui.AddMenu(mapEditorUI);
+                AddVRMShaders.Initialize(Path.Combine(Environment.CurrentDirectory, "vrmavatar.shaders"));
             }
         }
     }

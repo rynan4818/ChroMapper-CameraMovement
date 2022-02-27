@@ -5,12 +5,14 @@ using System.Reflection;
 using System.Threading;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using TMPro;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.HarmonyPatches;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.CameraPlus;
+using ChroMapper_CameraMovement.Util;
 using SFB;
 
 namespace ChroMapper_CameraMovement.Component
@@ -25,6 +27,7 @@ namespace ChroMapper_CameraMovement.Component
         public static SpectrogramSideSwapper spectrogramSideSwapper;
         public static EventsContainer eventContainer;
         public static BookmarkLinesController bookmarkLinesController;
+        public static VRMAvatarController vrmAvatarController;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
@@ -324,6 +327,7 @@ namespace ChroMapper_CameraMovement.Component
         public void Reload()
         {
             StartCoroutine("CustomAvatarLoad");
+            VRMAvatarLoad();
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
             var avatarHeadPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
             avatarHeadPosition.y += Options.Instance.originMatchOffsetY;
@@ -505,17 +509,48 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
+        public void VRMAvatarLoad()
+        {
+            if (!(!Options.Instance.vrmAvatarSetting && Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.vrm$", RegexOptions.IgnoreCase)))
+                return;
+            if (avatarModel != null)
+            {
+                Destroy(avatarModel);
+                Resources.UnloadUnusedAssets();
+            }
+            if (Options.Instance.customAvatar && Options.Instance.avatar)
+            {
+                if (currentAvatarFile != Options.Instance.avatarFileName)
+                {
+                    currentAvatarFile = Options.Instance.avatarFileName;
+                    vrmAvatarController.LoadModelAsync();
+                }
+                else
+                {
+                    VRMAvatarController.AvatarEnable();
+                    VRMAvatarController.AvatarTransformSet();
+                }
+            }
+            else
+            {
+                VRMAvatarController.AvatarDisable();
+            }
+        }
+
         public IEnumerator CustomAvatarLoad()
         {
-            if (currentAvatarFile != Options.Instance.customAvatarFileName && Options.Instance.customAvatar)
+            if (Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.avatar$", RegexOptions.IgnoreCase) && currentAvatarFile != Options.Instance.avatarFileName && Options.Instance.customAvatar)
             {
                 currentAvatarFile = "";
+                VRMAvatarController.AvatarDisable();
                 if (avatarModel != null)
-                    Destroy(avatarModel);
-                var avatarFullPath = Path.Combine(Environment.CurrentDirectory, Options.Instance.customAvatarFileName);
-                if (File.Exists(avatarFullPath))
                 {
-                    var request = AssetBundle.LoadFromFileAsync(avatarFullPath);
+                    Destroy(avatarModel);
+                    Resources.UnloadUnusedAssets();
+                }
+                if (File.Exists(Options.Instance.avatarFileName))
+                {
+                    var request = AssetBundle.LoadFromFileAsync(Options.Instance.avatarFileName);
                     yield return request;
                     if (request.isDone && request.assetBundle)
                     {
@@ -527,7 +562,7 @@ namespace ChroMapper_CameraMovement.Component
                             try
                             {
                                 avatarModel = (GameObject)Instantiate(assetBundleRequest.asset);
-                                currentAvatarFile = Options.Instance.customAvatarFileName;
+                                currentAvatarFile = Options.Instance.avatarFileName;
                             }
                             catch
                             {
@@ -575,6 +610,7 @@ namespace ChroMapper_CameraMovement.Component
             atsc = FindObjectOfType<AudioTimeSyncController>();
             autoSave = FindObjectOfType<AutoSaveController>();
             spectrogramSideSwapper = FindObjectOfType<SpectrogramSideSwapper>();
+            vrmAvatarController = new VRMAvatarController();
 
             cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
             cm_measureGrid16_1 = GameObject.Find("1/16th Measure Grid");
@@ -586,6 +622,8 @@ namespace ChroMapper_CameraMovement.Component
             cm_GridX = GameObject.Find("Grid X");
             cm_Grid = GameObject.Find("Grid");
             cm_baseTransparent = GameObject.Find("Base Transparent");
+
+            VRMAvatarController.cm_MapEditorCamera = cm_MapEditorCamera;
 
             measureGridColor16_1 = cm_measureGrid16_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
             measureGridColor8_1 = cm_measureGrid8_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
@@ -697,7 +735,7 @@ namespace ChroMapper_CameraMovement.Component
             SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
             init = true;
             BookMarkChangeUpdate();
-            this.Reload();
+            Reload();
         }
         private void Update()
         {

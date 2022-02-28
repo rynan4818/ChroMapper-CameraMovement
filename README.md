@@ -97,7 +97,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Rot Z ： メインカメラのZ軸(画面奥行き方向)の角度です[単位°]
 * FOV ： メインカメラの視野角です。[単位°]
 * Dist ： アバターとメインカメラまでの距離です[単位m]
-* Move Speed ： メインカメラの移動速度です。
+* Move Speed ： メインカメラの右クリック+WASDでの移動速度です。
 * Look At ： メインカメラの角度をアバターの方向に向けます。
 * Paste : Script Mapperのinput.csv形式(タブ区切り)で、クリップボードからカメラ位置・角度・FOVを設定します。
 * Copy ： Script Mapperのinput.csv形式(タブ区切り)で、カメラ位置・角度・FOVをクリップボードにコピーします。

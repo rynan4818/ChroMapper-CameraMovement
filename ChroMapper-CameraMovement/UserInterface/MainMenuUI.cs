@@ -97,7 +97,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             UIUtil.AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -145), Options.Instance.cameraControl, (check) =>
             {
                 Options.Instance.cameraControl = check;
-                Plugin._cameraControlMenuUI._cameraMovementCameraControlMenu.SetActive(check);
+                Plugin._cameraControlMenuUI._cameraControlMenu.SetActive(check);
                 CameraControlPanelPosition();
             });
             var mainMenuMoreSettingsButton = UIUtil.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -170), () =>

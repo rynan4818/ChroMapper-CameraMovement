@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
 
-namespace ChroMapper_CameraMovement.Util
+namespace ChroMapper_CameraMovement.Controller
 {
     public static class ScriptMapperController
     {

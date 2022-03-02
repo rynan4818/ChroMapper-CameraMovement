@@ -153,9 +153,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInterface\UI.cs" />
     <Compile Include="Util\AddVRMShaders.cs" />
-    <Compile Include="Util\ScriptMapperController.cs" />
+    <Compile Include="Controller\ScriptMapperController.cs" />
     <Compile Include="Util\SimpleJSON.cs" />
-    <Compile Include="Util\VRMAvatarController.cs" />
+    <Compile Include="Controller\VRMAvatarController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.png" />

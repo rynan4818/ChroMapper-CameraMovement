@@ -12,7 +12,7 @@ using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.HarmonyPatches;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.CameraPlus;
-using ChroMapper_CameraMovement.Util;
+using ChroMapper_CameraMovement.Controller;
 using SFB;
 
 namespace ChroMapper_CameraMovement.Component

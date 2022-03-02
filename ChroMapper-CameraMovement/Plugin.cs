@@ -47,7 +47,7 @@ namespace ChroMapper_CameraMovement
                 _ui.CameraMovementControllerSet();
                 MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
                 _ui.AddMenu(mapEditorUI);
-                AddVRMShaders.Initialize(Path.Combine(Environment.CurrentDirectory, "vrmavatar.shaders"));
+                AddVRMShaders.Initialize(Path.Combine(Environment.CurrentDirectory, "vrmavatar.shaders"), "UniGLTF/UniUnlit");
             }
         }
     }

@@ -7,7 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
-using ChroMapper_CameraMovement.Util;
+using ChroMapper_CameraMovement.Controller;
 using SFB;
 
 namespace ChroMapper_CameraMovement.UserInterface

@@ -8,7 +8,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using TMPro;
-using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.HarmonyPatches;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.CameraPlus;
@@ -20,7 +19,6 @@ namespace ChroMapper_CameraMovement.Component
     public class CameraMovementController : MonoBehaviour
     {
         public CameraMovement _cameraMovement;
-        private UI _ui;
         public static AudioTimeSyncController atsc;
         public static AutoSaveController autoSave;
         public static BookmarkManager bookmarkManager;
@@ -96,10 +94,6 @@ namespace ChroMapper_CameraMovement.Component
         public bool init = false;
         public bool customEventsObject = false;
         public string currentAvatarFile = "";
-        public void UI_set(UI ui)
-        {
-            this._ui = ui;
-        }
         public void BookmarkContainerGet()
         {
             Type type = bookmarkManager.GetType();
@@ -183,16 +177,16 @@ namespace ChroMapper_CameraMovement.Component
                     var lastBookmark = bookmarkContainers.FindLast(x => x.Data.Time <= atsc.CurrentBeat);
                     if (bookmarkContainers.IndexOf(lastBookmark) == -1)
                     {
-                        this._ui.CurrentBookmarkUpdate("", 0, 0);
+                        Plugin._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
                     }
                     else
                     {
-                        this._ui.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1, lastBookmark.Data.Time);
+                        Plugin._bookmarkMenuUI.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1, lastBookmark.Data.Time);
                     }
                 }
                 else
                 {
-                    this._ui.CurrentBookmarkUpdate("", 0, 0);
+                    Plugin._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
                 }
             }
         }
@@ -753,7 +747,7 @@ namespace ChroMapper_CameraMovement.Component
             }
             if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation || beforeFOV != Settings.Instance.CameraFOV)
             {
-                _ui.CameraPosRotUpdate();
+                Plugin._cameraControlMenuUI.CameraPosRotUpdate();
                 beforePositon = cm_MapEditorCamera.transform.position;
                 beforeRotation = cm_MapEditorCamera.transform.rotation;
                 beforeFOV = Settings.Instance.CameraFOV;

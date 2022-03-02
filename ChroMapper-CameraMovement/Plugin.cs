@@ -14,9 +14,11 @@ namespace ChroMapper_CameraMovement
     public class Plugin
     {
         public static CameraMovementController movement;
-        private UI _ui;
-        public static string setting_file;
-        private static Harmony _harmony;
+        public static MainMenuUI _mainMenuUI;
+        public static SettingMenuUI _settingMenuUI;
+        public static BookmarkMenuUI _bookmarkMenuUI;
+        public static CameraControlMenuUI _cameraControlMenuUI;
+        public static Harmony _harmony;
         public const string HARMONY_ID = "com.github.rynan4818.ChroMapper-CameraMovement";
 
         [Init]
@@ -26,7 +28,11 @@ namespace ChroMapper_CameraMovement
             _harmony.PatchAll(Assembly.GetExecutingAssembly());
             Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;
-            _ui = new UI();
+            _mainMenuUI = new MainMenuUI();
+            _settingMenuUI = new SettingMenuUI();
+            _bookmarkMenuUI = new BookmarkMenuUI();
+            _cameraControlMenuUI = new CameraControlMenuUI();
+            AddVRMShaders.Initialize(Path.Combine(Environment.CurrentDirectory, "vrmavatar.shaders"), "UniGLTF/UniUnlit");
         }
 
         [Exit]
@@ -43,11 +49,11 @@ namespace ChroMapper_CameraMovement
                 if (movement != null && movement.isActiveAndEnabled)
                     return;
                 movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
-                movement.UI_set(_ui);
-                _ui.CameraMovementControllerSet();
                 MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
-                _ui.AddMenu(mapEditorUI);
-                AddVRMShaders.Initialize(Path.Combine(Environment.CurrentDirectory, "vrmavatar.shaders"), "UniGLTF/UniUnlit");
+                _mainMenuUI.AddMenu(mapEditorUI);
+                _settingMenuUI.AddMenu(mapEditorUI);
+                _bookmarkMenuUI.AddMenu(mapEditorUI);
+                _cameraControlMenuUI.AddMenu(mapEditorUI);
             }
         }
     }

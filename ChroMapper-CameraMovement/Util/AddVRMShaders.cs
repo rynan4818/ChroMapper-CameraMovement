@@ -9,12 +9,12 @@ namespace ChroMapper_CameraMovement.Util
     {
         public static Dictionary<string, Shader> Shaders { get; } = new Dictionary<string, Shader>();
 
-        public static void Initialize(string shadersFile)
+        public static void Initialize(string shadersFile, string installCheckShader)
         {
             var installShaders = Resources.FindObjectsOfTypeAll(typeof(Shader));
             foreach (var installShader in installShaders)
             {
-                if (installShader.name == "UniGLTF/UniUnlit")
+                if (installShader.name == installCheckShader)
                     return;
             }
             var bundlePath = Path.Combine(Environment.CurrentDirectory, shadersFile);

@@ -5,7 +5,7 @@ using VRMShaders;
 using UniGLTF;
 using ChroMapper_CameraMovement.Configuration;
 
-namespace ChroMapper_CameraMovement.Util
+namespace ChroMapper_CameraMovement.Controller
 {
     public class VRMAvatarController
     {

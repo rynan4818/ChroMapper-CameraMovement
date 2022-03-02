@@ -53,6 +53,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public float originZoffset = 0;
         public bool cameraControl = false;
         public bool vrmAvatarSetting = false;
+        public bool qFormat = true;
         public static Options Instance {
             get {
                 if (instance is null)

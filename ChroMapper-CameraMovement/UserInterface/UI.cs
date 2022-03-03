@@ -1,12 +1,41 @@
-﻿using TMPro;
+﻿using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TMPro;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
-    public static class UIUtil
+    public class UI
     {
+        public static readonly ExtensionButton _extensionBtn = new ExtensionButton();
+        public static MainMenuUI _mainMenuUI = new MainMenuUI();
+        public static SettingMenuUI _settingMenuUI = new SettingMenuUI();
+        public static BookmarkMenuUI _bookmarkMenuUI = new BookmarkMenuUI();
+        public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
+        public UI()
+        {
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ChroMapper_CameraMovement.Icon.png");
+            byte[] data = new byte[stream.Length];
+            stream.Read(data, 0, (int)stream.Length);
+
+            Texture2D texture2D = new Texture2D(256, 256);
+            texture2D.LoadImage(data);
+
+            _extensionBtn.Icon = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), new Vector2(0, 0), 100.0f);
+            _extensionBtn.Tooltip = "CameraMovement";
+            ExtensionButtons.AddButton(_extensionBtn);
+        }
+
+        public void AddMenu(MapEditorUI mapEditorUI)
+        {
+            _mainMenuUI.AddMenu(mapEditorUI);
+            _settingMenuUI.AddMenu(mapEditorUI);
+            _bookmarkMenuUI.AddMenu(mapEditorUI);
+            _cameraControlMenuUI.AddMenu(mapEditorUI);
+        }
+
         // i ended up copying Top_Cat's CM-JS UI helper, too useful to make my own tho
         // after askin TC if it's one of the only way, he let me use this
         public static UIButton AddButton(Transform parent, string title, string text, Vector2 pos, UnityAction onClick)
@@ -117,6 +146,5 @@ namespace ChroMapper_CameraMovement.UserInterface
             rectTransform.anchorMin = rectTransform.anchorMax = new Vector2(anchorX, anchorY);
             rectTransform.anchoredPosition = new Vector3(anchorPosX, anchorPosY, 0);
         }
-
     }
 }

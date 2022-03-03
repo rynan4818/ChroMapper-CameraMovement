@@ -155,7 +155,7 @@
     <Compile Include="UserInterface\CameraControlMenuUI.cs" />
     <Compile Include="UserInterface\MainMenuUI.cs" />
     <Compile Include="UserInterface\SettingMenuUI.cs" />
-    <Compile Include="UserInterface\UIUtil.cs" />
+    <Compile Include="UserInterface\UI.cs" />
     <Compile Include="Util\AddVRMShaders.cs" />
     <Compile Include="Controller\ScriptMapperController.cs" />
     <Compile Include="Util\SimpleJSON.cs" />

@@ -12,6 +12,7 @@ using ChroMapper_CameraMovement.HarmonyPatches;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.CameraPlus;
 using ChroMapper_CameraMovement.Controller;
+using ChroMapper_CameraMovement.UserInterface;
 using SFB;
 
 namespace ChroMapper_CameraMovement.Component
@@ -177,16 +178,16 @@ namespace ChroMapper_CameraMovement.Component
                     var lastBookmark = bookmarkContainers.FindLast(x => x.Data.Time <= atsc.CurrentBeat);
                     if (bookmarkContainers.IndexOf(lastBookmark) == -1)
                     {
-                        Plugin._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
+                        UI._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
                     }
                     else
                     {
-                        Plugin._bookmarkMenuUI.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1, lastBookmark.Data.Time);
+                        UI._bookmarkMenuUI.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1, lastBookmark.Data.Time);
                     }
                 }
                 else
                 {
-                    Plugin._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
+                    UI._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
                 }
             }
         }
@@ -747,7 +748,7 @@ namespace ChroMapper_CameraMovement.Component
             }
             if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation || beforeFOV != Settings.Instance.CameraFOV)
             {
-                Plugin._cameraControlMenuUI.CameraPosRotUpdate();
+                UI._cameraControlMenuUI.CameraPosRotUpdate();
                 beforePositon = cm_MapEditorCamera.transform.position;
                 beforeRotation = cm_MapEditorCamera.transform.rotation;
                 beforeFOV = Settings.Instance.CameraFOV;

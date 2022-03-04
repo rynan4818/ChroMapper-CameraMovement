@@ -7,20 +7,17 @@
 # インストール方法
 1. [リリースページ](https://github.com/rynan4818/ChroMapper-CameraMovement/releases)から、最新版のプラグインのzipファイルをダウンロードして下さい。
 
-2. ダウンロードしたzipファイルを解凍して以下の通りファイルをコピーして下さい。
-    - `ChroMapperのインストールフォルダ`(ChroMapper.exeがあるフォルダ ※CML.exeでは無いです)に以下の８つのライブラリファイルをコピーします。
-        - netstandard.dll
-        - Newtonsoft.Json.dll ・・・ (以前はPluginsフォルダに入れていましたが変更しました)
-        - UniGLTF.dll
-        - UniHumanoid.dll
-        - VRM.dll
-        - VRMShaders.GLTF.IO.Runtime.dll
-        - VRMShaders.GLTF.UniUnlit.Runtime.dll
-        - vrmavatar.shaders
-    - `Plugins` フォルダに本プラグインをコピーします。
-        - ChroMapper-CameraMovement.dll
+2. ダウンロードしたzipファイルを解凍してChroMapperのインストールフォルダにある`Plugins`フォルダに`ChroMapper-CameraMovement.dll`をコピーします。
 
-    ライブラリのDLLファイルは`ChroMapper_Data\Managed`フォルダでも動作しますが、`vrmavatar.shaders`は ChroMapper.exe があるフォルダに必ずコピーして下さい。
+- Ver1.4.0～1.4.1 では以下のファイルをChroMapperのインストールフォルダにコピーしていましたが、Ver1.4.2 よりChroMapper-CameraMovement.dllに統合したため不要になりました。Ver1.4.0～1.4.1をお使いの方は、不要なため削除して下さい。
+    - netstandard.dll
+    - Newtonsoft.Json.dll
+    - UniGLTF.dll
+    - UniHumanoid.dll
+    - VRM.dll
+    - VRMShaders.GLTF.IO.Runtime.dll
+    - VRMShaders.GLTF.UniUnlit.Runtime.dll
+    - vrmavatar.shaders
 
 3. [Script Mapper](https://github.com/hibit-at/Scriptmapper)をダウンロードして、ChroMapperのインストールフォルダ(ChroMapper.exeがあるフォルダ)に`scriptmapper.exe`をコピーします。
 
@@ -134,29 +131,38 @@ ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイ
 # 添付ライブラリについて
 
 ### UniVRM
-以下のファイルは [UniVRM](https://github.com/vrm-c/UniVRM) の `UniVRM-0.95.1_6465.unitypackage`でビルドしたDLLファイルを使用しています。`vrmavatar.shaders`は同パッケージのアセットから `UniUnlit.shader`をアセットバンドルで出力した物です。
+ChroMapper-CameraMovement.dllには[UniVRM](https://github.com/vrm-c/UniVRM) の `UniVRM-0.96.2_b978.unitypackage`でビルドしたDLLファイルをILMergeによって内包しています。
+- FastSpringBone.dll
+- MToon.dll
 - UniGLTF.dll
 - UniHumanoid.dll
 - VRM.dll
 - VRMShaders.GLTF.IO.Runtime.dll
 - VRMShaders.GLTF.UniUnlit.Runtime.dll
-- vrmavatar.shaders
+- VRMShaders.VRM.IO.Runtime.dll
 - netstandard.dll
 
-ライセンス : https://github.com/vrm-c/UniVRM/blob/master/LICENSE.txt
+また、以下のシェーダーをアセットバンドルで`vrmavatar.shaders`にまとめ、DLLに埋め込んでいます。
+- Assets\VRMShaders\GLTF\UniUnlit\Resources\UniGLTF\UniUnlit.shader
+- Assets\VRMShaders\VRM\MToon\MToon\Resources\Shaders\MToon.shader
+- Assets\VRMShaders\GLTF\IO\Resources\UniGLTF\NormalMapExporter.shader
+- Assets\VRMShaders\GLTF\IO\Resources\UniGLTF\StandardMapExporter.shader
+- Assets\VRMShaders\GLTF\IO\Resources\UniGLTF\StandardMapImporter.shader
 
-### Newtonsoft.Json
-Movementスクリプトの読込に使用しています。
-Newtonsoft.Json.dll の配布先・ライセンスは以下です。
+UniVRMの著作権表記・ライセンスは以下の通りです。
+- https://github.com/vrm-c/UniVRM/blob/master/LICENSE.txt
 
-配布先 : https://www.newtonsoft.com/json
+### Json.NET
+Movementスクリプトの読込に[Json.NET](https://www.newtonsoft.com/json)使用しています。`Newtonsoft.Json.dll`をILMergeによって内包しています。
 
-ライセンス : https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
+Json.NETの著作権表記・ライセンスは以下の通りです。
+- https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
 
 ### SimpleJSON
 設定ファイルのJSONパースに[SimpleJSON](https://github.com/Bunny83/SimpleJSON)を使用しています。
 
-ライセンス： https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE
+SimpleJSONの著作権表記・ライセンスは以下の通りです。
+- https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE
 
 ## プラグイン製作の参考
 `CameraMovement.cs`の大半は、すのーさん製作のCameraPlusの[CameraMovement.cs](https://github.com/Snow1226/CameraPlus/blob/master/CameraPlus/Behaviours/CameraMovement.cs)をコピーして作成しています。カメラ移動部分は全く同じです。

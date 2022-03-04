@@ -16,7 +16,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
         public UI()
         {
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ChroMapper_CameraMovement.Icon.png");
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ChroMapper_CameraMovement.Resources.Icon.png");
             byte[] data = new byte[stream.Length];
             stream.Read(data, 0, (int)stream.Length);
 

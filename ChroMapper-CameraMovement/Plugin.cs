@@ -1,6 +1,4 @@
 ﻿using HarmonyLib;
-using System;
-using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,7 +23,7 @@ namespace ChroMapper_CameraMovement
             _harmony.PatchAll(Assembly.GetExecutingAssembly());
             Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;
-            AddVRMShaders.Initialize(Path.Combine(Environment.CurrentDirectory, "vrmavatar.shaders"), "UniGLTF/UniUnlit");
+            AddVRMShaders.Initialize("ChroMapper_CameraMovement.Resources.vrmavatar.shaders", "UniGLTF/UniUnlit");
             _ui = new UI();
         }
 

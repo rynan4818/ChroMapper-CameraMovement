@@ -164,7 +164,17 @@ Json.NETの著作権表記・ライセンスは以下の通りです。
 SimpleJSONの著作権表記・ライセンスは以下の通りです。
 - https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE
 
-## プラグイン製作の参考
-`CameraMovement.cs`の大半は、すのーさん製作のCameraPlusの[CameraMovement.cs](https://github.com/Snow1226/CameraPlus/blob/master/CameraPlus/Behaviours/CameraMovement.cs)をコピーして作成しています。カメラ移動部分は全く同じです。
+## アイコン素材
+- ICONION
+- http://iconion.com/ja/
 
-`UI.cs`の大半はKival Evanさん製作の[Lolighter](https://github.com/KivalEvan/ChroMapper-Lolighter)の[UI.cs](https://github.com/KivalEvan/ChroMapper-Lolighter/blob/main/UI/UI.cs)をコピーして作成しています。
+## プラグイン製作の参考
+`CameraPlus`フォルダのファイルは、すのーさんの[CameraPlus](https://github.com/Snow1226/CameraPlus)のソースコードをコピー・修正して使用しています。カメラ移動部分の処理は全く同じです。
+
+CameraPlusの著作権表記・ライセンスは以下の通りです。
+- https://github.com/Snow1226/CameraPlus/blob/master/LICENSE
+
+`UI.cs`はKival Evanさん製作の[Lolighter](https://github.com/KivalEvan/ChroMapper-Lolighter)のソースコードをコピー・修正して使用しています。
+
+Lolighterの著作権表記・ライセンスは以下の通りです。
+- https://github.com/KivalEvan/ChroMapper-Lolighter/blob/main/LICENSE

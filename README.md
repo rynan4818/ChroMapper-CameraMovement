@@ -29,6 +29,11 @@
 VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan4818/ChroMapper-VRMAvatar)を作りました。VRMアバターをChroMapperに読み込む単独で動くプラグインです。
 
 # 使用法
+
+本ツールとScriptMapperを使った記事を書いてみました。
+
+**[BeatSaberでカメラを動かしてみよう](https://note.com/rynan/n/n2830a21add26)**
+
 譜面を読み込んでエディタ画面を出して下さい。Tabキーを押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。
 
 ![image](https://user-images.githubusercontent.com/14249877/155874695-cdf4c42f-1620-4020-9855-f19a1c18963d.png)
@@ -102,7 +107,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 上記項目はカメラを移動すると現在値を表示します。値を入力するとその状態にカメラが移動します。
 
 ## 補足
-ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイムライン上をクリックすると最編集できます。またブックマークの削除は、タイムライン上のブックマークをマウス中クリックです。
+ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイムライン上をクリックすると再編集できます。またブックマークの削除は、タイムライン上のブックマークをマウス中クリックです。
 
 メイン画面のカメラ位置はF5～F8に登録して呼び出せます。(MMA2のBackSpaceの代わり)　登録はCtrl + F5～F8です。Shift+で更に登録できるので、合計8箇所登録できます。
 

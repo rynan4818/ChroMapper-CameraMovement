@@ -175,10 +175,19 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>del "$(TargetName)_org.dll"
+    <PostBuildEvent>if exist "$(TargetName)_org.dll" del "$(TargetName)_org.dll"
 ren "$(TargetPath)" "$(TargetName)_org.dll"
+if exist "$(TargetDir)$(TargetName)_org.pdb" del "$(TargetDir)$(TargetName)_org.pdb"
+if exist "$(TargetDir)$(TargetName).pdb" ren "$(TargetDir)$(TargetName).pdb" "$(TargetName)_org.pdb"
 "$(ILMergeConsolePath)" /ndebug /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetPath)" "$(TargetDir)$(TargetName)_org.dll" "$(ProjectDir)DLL\*.dll"
-copy "$(TargetFileName)" "$(ChroMapperDir)\Plugins"</PostBuildEvent>
+copy /Y "$(TargetFileName)" "$(ChroMapperDir)\Plugins"
+if $(ConfigurationName)==Release (
+  if not exist "$(ProjectDir)ReleasesArchives\Release\Plugins" mkdir "$(ProjectDir)ReleasesArchives\Release\Plugins"
+  copy /Y "$(TargetFileName)" "$(ProjectDir)ReleasesArchives\Release\Plugins"
+  if exist "$(ProjectDir)ReleasesArchives\ChroMapper-CameraMovement-.zip" del "$(ProjectDir)ReleasesArchives\ChroMapper-CameraMovement-.zip"
+  powershell compress-archive -Path "$(ProjectDir)ReleasesArchives\Release\*" -DestinationPath "$(ProjectDir)ReleasesArchives\ChroMapper-CameraMovement-.zip"
+)
+</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

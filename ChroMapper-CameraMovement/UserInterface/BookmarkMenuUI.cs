@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
+using ChroMapper_CameraMovement.Controller;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -87,21 +88,28 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     movementController.BookmarkNew(bookmarkMenuInputText.InputField.text);
             });
-            UI.MoveTransform(bookmarkMenuNewButton.transform, 50, 20, 0.1f, 1, 520, -35);
+            UI.MoveTransform(bookmarkMenuNewButton.transform, 30, 20, 0.1f, 1, 500, -35);
 
             var bookmarkMenuChangeButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Change", "Change", new Vector2(460, -22), () =>
             {
                 if (currentBookmarkNo > 0)
                     movementController.BookmarkChange(currentBookmarkNo);
             });
-            UI.MoveTransform(bookmarkMenuChangeButton.transform, 50, 20, 0.1f, 1, 580, -35);
+            UI.MoveTransform(bookmarkMenuChangeButton.transform, 40, 20, 0.1f, 1, 535, -35);
 
             var bookmarkMenuDeleteButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Delete", "Delete", new Vector2(460, -22), () =>
             {
                 if (currentBookmarkNo > 0)
                     movementController.BookmarkDelete(currentBookmarkNo);
             });
-            UI.MoveTransform(bookmarkMenuDeleteButton.transform, 50, 20, 0.1f, 1, 640, -35);
+            UI.MoveTransform(bookmarkMenuDeleteButton.transform, 40, 20, 0.1f, 1, 575, -35);
+
+            var scriptMapperRunButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(460, -22), () =>
+            {
+                ScriptMapperController.ScriptMapperRun(movementController);
+            });
+            scriptMapperRunButton.Text.fontSize = 9;
+            UI.MoveTransform(scriptMapperRunButton.transform, 60, 20, 0.1f, 1, 635, -35);
 
             quickCommand1Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command1", Options.Instance.quickCommand1, new Vector2(460, -22), () =>
             {

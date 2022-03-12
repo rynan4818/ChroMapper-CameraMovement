@@ -45,11 +45,13 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 Options.Instance.movement = check;
                 movementController.Reload();
+                UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.Instance.uIhidden, (check) =>
             {
                 Options.Instance.uIhidden = check;
                 movementController.UiHidden();
+                UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Turn To Head", "Turn To Head", new Vector2(0, -70), Options.Instance.turnToHead, (check) =>
             {
@@ -65,27 +67,32 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 Options.Instance.bookmarkLines = check;
                 movementController.Reload();
+                UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Sub Camera", "Sub Camera", new Vector2(0, -115), Options.Instance.subCamera, (check) =>
             {
                 Options.Instance.subCamera = check;
                 movementController.Reload();
+                UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Bookmark Edit", "Bookmark Edit", new Vector2(0, -130), Options.Instance.bookmarkEdit, (check) =>
             {
                 Options.Instance.bookmarkEdit = check;
                 UI._bookmarkMenuUI._cameraMovementBookmarkMenu.SetActive(check);
                 CameraControlPanelPosition();
+                UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -145), Options.Instance.cameraControl, (check) =>
             {
                 Options.Instance.cameraControl = check;
                 UI._cameraControlMenuUI._cameraControlMenu.SetActive(check);
                 CameraControlPanelPosition();
+                UI.KeyDisableCheck();
             });
             var mainMenuMoreSettingsButton = UI.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -170), () =>
             {
                 UI._settingMenuUI._cameraMovementSettingMenu.SetActive(true);
+                UI.KeyDisableCheck();
             });
             UI.MoveTransform(mainMenuMoreSettingsButton.transform, 70, 25, 0.28f, 1, 0, -170);
 

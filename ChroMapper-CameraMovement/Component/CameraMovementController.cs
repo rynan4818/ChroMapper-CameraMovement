@@ -734,6 +734,7 @@ namespace ChroMapper_CameraMovement.Component
         }
         private void Update()
         {
+            UI.QueuedActionMaps();
             if (_reload || beforeSeconds != atsc.CurrentSeconds)
             {
                 _reload = false;

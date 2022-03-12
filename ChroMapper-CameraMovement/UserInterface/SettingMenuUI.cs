@@ -249,6 +249,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(scriptFileInput.Item1, 60, 16, 0, 1, 30, -185);
             UI.MoveTransform(scriptFileInput.Item3.transform, 80, 20, 0.1f, 1, 55, -185);
 
+            var mappingDisableCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Mapping Disable", "Mapping Disable", new Vector2(0, -140), Options.Instance.mappingDisable, (check) =>
+            {
+                Options.Instance.mappingDisable = check;
+                UI.KeyDisableCheck();
+            });
+            UI.MoveTransform(mappingDisableCheck.Item3.transform, 30, 16, 0, 1, 170, -185);
+            UI.MoveTransform(mappingDisableCheck.Item1, 70, 16, 0, 1, 210, -185);
+
             var saveButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -250), () =>
             {
                 Options.Instance.SettingSave();
@@ -258,6 +266,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var closeButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -415), () =>
             {
                 _cameraMovementSettingMenu.SetActive(false);
+                UI.KeyDisableCheck();
             });
             UI.MoveTransform(closeButton.transform, 70, 25, 0, 1, 440, -190);
 

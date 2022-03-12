@@ -1,9 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.Linq;
+using System.IO;
 using System.Reflection;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using ChroMapper_CameraMovement.Configuration;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -14,6 +18,29 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static SettingMenuUI _settingMenuUI = new SettingMenuUI();
         public static BookmarkMenuUI _bookmarkMenuUI = new BookmarkMenuUI();
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
+        public static List<Type> queuedToDisable = new List<Type>();
+        public static List<Type> queuedToEnable = new List<Type>();
+
+        private static readonly Type[] editActionMapsDisabled =
+        {
+            typeof(CMInput.IBookmarksActions), typeof(CMInput.IEditorScaleActions),
+            typeof(CMInput.ISongSpeedActions), typeof(CMInput.IPlaybackActions),
+            typeof(CMInput.IUIModeActions), typeof(CMInput.IPauseMenuActions),
+            typeof(CMInput.IAudioActions), typeof(CMInput.ILightshowActions),
+            typeof(CMInput.IDebugActions), typeof(CMInput.IMenusExtendedActions),
+            typeof(CMInput.IPlatformDisableableObjectsActions), typeof(CMInput.IRefreshMapActions),
+            typeof(CMInput.IEventUIActions), typeof(CMInput.IWorkflowsActions)
+        };
+
+        private static readonly Type[] actionMapsEnabledWhenNodeEditing =
+        {
+            typeof(CMInput.ICameraActions), typeof(CMInput.IBeatmapObjectsActions),
+            typeof(CMInput.ISavingActions), typeof(CMInput.ITimelineActions)
+        };
+
+        private static Type[] actionMapsDisabled => typeof(CMInput).GetNestedTypes()
+            .Where(x => x.IsInterface && !actionMapsEnabledWhenNodeEditing.Contains(x)).ToArray();
+
         public UI()
         {
             Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ChroMapper_CameraMovement.Resources.Icon.png");
@@ -34,13 +61,59 @@ namespace ChroMapper_CameraMovement.UserInterface
             _settingMenuUI.AddMenu(mapEditorUI);
             _bookmarkMenuUI.AddMenu(mapEditorUI);
             _cameraControlMenuUI.AddMenu(mapEditorUI);
+            KeyDisableCheck();
+        }
+
+        public static void DisableAction(Type[] actionMaps)
+        {
+            foreach (Type actionMap in actionMaps)
+            {
+                queuedToEnable.Remove(actionMap);
+                if (!queuedToDisable.Contains(actionMap))
+                    queuedToDisable.Add(actionMap);
+            }
+        }
+
+        public static void EnableAction(Type[] actionMaps)
+        {
+            foreach (Type actionMap in actionMaps)
+            {
+                queuedToDisable.Remove(actionMap);
+                if (!queuedToEnable.Contains(actionMap))
+                    queuedToEnable.Add(actionMap);
+            }
+        }
+
+        public static void KeyDisableCheck()
+        {
+            if (Options.Instance.mappingDisable && (_settingMenuUI._cameraMovementSettingMenu.activeSelf || _bookmarkMenuUI._cameraMovementBookmarkMenu.activeSelf ||
+                _cameraControlMenuUI._cameraControlMenu.activeSelf || Options.Instance.subCamera || Options.Instance.movement ||
+                Options.Instance.uIhidden || Options.Instance.bookmarkLines))
+            {
+                DisableAction(actionMapsDisabled);
+                EnableAction(editActionMapsDisabled);
+            }
+            else
+            {
+                EnableAction(actionMapsDisabled);
+            }
+        }
+
+        public static void QueuedActionMaps()
+        {
+            if (queuedToDisable.Any())
+                CMInputCallbackInstaller.DisableActionMaps(typeof(UI), queuedToDisable.ToArray());
+            queuedToDisable.Clear();
+            if (queuedToEnable.Any())
+                CMInputCallbackInstaller.ClearDisabledActionMaps(typeof(UI), queuedToEnable.ToArray());
+            queuedToEnable.Clear();
         }
 
         // i ended up copying Top_Cat's CM-JS UI helper, too useful to make my own tho
         // after askin TC if it's one of the only way, he let me use this
         public static UIButton AddButton(Transform parent, string title, string text, Vector2 pos, UnityAction onClick)
         {
-            var button = Object.Instantiate(PersistentUI.Instance.ButtonPrefab, parent);
+            var button = UnityEngine.Object.Instantiate(PersistentUI.Instance.ButtonPrefab, parent);
             MoveTransform(button.transform, 100, 25, 0.5f, 1, pos.x, pos.y);
 
             button.name = title;
@@ -84,7 +157,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             textComponent.fontSize = 12;
             textComponent.text = text;
 
-            var textInput = Object.Instantiate(PersistentUI.Instance.TextInputPrefab, parent);
+            var textInput = UnityEngine.Object.Instantiate(PersistentUI.Instance.TextInputPrefab, parent);
             MoveTransform(textInput.transform, 75, 20, 0.5f, 1, pos.x + 27.5f, pos.y);
             textInput.GetComponent<Image>().pixelsPerUnitMultiplier = 3;
             textInput.InputField.text = value;
@@ -93,6 +166,8 @@ namespace ChroMapper_CameraMovement.UserInterface
             textInput.InputField.textComponent.fontSize = 10;
 
             textInput.InputField.onValueChanged.AddListener(onChange);
+            textInput.InputField.onEndEdit.AddListener(delegate { KeyDisableCheck(); });
+            textInput.InputField.onSelect.AddListener(delegate { DisableAction(actionMapsDisabled); });
             return (rectTransform, textComponent, textInput);
         }
 
@@ -111,7 +186,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             textComponent.text = text;
 
             var original = GameObject.Find("Strobe Generator").GetComponentInChildren<Toggle>(true);
-            var toggleObject = Object.Instantiate(original, parent.transform);
+            var toggleObject = UnityEngine.Object.Instantiate(original, parent.transform);
             MoveTransform(toggleObject.transform, 100, 25, 0.5f, 1, pos.x, pos.y);
 
             var toggleComponent = toggleObject.GetComponent<Toggle>();

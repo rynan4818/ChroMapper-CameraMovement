@@ -111,15 +111,23 @@ namespace ChroMapper_CameraMovement.UserInterface
             cameraPosRotNoUpdate = true;
         }
 
+        public void AnchoredPosSave()
+        {
+            Options.Instance.cameraControlUIAnchoredPosX = _cameraControlMenu.GetComponent<RectTransform>().anchoredPosition.x;
+            Options.Instance.cameraControlUIAnchoredPosY = _cameraControlMenu.GetComponent<RectTransform>().anchoredPosition.y;
+        }
         public void AddMenu(MapEditorUI mapEditorUI)
         {
             movementController = Plugin.movement;
             var parent = mapEditorUI.MainUIGroup[5];
             _cameraControlMenu = new GameObject("Camera Control");
             _cameraControlMenu.transform.parent = parent.transform;
+            _cameraControlMenu.AddComponent<DragWindowController>();
+            _cameraControlMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
+            _cameraControlMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
 
             // Camera Control
-            _cameraMovementCameraControlMenuRect = UI.AttachTransform(_cameraControlMenu, 500, 55, 0.7f, 0.2f, 310, 40, 1, 1);
+            _cameraMovementCameraControlMenuRect = UI.AttachTransform(_cameraControlMenu, 500, 55, 0.7f, 0.2f, Options.Instance.cameraControlUIAnchoredPosX, Options.Instance.cameraControlUIAnchoredPosY, 1, 1);
 
             Image imageCameraControl = _cameraControlMenu.AddComponent<Image>();
             imageCameraControl.sprite = PersistentUI.Instance.Sprites.Background;

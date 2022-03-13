@@ -13,17 +13,10 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static CameraMovementController movementController;
         public static GameObject cm_MapEditorCamera;
 
-        public void CameraControlPanelPosition()
+        public void AnchoredPosSave()
         {
-            var cameraMenuRect = UI._cameraControlMenuUI._cameraMovementCameraControlMenuRect;
-            if (Options.Instance.bookmarkEdit)
-            {
-                cameraMenuRect.anchorMin = cameraMenuRect.anchorMax = new Vector2(0.7f, 0.2f);
-            }
-            else
-            {
-                cameraMenuRect.anchorMin = cameraMenuRect.anchorMax = new Vector2(0.55f, 0.09f);
-            }
+            Options.Instance.mainMenuUIAnchoredPosX = _cameraMovementMainMenu.GetComponent<RectTransform>().anchoredPosition.x;
+            Options.Instance.mainMenuUIAnchoredPosY = _cameraMovementMainMenu.GetComponent<RectTransform>().anchoredPosition.y;
         }
 
         public void AddMenu(MapEditorUI mapEditorUI)
@@ -32,9 +25,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             var parent = mapEditorUI.MainUIGroup[5];
             _cameraMovementMainMenu = new GameObject("CameraMovement Menu");
             _cameraMovementMainMenu.transform.parent = parent.transform;
+            _cameraMovementMainMenu.AddComponent<DragWindowController>();
+            _cameraMovementMainMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
+            _cameraMovementMainMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
 
             //Main Menu
-            UI.AttachTransform(_cameraMovementMainMenu, 170, 240, 1, 1, -50, -30, 1, 1);
+            UI.AttachTransform(_cameraMovementMainMenu, 170, 240, 1, 1, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY, 1, 1);
 
             Image imageMain = _cameraMovementMainMenu.AddComponent<Image>();
             imageMain.sprite = PersistentUI.Instance.Sprites.Background;
@@ -85,14 +81,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 Options.Instance.bookmarkEdit = check;
                 UI._bookmarkMenuUI._cameraMovementBookmarkMenu.SetActive(check);
-                CameraControlPanelPosition();
                 UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -160), Options.Instance.cameraControl, (check) =>
             {
                 Options.Instance.cameraControl = check;
                 UI._cameraControlMenuUI._cameraControlMenu.SetActive(check);
-                CameraControlPanelPosition();
                 UI.KeyDisableCheck();
             });
             var mainMenuMoreSettingsButton = UI.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -185), () =>

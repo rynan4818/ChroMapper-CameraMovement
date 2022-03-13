@@ -12,6 +12,24 @@ namespace ChroMapper_CameraMovement.UserInterface
         public GameObject _cameraMovementSettingMenu;
         public CameraMovementController movementController;
         public UITextInput _avatarFileInputText;
+        public UITextInput subRectX;
+        public UITextInput subRectY;
+        public UITextInput subRectW;
+        public UITextInput subRectH;
+
+        public void AnchoredPosSave()
+        {
+            Options.Instance.settingMenuUIAnchoredPosX = _cameraMovementSettingMenu.GetComponent<RectTransform>().anchoredPosition.x;
+            Options.Instance.settingMenuUIAnchoredPosY = _cameraMovementSettingMenu.GetComponent<RectTransform>().anchoredPosition.y;
+        }
+
+        public void SubCameraRectSet()
+        {
+            subRectX.InputField.text = Options.Instance.subCameraRectX.ToString("0.##");
+            subRectY.InputField.text = Options.Instance.subCameraRectY.ToString("0.##");
+            subRectW.InputField.text = Options.Instance.subCameraRectW.ToString("0.##");
+            subRectH.InputField.text = Options.Instance.subCameraRectH.ToString("0.##");
+        }
 
         public void AddMenu(MapEditorUI mapEditorUI)
         {
@@ -19,9 +37,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             var parent = mapEditorUI.MainUIGroup[5];
             _cameraMovementSettingMenu = new GameObject("CameraMovement Setting Menu");
             _cameraMovementSettingMenu.transform.parent = parent.transform;
+            _cameraMovementSettingMenu.AddComponent<DragWindowController>();
+            _cameraMovementSettingMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
+            _cameraMovementSettingMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
 
             //More Settings Menu
-            UI.AttachTransform(_cameraMovementSettingMenu, 500, 210, 1, 1, 0, 0, 1, 1);
+            UI.AttachTransform(_cameraMovementSettingMenu, 500, 210, 1, 1, Options.Instance.settingMenuUIAnchoredPosX, Options.Instance.settingMenuUIAnchoredPosY, 1, 1);
 
             Image imageSetting = _cameraMovementSettingMenu.AddComponent<Image>();
             imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
@@ -194,8 +215,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(settingMenuBookmarkImportButton.transform, 70, 25, 0, 1, 370, -135);
             */
 
-            var rectXInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub Rect X", new Vector2(0, -245), Options.Instance.subCameraRectX.ToString(), (value) =>
+            var rectXInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub X", new Vector2(0, -245), Options.Instance.subCameraRectX.ToString(), (value) =>
             {
+                if (movementController.SubCameraRectEnableGet())
+                    return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
@@ -205,9 +228,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(rectXInput.Item1, 60, 16, 0, 1, 30, -160);
             UI.MoveTransform(rectXInput.Item3.transform, 40, 20, 0.1f, 1, 35, -160);
+            subRectX = rectXInput.Item3;
 
-            var rectYInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect Y", "Sub Rect Y", new Vector2(0, -265), Options.Instance.subCameraRectY.ToString(), (value) =>
+            var rectYInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect Y", "Sub Y", new Vector2(0, -265), Options.Instance.subCameraRectY.ToString(), (value) =>
             {
+                if (movementController.SubCameraRectEnableGet())
+                    return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
@@ -215,11 +241,20 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            UI.MoveTransform(rectYInput.Item1, 60, 16, 0, 1, 140, -160);
-            UI.MoveTransform(rectYInput.Item3.transform, 40, 20, 0.1f, 1, 145, -160);
+            UI.MoveTransform(rectYInput.Item1, 60, 16, 0, 1, 110, -160);
+            UI.MoveTransform(rectYInput.Item3.transform, 40, 20, 0.1f, 1, 115, -160);
+            subRectY = rectYInput.Item3;
 
-            var rectWInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect W", "Sub Rect W", new Vector2(0, -285), Options.Instance.subCameraRectW.ToString(), (value) =>
+            var subMoveButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Move", "Cursor Key Move", new Vector2(0, -190), () =>
             {
+                movementController.SubCameraRectEnable(true);
+            });
+            UI.MoveTransform(subMoveButton.transform, 50, 25, 0, 1, 220, -160);
+
+            var rectWInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect W", "Sub W", new Vector2(0, -285), Options.Instance.subCameraRectW.ToString(), (value) =>
+            {
+                if (movementController.SubCameraRectEnableGet())
+                    return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
@@ -229,9 +264,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(rectWInput.Item1, 60, 16, 0, 1, 250, -160);
             UI.MoveTransform(rectWInput.Item3.transform, 40, 20, 0.1f, 1, 255, -160);
+            subRectW = rectWInput.Item3;
 
-            var rectHInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect H", "Sub Rect H", new Vector2(0, -305), Options.Instance.subCameraRectH.ToString(), (value) =>
+            var rectHInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect H", "Sub H", new Vector2(0, -305), Options.Instance.subCameraRectH.ToString(), (value) =>
             {
+                if (movementController.SubCameraRectEnableGet())
+                    return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
@@ -239,8 +277,15 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            UI.MoveTransform(rectHInput.Item1, 60, 16, 0, 1, 360, -160);
-            UI.MoveTransform(rectHInput.Item3.transform, 40, 20, 0.1f, 1, 365, -160);
+            UI.MoveTransform(rectHInput.Item1, 60, 16, 0, 1, 330, -160);
+            UI.MoveTransform(rectHInput.Item3.transform, 40, 20, 0.1f, 1, 335, -160);
+            subRectH = rectHInput.Item3;
+
+            var subSizeButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Move", "Cursor Key Size", new Vector2(0, -190), () =>
+            {
+                movementController.SubCameraRectEnable(false);
+            });
+            UI.MoveTransform(subSizeButton.transform, 50, 25, 0, 1, 440, -160);
 
             var scriptFileInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Script File", "Script File", new Vector2(0, -325), Options.Instance.scriptFileName, (value) =>
             {
@@ -267,6 +312,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 _cameraMovementSettingMenu.SetActive(false);
                 UI.KeyDisableCheck();
+                movementController.SubCameraRectDisable();
             });
             UI.MoveTransform(closeButton.transform, 70, 25, 0, 1, 440, -190);
 

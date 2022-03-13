@@ -39,15 +39,24 @@ namespace ChroMapper_CameraMovement.UserInterface
             }
         }
 
+        public void AnchoredPosSave()
+        {
+            Options.Instance.bookmarkUIAnchoredPosX = _cameraMovementBookmarkMenu.GetComponent<RectTransform>().anchoredPosition.x;
+            Options.Instance.bookmarkUIAnchoredPosY = _cameraMovementBookmarkMenu.GetComponent<RectTransform>().anchoredPosition.y;
+        }
+
         public void AddMenu(MapEditorUI mapEditorUI)
         {
             movementController = Plugin.movement;
             var parent = mapEditorUI.MainUIGroup[5];
             _cameraMovementBookmarkMenu = new GameObject("CameraMovement Bookmark");
             _cameraMovementBookmarkMenu.transform.parent = parent.transform;
+            _cameraMovementBookmarkMenu.AddComponent<DragWindowController>();
+            _cameraMovementBookmarkMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
+            _cameraMovementBookmarkMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
 
             //Bookmark
-            UI.AttachTransform(_cameraMovementBookmarkMenu, 750, 55, 0.7f, 0.09f, 150, 40, 1, 1);
+            UI.AttachTransform(_cameraMovementBookmarkMenu, 750, 55, 0.7f, 0.09f, Options.Instance.bookmarkUIAnchoredPosX, Options.Instance.bookmarkUIAnchoredPosY, 1, 1);
 
             Image imageBookmark = _cameraMovementBookmarkMenu.AddComponent<Image>();
             imageBookmark.sprite = PersistentUI.Instance.Sprites.Background;

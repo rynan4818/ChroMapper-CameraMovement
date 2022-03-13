@@ -57,6 +57,8 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject avatarModel;
         public static InputAction previewAction;
         public static InputAction scriptMapperAction;
+        public static InputAction dragWindowsAction;
+        public static InputAction subCameraRectAction;
 
         public bool _reload = false;
         public float beforeSeconds;
@@ -101,6 +103,8 @@ namespace ChroMapper_CameraMovement.Component
         public string currentAvatarFile = "";
         public bool previewMode = false;
         public (bool, bool, bool, bool, bool, bool, Vector3, Quaternion, float) previewEve;
+        public bool subCameraRectPos = true;
+        public bool dragWindowKeyEnable { set; get; } = false;
         public void BookmarkContainerGet()
         {
             Type type = bookmarkManager.GetType();
@@ -686,16 +690,68 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
+        public void OnDragWIndows(InputAction.CallbackContext context)
+        {
+            dragWindowKeyEnable = context.ReadValueAsButton();
+        }
+
+        public void OnSubCameraRect(InputAction.CallbackContext context)
+        {
+            var rect = context.ReadValue<Vector2>();
+            var scale = 100;
+            if (dragWindowKeyEnable)
+                scale = 10;
+            if (subCameraRectPos)
+            {
+                Options.Instance.subCameraRectX += rect.x / scale;
+                if (Options.Instance.subCameraRectX > 1) Options.Instance.subCameraRectX = 1;
+                if (Options.Instance.subCameraRectX < 0) Options.Instance.subCameraRectX = 0;
+                Options.Instance.subCameraRectY += rect.y / scale;
+                if (Options.Instance.subCameraRectY > 1) Options.Instance.subCameraRectY = 1;
+                if (Options.Instance.subCameraRectY < 0) Options.Instance.subCameraRectY = 0;
+            }
+            else
+            {
+                Options.Instance.subCameraRectW += rect.x / scale;
+                if (Options.Instance.subCameraRectW > 1) Options.Instance.subCameraRectW = 1;
+                if (Options.Instance.subCameraRectW < 0) Options.Instance.subCameraRectW = 0;
+                Options.Instance.subCameraRectH += rect.y / scale;
+                if (Options.Instance.subCameraRectH > 1) Options.Instance.subCameraRectH = 1;
+                if (Options.Instance.subCameraRectH < 0) Options.Instance.subCameraRectH = 0;
+            }
+            sub_camera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
+            UI._settingMenuUI.SubCameraRectSet();
+        }
+
+        public void SubCameraRectEnable (bool posEnable)
+        {
+            subCameraRectAction.Enable();
+            subCameraRectPos = posEnable;
+        }
+
+        public void SubCameraRectDisable()
+        {
+            subCameraRectAction.Disable();
+        }
+
+        public bool SubCameraRectEnableGet()
+        {
+            return subCameraRectAction.enabled;
+        }
+
         public void KeyDisable()
         {
             previewAction.Disable();
             scriptMapperAction.Disable();
+            dragWindowsAction.Disable();
+            subCameraRectAction.Disable();
         }
 
         public void KeyEnable()
         {
             previewAction.Enable();
             scriptMapperAction.Enable();
+            dragWindowsAction.Enable();
         }
 
         private IEnumerator Start()
@@ -828,6 +884,19 @@ namespace ChroMapper_CameraMovement.Component
             scriptMapperAction = new InputAction("Script Mapper run", binding: Options.Instance.scriptMapperKeyBinding);
             scriptMapperAction.performed += context => ScriptMapperController.ScriptMapperRun();
             scriptMapperAction.Enable();
+            dragWindowsAction = new InputAction("Drag Windows", binding: Options.Instance.dragWindowKeyBinding);
+            dragWindowsAction.started += OnDragWIndows;
+            dragWindowsAction.performed += OnDragWIndows;
+            dragWindowsAction.canceled += OnDragWIndows;
+            dragWindowsAction.Enable();
+            subCameraRectAction = new InputAction("Sub Camera");
+            subCameraRectAction.AddCompositeBinding("2DVector")
+                .With("Up", "<Keyboard>/upArrow")
+                .With("Down", "<Keyboard>/downArrow")
+                .With("Left", "<Keyboard>/leftArrow")
+                .With("Right", "<Keyboard>/rightArrow");
+            subCameraRectAction.performed += OnSubCameraRect;
+            subCameraRectAction.Disable();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             bookmarkManager = FindObjectOfType<BookmarkManager>();
@@ -882,6 +951,8 @@ namespace ChroMapper_CameraMovement.Component
             SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
             previewAction.Disable();
             scriptMapperAction.Disable();
+            dragWindowsAction.Disable();
+            subCameraRectAction.Disable();
         }
 
     }

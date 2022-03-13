@@ -151,6 +151,7 @@
     <Compile Include="Component\BookmarkLinesController.cs" />
     <Compile Include="Component\BookmarkLinesRenderingOrderController.cs" />
     <Compile Include="CameraPlus\MovementScriptJson.cs" />
+    <Compile Include="Component\DragWindowController.cs" />
     <Compile Include="Configuration\Options.cs" />
     <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />
     <Compile Include="HarmonyPatches\ShaderPatch.cs" />

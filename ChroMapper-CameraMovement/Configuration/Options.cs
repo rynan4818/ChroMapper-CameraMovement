@@ -58,6 +58,15 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool cameraControlSub = false;
         public string previewKeyBinding = "<Keyboard>/f4";
         public string scriptMapperKeyBinding = "<Keyboard>/f3";
+        public string dragWindowKeyBinding = "<Keyboard>/shift";
+        public float bookmarkUIAnchoredPosX = 150;
+        public float bookmarkUIAnchoredPosY = 40;
+        public float cameraControlUIAnchoredPosX = 310;
+        public float cameraControlUIAnchoredPosY = 40;
+        public float mainMenuUIAnchoredPosX = -50;
+        public float mainMenuUIAnchoredPosY = -30;
+        public float settingMenuUIAnchoredPosX = 0;
+        public float settingMenuUIAnchoredPosY = 0;
         public static Options Instance {
             get {
                 if (instance is null)

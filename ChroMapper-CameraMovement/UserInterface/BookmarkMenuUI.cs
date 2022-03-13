@@ -63,8 +63,8 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 commandSet = check;
             });
-            UI.MoveTransform(bookmarkSetCheckbox.Item1, 50, 16, 0.1f, 1, -20, -37);
-            UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0.1f, 1, -10, -37);
+            UI.MoveTransform(bookmarkSetCheckbox.Item1, 50, 16, 0.1f, 1, -40, -37);
+            UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0.1f, 1, -35, -37);
             bookmarkSetCheckboxToggle = bookmarkSetCheckbox.Item3;
 
             var bookmarkMenuInput = UI.AddTextInput(_cameraMovementBookmarkMenu.transform, "No.-", "No.-", new Vector2(0, -22), "", (value) =>
@@ -81,7 +81,13 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 bookmarkMenuInputText.InputField.text = currentBookmarkLabelText.text;
             });
-            UI.MoveTransform(bookmarkMenuCopyButton.transform, 60, 20, 0.1f, 1, 40, -35);
+            UI.MoveTransform(bookmarkMenuCopyButton.transform, 60, 20, 0.1f, 1, 0, -35);
+
+            var bookmarkMenuClearButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Clear", "Clear", new Vector2(460, -22), () =>
+            {
+                bookmarkMenuInputText.InputField.text = "";
+            });
+            UI.MoveTransform(bookmarkMenuClearButton.transform, 40, 20, 0.1f, 1, 55, -35);
 
             var bookmarkMenuNewButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "New", "New", new Vector2(460, -22), () =>
             {

@@ -131,19 +131,65 @@ namespace ChroMapper_CameraMovement.Component
             position += new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
             position *= Options.Instance.avatarCameraScale;
             position += new Vector3(0, Options.Instance.originMatchOffsetY, Options.Instance.originMatchOffsetZ);
-            cm_MapEditorCamera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
+            if (Options.Instance.cameraControlSub)
+            {
+                sub_camera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
+            }
+            else
+            {
+                cm_MapEditorCamera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
+            }
+        }
+        public void CameraFOVSet(float fov)
+        {
+            if (Options.Instance.cameraControlSub)
+            {
+                sub_camera.fieldOfView = fov;
+            }
+            else
+            {
+                Settings.Instance.CameraFOV = fov;
+            }
         }
         public Vector3 CameraPositionGet()
         {
-            var cameraPosition = new Vector3(cm_MapEditorCamera.transform.position.x, cm_MapEditorCamera.transform.position.y - Options.Instance.originMatchOffsetY, cm_MapEditorCamera.transform.position.z - Options.Instance.originMatchOffsetZ);
+            GameObject targetCamera;
+            if (Options.Instance.cameraControlSub)
+            {
+                targetCamera = sub_camera.gameObject;
+            }
+            else
+            {
+                targetCamera = cm_MapEditorCamera;
+            }
+            var cameraPosition = new Vector3(targetCamera.transform.position.x, targetCamera.transform.position.y - Options.Instance.originMatchOffsetY, targetCamera.transform.position.z - Options.Instance.originMatchOffsetZ);
             cameraPosition /= Options.Instance.avatarCameraScale;
             cameraPosition -= new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
             return cameraPosition;
         }
         public Transform CameraTransformGet()
         {
-            return cm_MapEditorCamera.transform;
+            if (Options.Instance.cameraControlSub)
+            {
+                return sub_camera.transform;
+            }
+            else
+            {
+                return cm_MapEditorCamera.transform;
+            }
         }
+        public float CameraFOVGet()
+        {
+            if (Options.Instance.cameraControlSub)
+            {
+                return sub_camera.fieldOfView;
+            }
+            else
+            {
+                return Settings.Instance.CameraFOV;
+            }
+        }
+
         public Vector3 AvatarPositionGet()
         {
             return new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset);
@@ -747,12 +793,24 @@ namespace ChroMapper_CameraMovement.Component
                 BookMarkUpdate();
                 _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, sub_camera , AvatarPositionGet());
             }
-            if (beforePositon != cm_MapEditorCamera.transform.position || beforeRotation != cm_MapEditorCamera.transform.rotation || beforeFOV != Settings.Instance.CameraFOV)
+            GameObject targetCamera;
+            float targetFOV;
+            if (Options.Instance.cameraControlSub)
+            {
+                targetCamera = sub_camera.gameObject;
+                targetFOV = sub_camera.fieldOfView;
+            }
+            else
+            {
+                targetCamera = cm_MapEditorCamera;
+                targetFOV = Settings.Instance.CameraFOV;
+            }
+            if (beforePositon != targetCamera.transform.position || beforeRotation != targetCamera.transform.rotation || beforeFOV != targetFOV)
             {
                 UI._cameraControlMenuUI.CameraPosRotUpdate();
-                beforePositon = cm_MapEditorCamera.transform.position;
-                beforeRotation = cm_MapEditorCamera.transform.rotation;
-                beforeFOV = Settings.Instance.CameraFOV;
+                beforePositon = targetCamera.transform.position;
+                beforeRotation = targetCamera.transform.rotation;
+                beforeFOV = targetFOV;
             }
         }
 

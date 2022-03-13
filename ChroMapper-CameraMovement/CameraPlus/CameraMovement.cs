@@ -28,6 +28,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
         public DateTime _pauseTime;
         public bool turnToHead;
         public bool turnToHeadHorizontal;
+        public float NowFOV = Settings.Instance.CameraFOV;
 
         public class Movements
         {
@@ -191,9 +192,10 @@ namespace ChroMapper_CameraMovement.CameraPlus
                 sub_camera.transform.SetPositionAndRotation(cameraPosSet, Quaternion.Euler(cameraRot));
             }
 
+            NowFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
             if (Options.Instance.movement)
-                Settings.Instance.CameraFOV = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
-            sub_camera.fieldOfView = Mathf.Lerp(StartFOV, EndFOV, Ease(movePerc));
+                Settings.Instance.CameraFOV = NowFOV;
+            sub_camera.fieldOfView = NowFOV;
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
@@ -259,11 +261,11 @@ namespace ChroMapper_CameraMovement.CameraPlus
             if (data.Movements[eventID].StartFOV != 0)
                 StartFOV = data.Movements[eventID].StartFOV;
             else
-                StartFOV = Settings.Instance.CameraFOV;
+                StartFOV = NowFOV;
             if (data.Movements[eventID].EndFOV != 0)
                 EndFOV = data.Movements[eventID].EndFOV;
             else
-                EndFOV = Settings.Instance.CameraFOV;
+                EndFOV = NowFOV;
 
             FindShortestDelta(ref StartRot, ref EndRot);
 

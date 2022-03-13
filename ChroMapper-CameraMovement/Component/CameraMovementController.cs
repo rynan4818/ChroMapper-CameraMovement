@@ -7,6 +7,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 using ChroMapper_CameraMovement.HarmonyPatches;
 using ChroMapper_CameraMovement.Configuration;
@@ -45,6 +46,7 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject cm_BPMchangeBackBase;
         public static GameObject cm_BPMChangeLable;
         public static GameObject cm_MeasureLinesCanvas;
+        public static GameObject cm_UIMode;
         public static GameObject avatarHead;
         public static GameObject avatarArm;
         public static GameObject avatarBody;
@@ -53,6 +55,8 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject bookmarkLines;
         public static Camera sub_camera;
         public static GameObject avatarModel;
+        public static InputActionMap keyControl;
+        public static InputAction previewAction;
 
         public bool _reload = false;
         public float beforeSeconds;
@@ -95,6 +99,8 @@ namespace ChroMapper_CameraMovement.Component
         public bool init = false;
         public bool customEventsObject = false;
         public string currentAvatarFile = "";
+        public bool previewMode = false;
+        public (bool, bool, bool, bool, bool, bool, Vector3, Quaternion, float) previewEve;
         public void BookmarkContainerGet()
         {
             Type type = bookmarkManager.GetType();
@@ -645,6 +651,41 @@ namespace ChroMapper_CameraMovement.Component
 
         }
 
+        public void OnPreview()
+        {
+            Debug.Log("PreviewToggle");
+            previewMode = !previewMode;
+            if (previewMode)
+            {
+                previewEve = (Options.Instance.movement, Options.Instance.uIhidden, Options.Instance.bookmarkLines, Options.Instance.subCamera, Options.Instance.bookmarkEdit, Options.Instance.cameraControl,
+                    cm_MapEditorCamera.transform.position, cm_MapEditorCamera.transform.rotation, Settings.Instance.CameraFOV);
+                Options.Instance.movement = true;
+                Options.Instance.uIhidden = false;
+                Options.Instance.bookmarkLines = false;
+                Options.Instance.subCamera = false;
+                Options.Instance.bookmarkEdit = false;
+                Options.Instance.cameraControl = false;
+                Reload();
+                UI.KeyDisableCheck();
+                cm_UIMode.GetComponent<UIMode>().SetUIMode(UIModeType.Preview, false);
+            }
+            else
+            {
+                Options.Instance.movement = previewEve.Item1;
+                Options.Instance.uIhidden = previewEve.Item2;
+                Options.Instance.bookmarkLines = previewEve.Item3;
+                Options.Instance.subCamera = previewEve.Item4;
+                Options.Instance.bookmarkEdit = previewEve.Item5;
+                Options.Instance.cameraControl = previewEve.Item6;
+                cm_MapEditorCamera.transform.position = previewEve.Item7;
+                cm_MapEditorCamera.transform.rotation = previewEve.Item8;
+                Settings.Instance.CameraFOV = previewEve.Item9;
+                Reload();
+                UI.KeyDisableCheck();
+                cm_UIMode.GetComponent<UIMode>().SetUIMode(UIModeType.Normal, false);
+            }
+        }
+
         private IEnumerator Start()
         {
             _cameraMovement = new CameraMovement();
@@ -663,6 +704,7 @@ namespace ChroMapper_CameraMovement.Component
             cm_GridX = GameObject.Find("Grid X");
             cm_Grid = GameObject.Find("Grid");
             cm_baseTransparent = GameObject.Find("Base Transparent");
+            cm_UIMode = GameObject.Find("UI Mode");
 
             VRMAvatarController.cm_MapEditorCamera = cm_MapEditorCamera;
 
@@ -768,6 +810,11 @@ namespace ChroMapper_CameraMovement.Component
             sub_camera.clearFlags = CameraClearFlags.SolidColor;
             sub_camera.backgroundColor = new Color(0, 0, 0, 255);
 
+            keyControl = new InputActionMap("CameraMovementKeyControl");
+            previewAction = new InputAction("Preview", binding: Options.Instance.previewKeyBinding);
+            previewAction.performed += context => OnPreview();
+            previewAction.Enable();
+
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             bookmarkManager = FindObjectOfType<BookmarkManager>();
 
@@ -819,6 +866,8 @@ namespace ChroMapper_CameraMovement.Component
             bookmarkManager.BookmarksUpdated -= BookMarkChangeUpdate;
             BookmarkContainerPatch.OnNewBookmarkName -= BookMarkChangeUpdate;
             SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
+            previewAction.performed -= context => OnPreview();
+            previewAction.Disable();
         }
 
     }

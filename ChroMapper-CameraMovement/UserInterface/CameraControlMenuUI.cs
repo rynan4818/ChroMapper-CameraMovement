@@ -270,6 +270,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(cameraControlSub.Item3.transform, 30, 16, 0, 1, 220, -40);
             UI.MoveTransform(cameraControlSub.Item1, 50, 16, 0, 1, 250, -40);
 
+            var regexKey = new Regex(@"<\w+>/");
+            var cameraControlPreviewButton = UI.AddButton(_cameraControlMenu.transform, "Preview", $"Preview [{regexKey.Replace(Options.Instance.previewKeyBinding,"").ToUpper()}]", new Vector2(0, -40), () =>
+            {
+                movementController.OnPreview();
+            });
+            cameraControlPreviewButton.Text.fontSize = 9;
+            UI.MoveTransform(cameraControlPreviewButton.transform, 50, 20, 0, 1, 270, -40);
+
             var cameraControlMenuPasteButton = UI.AddButton(_cameraControlMenu.transform, "Paste", "Paste", new Vector2(0, -40), () =>
             {
                 var position = movementController.CameraPositionGet();

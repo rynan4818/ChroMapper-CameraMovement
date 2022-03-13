@@ -56,6 +56,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool qFormat = true;
         public bool mappingDisable = true;
         public bool cameraControlSub = false;
+        public string previewKeyBinding = "<Keyboard>/f4";
         public static Options Instance {
             get {
                 if (instance is null)

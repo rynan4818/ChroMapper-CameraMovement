@@ -55,8 +55,8 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject bookmarkLines;
         public static Camera sub_camera;
         public static GameObject avatarModel;
-        public static InputActionMap keyControl;
         public static InputAction previewAction;
+        public static InputAction scriptMapperAction;
 
         public bool _reload = false;
         public float beforeSeconds;
@@ -686,6 +686,18 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
+        public void KeyDisable()
+        {
+            previewAction.Disable();
+            scriptMapperAction.Disable();
+        }
+
+        public void KeyEnable()
+        {
+            previewAction.Enable();
+            scriptMapperAction.Enable();
+        }
+
         private IEnumerator Start()
         {
             _cameraMovement = new CameraMovement();
@@ -810,10 +822,12 @@ namespace ChroMapper_CameraMovement.Component
             sub_camera.clearFlags = CameraClearFlags.SolidColor;
             sub_camera.backgroundColor = new Color(0, 0, 0, 255);
 
-            keyControl = new InputActionMap("CameraMovementKeyControl");
             previewAction = new InputAction("Preview", binding: Options.Instance.previewKeyBinding);
             previewAction.performed += context => OnPreview();
             previewAction.Enable();
+            scriptMapperAction = new InputAction("Script Mapper run", binding: Options.Instance.scriptMapperKeyBinding);
+            scriptMapperAction.performed += context => ScriptMapperController.ScriptMapperRun();
+            scriptMapperAction.Enable();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             bookmarkManager = FindObjectOfType<BookmarkManager>();
@@ -866,8 +880,8 @@ namespace ChroMapper_CameraMovement.Component
             bookmarkManager.BookmarksUpdated -= BookMarkChangeUpdate;
             BookmarkContainerPatch.OnNewBookmarkName -= BookMarkChangeUpdate;
             SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
-            previewAction.performed -= context => OnPreview();
             previewAction.Disable();
+            scriptMapperAction.Disable();
         }
 
     }

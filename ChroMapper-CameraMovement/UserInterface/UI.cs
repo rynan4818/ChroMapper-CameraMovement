@@ -166,8 +166,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             textInput.InputField.textComponent.fontSize = 10;
 
             textInput.InputField.onValueChanged.AddListener(onChange);
-            textInput.InputField.onEndEdit.AddListener(delegate { KeyDisableCheck(); });
-            textInput.InputField.onSelect.AddListener(delegate { DisableAction(actionMapsDisabled); });
+            textInput.InputField.onEndEdit.AddListener(delegate {
+                KeyDisableCheck();
+                Plugin.movement.KeyEnable();
+            });
+            textInput.InputField.onSelect.AddListener(delegate {
+                DisableAction(actionMapsDisabled);
+                Plugin.movement.KeyDisable();
+            });
             return (rectTransform, textComponent, textInput);
         }
 

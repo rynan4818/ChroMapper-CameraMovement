@@ -11,8 +11,9 @@ namespace ChroMapper_CameraMovement.Controller
     public static class ScriptMapperController
     {
         public static bool scriptMapperAlive;
-        public static async void ScriptMapperRun(CameraMovementController movement)
+        public static async void ScriptMapperRun()
         {
+            var movement = Plugin.movement;
             if (scriptMapperAlive)
                 return;
             scriptMapperAlive = true;

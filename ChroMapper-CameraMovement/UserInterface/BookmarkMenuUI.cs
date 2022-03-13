@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Controller;
+using System.Text.RegularExpressions;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -110,9 +111,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(bookmarkMenuDeleteButton.transform, 40, 20, 0.1f, 1, 575, -35);
 
-            var scriptMapperRunButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(460, -22), () =>
+            var regexKey = new Regex(@"<\w+>/");
+            var scriptMapperRunButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(460, -22), () =>
             {
-                ScriptMapperController.ScriptMapperRun(movementController);
+                ScriptMapperController.ScriptMapperRun();
             });
             scriptMapperRunButton.Text.fontSize = 9;
             UI.MoveTransform(scriptMapperRunButton.transform, 60, 20, 0.1f, 1, 635, -35);

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Controller;
+using System.Text.RegularExpressions;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -113,9 +114,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -215);
 
-            var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", "Script Mapper Run", new Vector2(0, -215), () =>
+            var regexKey = new Regex(@"<\w+>/");
+            var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(0, -215), () =>
             {
-                ScriptMapperController.ScriptMapperRun(movementController);
+                ScriptMapperController.ScriptMapperRun();
             });
             UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -215);
 

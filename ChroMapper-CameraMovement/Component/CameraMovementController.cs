@@ -562,7 +562,7 @@ namespace ChroMapper_CameraMovement.Component
 
         public void VRMAvatarLoad()
         {
-            if (!(!Options.Instance.vrmAvatarSetting && Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.vrm$", RegexOptions.IgnoreCase)))
+            if (!Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.vrm$", RegexOptions.IgnoreCase))
                 return;
             if (avatarModel != null)
             {

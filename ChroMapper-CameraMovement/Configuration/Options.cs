@@ -52,7 +52,6 @@ namespace ChroMapper_CameraMovement.Configuration
         public float originYoffset = 0;
         public float originZoffset = 0;
         public bool cameraControl = false;
-        public bool vrmAvatarSetting = false;
         public bool qFormat = true;
         public bool mappingDisable = true;
         public bool cameraControlSub = false;

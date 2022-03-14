@@ -2,7 +2,7 @@
 [CameraPlus](https://github.com/Snow1226/CameraPlus)用の[MovementScript](https://github.com/Snow1226/CameraPlus/wiki/MovementScript)を読み込んで、作譜ツールの[ChroMapper](https://github.com/Caeden117/ChroMapper)でカメラワークの再現をするChroMapper用プラグインです。
 主に[Script Mapper](https://github.com/hibit-at/Scriptmapper)を使ったカメラスクリプトの作成を前提とした作りになっています。
 
-![image](https://user-images.githubusercontent.com/14249877/155873272-56ef7f1e-cfe5-428a-9092-3185ce923a8b.png)
+![image](https://user-images.githubusercontent.com/14249877/158151048-4d7dbe2e-0df6-4a9d-812a-b977847721b7.png)
 
 # インストール方法
 1. [リリースページ](https://github.com/rynan4818/ChroMapper-CameraMovement/releases)から、最新版のプラグインのzipファイルをダウンロードして下さい。
@@ -38,7 +38,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 **各パネルはShiftを押しながら左ドラッグで移動可能です**
 
-![image](https://user-images.githubusercontent.com/14249877/155874695-cdf4c42f-1620-4020-9855-f19a1c18963d.png)
+![image](https://user-images.githubusercontent.com/14249877/158151205-a13f2038-ec85-40e8-bc2d-374c5a0cb4f1.png)
 
 * Movement Enable ： カメラスクリプトに合わせてカメラが移動します。
 * UI Hidden ： 作譜用のグリッドUI、ライティングブロック、音声波形などを消します。
@@ -54,7 +54,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Setting Save : 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。
 * Script Mapper Run [F3] ： 譜面データを保存して、Script Mapperでブックマークをカメラスクリプトに変換します。F3キーでショートカット。
 
-![image](https://user-images.githubusercontent.com/14249877/155874730-eca4ba00-9d26-43e6-a7d8-ae9b97b44f52.png)
+![image](https://user-images.githubusercontent.com/14249877/158151330-93cfb73b-0ca2-4d88-8c05-edb11b8e49b0.png)
 
 * Custom or VRM Avatar ： 読み込んだカスタムアバター・VRMアバターモデルを表示します。
 * Avatar File ： `*.vrm` VRMファイルもしくは、`*.avatar` [カスタムアバターのファイル](https://modelsaber.com/Avatars/)を`Select`ボタンで選択します。デフォルト設定はChroMapper.exeと同じフォルダにある[Sour Miku Black v2](https://modelsaber.com/Avatars/?id=1564625718&pc)になっています。
@@ -84,10 +84,10 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。(メイン設定の同名ボタンと機能は同じ)
 * Close ： More Settingパネルを閉じます。
 
-![image](https://user-images.githubusercontent.com/14249877/154273925-45361056-d4bd-4249-b738-0d9b2085548c.png)
+![image](https://user-images.githubusercontent.com/14249877/158151436-430f0a38-d5b5-47fd-992c-7d5b8c860910.png)
 
-* `No.*[**]` ： 現在の編集対象のブックマークNo.と拍子位置です。
-* `center3` ： 設定されたブックマークの内容が表示されます。
+* `No.8[18]` ： 現在の編集対象のブックマークNo.と拍子位置です。
+* `center1,next` ： 設定されたブックマークの内容が表示されます。
 * `center`～`random` ： よく使用するコマンドを登録して呼び出せます。
 * Set ： チェックしてから上の６箇所のボタンを押すと`Empty` の部分に入力した内容が登録できます。
 * Copy to Edit ： 現在のブックマーク内容を`Empty` の部分にコピーします。
@@ -97,7 +97,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Delete ： 現在のブックマークを削除します。
 * Script Mapper Run [F3] ： ScriptMapperを実行します。メインメニューのそれと同じです。
 
-![image](https://user-images.githubusercontent.com/14249877/155875168-a39690fd-3c1f-4152-a6ce-1cec1d1a7826.png)
+![image](https://user-images.githubusercontent.com/14249877/158151664-16964d70-680c-4625-ba72-133fed53bf96.png)
 
 * Pos X ： メインカメラのX軸(横方向)位置です[単位m]
 * Pos Y ： メインカメラのY軸(高さ方向)位置です[単位m]
@@ -146,6 +146,7 @@ ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイ
 
 # ToDo
 * ブックマークデータ単体の入出力（譜面.datとブックマークの分離)
+* サブカメラだけマッピング用のUI表示を消す
 * サブカメラにオブジェクトを割り当てて、カメラ移動を見えるモードの追加
 * カメラコントロールでサブカメラ対象の時に、カメラ操作(WASD)もサブカメラを対象にする
 * カメラ移動をWASDではなく、CADみたいに対象物(アバター)中心で回転操作で動かすモード

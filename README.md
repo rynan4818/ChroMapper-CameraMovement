@@ -34,8 +34,6 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 **[BeatSaberでカメラを動かしてみよう](https://note.com/rynan/n/n2830a21add26)**
 
-譜面を読み込んでエディタ画面を出して下さい。Tabキーを押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。
-
 ## キーボードショートカット
 - F4 でプレビュー表示のON/OFF
 - F3 でScriptMapperの実行
@@ -51,6 +49,8 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 ※上記キーバインドは設定ファイルの直接変更で変更可能
 
 ## 各パネル説明
+譜面を読み込んでエディタ画面を出して下さい。Tabキーを押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。
+
 ![image](https://user-images.githubusercontent.com/14249877/158151205-a13f2038-ec85-40e8-bc2d-374c5a0cb4f1.png)
 
 * Movement Enable ： カメラスクリプトに合わせてカメラが移動します。

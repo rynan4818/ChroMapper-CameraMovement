@@ -20,6 +20,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
         public static List<Type> queuedToDisable = new List<Type>();
         public static List<Type> queuedToEnable = new List<Type>();
+        public static bool keyDisable { get; private set; } = false;
 
         private static readonly Type[] editActionMapsDisabled =
         {
@@ -92,10 +93,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 DisableAction(actionMapsDisabled);
                 EnableAction(editActionMapsDisabled);
+                keyDisable = true;
             }
             else
             {
                 EnableAction(actionMapsDisabled);
+                keyDisable = false;
             }
         }
 

@@ -907,6 +907,8 @@ namespace ChroMapper_CameraMovement.Component
             init = true;
             BookMarkChangeUpdate();
             Reload();
+            Plugin.orbitCamera.targetCamera = cm_MapEditorCamera.GetComponent<Camera>();
+            Plugin.orbitCamera.targetObject = avatarHead;
         }
         private void Update()
         {

@@ -36,8 +36,21 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 譜面を読み込んでエディタ画面を出して下さい。Tabキーを押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。
 
-**各パネルはShiftを押しながら左ドラッグで移動可能です**
+## キーボードショートカット
+- F4 でプレビュー表示のON/OFF
+- F3 でScriptMapperの実行
+- 各設定パネルは、Shiftを押しながら左ドラッグで移動
+- 注視点カメラ移動モード
+    - ALT + マウス右ドラッグでアバター中心にカメラ移動
+    - ALT + マウス左ドラッグで注視点のオフセット
+    - ALT + マウス左右同時クリックで注視点オフセットのリセット
+    - ALT + マウスホイールで注視点との距離の変更
+    - ALT + CTRL + マウスホイールでFOVの変更
+    - ALT + CTRL + マウス左右同時クリックでFOVのリセット
 
+※上記キーバインドは設定ファイルの直接変更で変更可能
+
+## 各パネル説明
 ![image](https://user-images.githubusercontent.com/14249877/158151205-a13f2038-ec85-40e8-bc2d-374c5a0cb4f1.png)
 
 * Movement Enable ： カメラスクリプトに合わせてカメラが移動します。
@@ -124,18 +137,29 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 | 設定項目 | デフォルト値 | 説明 |
 |:---|:---|:---|
-|scriptMapperExe |scriptmapper.exe |ScriptMapperの実行ファイル名です。フォルダパスはChroMapper.exeの場所です |
-|scriptMapperLog |log_latest.txt |ScriptMapperのログファイル名です。フォルダパスは編集中の譜面フォルダです |
-|bookmarkLinesShowOnTop |False | Trueにすると、ブックマーク床面表示を最前面にします |
-|avatarCameraScale |1.5 |ChroMapper内のUnity単位をBeatSaberと合わせるための倍率です |
-|originMatchOffsetY |-0.5 |ChroMapper内のY座標原点をBeatSaberと合わせるためのオフセット値です[avatarCameraScale反映前] |
-|originMatchOffsetZ |-1.5 |ChroMapper内のZ座標原点をBeatSaberと合わせるためのオフセット値です[avatarCameraScale反映前] |
-|originXoffset |0 |原点座標調整用のXオフセット値です[avatarCameraScale反映後] |
-|originYoffset |0 |原点座標調整用のYオフセット値です[avatarCameraScale,originMatchOffsetY反映後] |
-|originZoffset |0 |原点座標調整用のZオフセット値です[avatarCameraScale,originMatchOffsetZ反映後] |
-|previewKeyBinding |＜Keyboard＞/f4 |プレビューのショートカットキーバインドです |
-|scriptMapperKeyBinding |＜Keyboard＞/f3|Script Mapper Runのショートカットキーバインドです |
-|dragWindowKeyBinding |＜Keyboard＞/shift|パネルドラッグ時の押すキーバインドです |
+| scriptMapperExe | scriptmapper.exe | ScriptMapperの実行ファイル名です。フォルダパスはChroMapper.exeの場所です |
+| scriptMapperLog | log_latest.txt | ScriptMapperのログファイル名です。フォルダパスは編集中の譜面フォルダです |
+| bookmarkLinesShowOnTop | False | Trueにすると、ブックマーク床面表示を最前面にします |
+| avatarCameraScale | 1.5 | ChroMapper内のUnity単位をBeatSaberと合わせるための倍率です |
+| originMatchOffsetY | -0.5 | ChroMapper内のY座標原点をBeatSaberと合わせるためのオフセット値です[avatarCameraScale反映前] |
+| originMatchOffsetZ | -1.5 | ChroMapper内のZ座標原点をBeatSaberと合わせるためのオフセット値です[avatarCameraScale反映前] |
+| originXoffset | 0 | 原点座標調整用のXオフセット値です[avatarCameraScale反映後] |
+| originYoffset | 0 | 原点座標調整用のYオフセット値です[avatarCameraScale,originMatchOffsetY反映後] |
+| originZoffset | 0 | 原点座標調整用のZオフセット値です[avatarCameraScale,originMatchOffsetZ反映後] |
+| previewKeyBinding | ＜Keyboard＞/f4 |プレビューのショートカットキーバインドです |
+| scriptMapperKeyBinding | ＜Keyboard＞/f3 | Script Mapper Runのショートカットキーバインドです |
+| dragWindowKeyBinding | ＜Keyboard＞/shift | パネルドラッグ時の押すキーバインドです |
+| orbitDefaultFOV | 60 | 注視点カメラ移動のデフォルトFOVです |
+| orbitRotSensitivity | 0.5 | 注視点カメラ移動のカメラ回転感度です |
+| orbitZoomSensitivity | 0.001 | 注視点カメラ移動のカメラズーム感度です |
+| orbitOffsetSensitivity | 0.01 | 注視点カメラ移動のオフセット感度です |
+| orbitFovSensitivity | 0.005 | 注視点カメラ移動のFOV変更感度です |
+| orbitMinDistance | 0.2 | 注視点カメラ移動のズーム最接近距離です |
+| orbitMaxDistance | 100 | 注視点カメラ移動のズーム最遠方距離です |
+| orbitActiveKeyBinding | ＜Keyboard＞/alt | 注視点カメラ移動のキーバンドです |
+| orbitSubActiveKeyBinding | ＜Keyboard＞/ctrl | 注視点カメラ移動のFOV変更キーバンドです |
+| orbitMoveActiveKeyBinding | ＜Mouse＞/leftButton | 注視点カメラ移動のオフセット移動キーバンドです |
+| orbitRotActiveKeyBinding | ＜Mouse＞/rightButton | 注視点カメラ移動のカメラ回転キーバンドです |
 
 ※キーバインドはUnityのInputSystem形式で設定してください。
 
@@ -149,8 +173,8 @@ ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイ
 * サブカメラだけマッピング用のUI表示を消す
 * サブカメラにオブジェクトを割り当てて、カメラ移動を見えるモードの追加
 * カメラコントロールでサブカメラ対象の時に、カメラ操作(WASD)もサブカメラを対象にする
-* カメラ移動をWASDではなく、CADみたいに対象物(アバター)中心で回転操作で動かすモード
 * ブックマークもノーツブロックのようにコピペ出来たら良いけど、だいぶムズい。
+* ~~カメラ移動をWASDではなく、CADみたいに対象物(アバター)中心で回転操作で動かすモード~~
 * ~~現在のカメラ位置をinput.csvに出力するボタン（コピペは実装済み）~~ ※qコマンドが有用なのでこれ以上実装しない
 * ~~ノーツや壁のスピードをゲームと一致させる~~
 * ~~作譜用のショートカットキーが数値やコマンド入力の障害になるので、無効化チェックボックス~~

@@ -148,12 +148,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraPlus\CameraMovement.cs" />
+    <Compile Include="Component\MultiDisplayController.cs" />
     <Compile Include="Component\BookmarkLinesController.cs" />
     <Compile Include="Component\BookmarkLinesRenderingOrderController.cs" />
     <Compile Include="CameraPlus\MovementScriptJson.cs" />
     <Compile Include="Component\DragWindowController.cs" />
     <Compile Include="Component\OrbitCameraController.cs" />
     <Compile Include="Configuration\Options.cs" />
+    <Compile Include="Controller\WindowController.cs" />
     <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />
     <Compile Include="HarmonyPatches\ShaderPatch.cs" />
     <Compile Include="HarmonyPatches\SpectrogramSideSwapperPatch.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="UserInterface\BookmarkMenuUI.cs" />
     <Compile Include="UserInterface\CameraControlMenuUI.cs" />
     <Compile Include="UserInterface\MainMenuUI.cs" />
+    <Compile Include="UserInterface\MultiDisplayUI.cs" />
     <Compile Include="UserInterface\SettingMenuUI.cs" />
     <Compile Include="UserInterface\UI.cs" />
     <Compile Include="Util\AddVRMShaders.cs" />

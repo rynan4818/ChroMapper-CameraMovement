@@ -28,6 +28,7 @@ namespace ChroMapper_CameraMovement.Component
         public static EventsContainer eventContainer;
         public static BookmarkLinesController bookmarkLinesController;
         public static VRMAvatarController vrmAvatarController;
+        public static MultiDisplayController multiDisplayController;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
@@ -53,7 +54,8 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject avatarLeg;
         public static GameObject avatarHair;
         public static GameObject bookmarkLines;
-        public static Camera sub_camera;
+        public static Camera subCamera;
+        public static Camera layoutCamera;
         public static GameObject avatarModel;
         public static InputAction previewAction;
         public static InputAction scriptMapperAction;
@@ -142,36 +144,30 @@ namespace ChroMapper_CameraMovement.Component
             position *= Options.Instance.avatarCameraScale;
             position += new Vector3(0, Options.Instance.originMatchOffsetY, Options.Instance.originMatchOffsetZ);
             if (Options.Instance.cameraControlSub)
-            {
-                sub_camera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
-            }
+                subCamera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
+            else if (Options.Instance.cameraControlLay)
+                layoutCamera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
             else
-            {
                 cm_MapEditorCamera.transform.SetPositionAndRotation(position, Quaternion.Euler(rotation));
-            }
         }
         public void CameraFOVSet(float fov)
         {
             if (Options.Instance.cameraControlSub)
-            {
-                sub_camera.fieldOfView = fov;
-            }
+                subCamera.fieldOfView = fov;
+            else if (Options.Instance.cameraControlLay)
+                layoutCamera.fieldOfView = fov;
             else
-            {
                 Settings.Instance.CameraFOV = fov;
-            }
         }
         public Vector3 CameraPositionGet()
         {
             GameObject targetCamera;
             if (Options.Instance.cameraControlSub)
-            {
-                targetCamera = sub_camera.gameObject;
-            }
+                targetCamera = subCamera.gameObject;
+            else if (Options.Instance.cameraControlLay)
+                targetCamera = layoutCamera.gameObject;
             else
-            {
                 targetCamera = cm_MapEditorCamera;
-            }
             var cameraPosition = new Vector3(targetCamera.transform.position.x, targetCamera.transform.position.y - Options.Instance.originMatchOffsetY, targetCamera.transform.position.z - Options.Instance.originMatchOffsetZ);
             cameraPosition /= Options.Instance.avatarCameraScale;
             cameraPosition -= new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
@@ -180,24 +176,20 @@ namespace ChroMapper_CameraMovement.Component
         public Transform CameraTransformGet()
         {
             if (Options.Instance.cameraControlSub)
-            {
-                return sub_camera.transform;
-            }
+                return subCamera.transform;
+            else if (Options.Instance.cameraControlLay)
+                return layoutCamera.transform;
             else
-            {
                 return cm_MapEditorCamera.transform;
-            }
         }
         public float CameraFOVGet()
         {
             if (Options.Instance.cameraControlSub)
-            {
-                return sub_camera.fieldOfView;
-            }
+                return subCamera.fieldOfView;
+            else if (Options.Instance.cameraControlLay)
+                return layoutCamera.fieldOfView;
             else
-            {
                 return Settings.Instance.CameraFOV;
-            }
         }
 
         public Vector3 AvatarPositionGet()
@@ -452,8 +444,11 @@ namespace ChroMapper_CameraMovement.Component
             {
                 EventBpmOffset(0);
             }
-            sub_camera.gameObject.SetActive(!(Options.Instance.movement || !Options.Instance.subCamera));
-            sub_camera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
+            if (!MultiDisplayController.subActive)
+            {
+                subCamera.gameObject.SetActive(!(Options.Instance.movement || !Options.Instance.subCamera));
+                subCamera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
+            }
             if (Options.Instance.uIhidden)
             {
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
@@ -719,7 +714,7 @@ namespace ChroMapper_CameraMovement.Component
                 if (Options.Instance.subCameraRectH > 1) Options.Instance.subCameraRectH = 1;
                 if (Options.Instance.subCameraRectH < 0) Options.Instance.subCameraRectH = 0;
             }
-            sub_camera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
+            subCamera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
             UI._settingMenuUI.SubCameraRectSet();
         }
 
@@ -874,9 +869,19 @@ namespace ChroMapper_CameraMovement.Component
 
             beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
 
-            sub_camera = new GameObject("Sub Camera").AddComponent<Camera>();
-            sub_camera.clearFlags = CameraClearFlags.SolidColor;
-            sub_camera.backgroundColor = new Color(0, 0, 0, 255);
+            subCamera = new GameObject("Preview Camera").AddComponent<Camera>();
+            subCamera.clearFlags = CameraClearFlags.SolidColor;
+            subCamera.backgroundColor = new Color(0, 0, 0, 255);
+            if (Options.Instance.subCameraNoUI)
+                subCamera.cullingMask &= ~(1 << 11);
+            subCamera.gameObject.SetActive(false);
+
+            layoutCamera = new GameObject("Sub Camera").AddComponent<Camera>();
+            layoutCamera.clearFlags = CameraClearFlags.SolidColor;
+            layoutCamera.backgroundColor = new Color(0, 0, 0, 255);
+            if (Options.Instance.layoutCameraNoUI)
+                layoutCamera.cullingMask &= ~(1 << 11);
+            layoutCamera.gameObject.SetActive(false);
 
             previewAction = new InputAction("Preview", binding: Options.Instance.previewKeyBinding);
             previewAction.performed += context => OnPreview();
@@ -907,8 +912,11 @@ namespace ChroMapper_CameraMovement.Component
             init = true;
             BookMarkChangeUpdate();
             Reload();
-            Plugin.orbitCamera.targetCamera = cm_MapEditorCamera.GetComponent<Camera>();
+            Plugin.orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             Plugin.orbitCamera.targetObject = avatarHead;
+            multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
+            if (Plugin.activeWindow > 1)
+                multiDisplayController.SetTargetDisplay();
         }
         private void Update()
         {
@@ -923,14 +931,19 @@ namespace ChroMapper_CameraMovement.Component
                 }
                 beforeSeconds = atsc.CurrentSeconds;
                 BookMarkUpdate();
-                _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, sub_camera , AvatarPositionGet());
+                _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, subCamera , AvatarPositionGet());
             }
             GameObject targetCamera;
             float targetFOV;
             if (Options.Instance.cameraControlSub)
             {
-                targetCamera = sub_camera.gameObject;
-                targetFOV = sub_camera.fieldOfView;
+                targetCamera = subCamera.gameObject;
+                targetFOV = subCamera.fieldOfView;
+            }
+            else if (Options.Instance.cameraControlLay)
+            {
+                targetCamera = layoutCamera.gameObject;
+                targetFOV = layoutCamera.fieldOfView;
             }
             else
             {

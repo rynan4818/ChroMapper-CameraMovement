@@ -55,6 +55,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool qFormat = true;
         public bool mappingDisable = true;
         public bool cameraControlSub = false;
+        public bool cameraControlLay = false;
         public string previewKeyBinding = "<Keyboard>/f4";
         public string scriptMapperKeyBinding = "<Keyboard>/f3";
         public string dragWindowKeyBinding = "<Keyboard>/shift";
@@ -66,6 +67,8 @@ namespace ChroMapper_CameraMovement.Configuration
         public float mainMenuUIAnchoredPosY = -30;
         public float settingMenuUIAnchoredPosX = 0;
         public float settingMenuUIAnchoredPosY = 0;
+        public float multiDisplayMenuUIAnchoredPosX = 0;
+        public float multiDisplayMenuUIAnchoredPosY = 0;
         public float orbitDefaultFOV = 60f;
         public float orbitRotSensitivity = 0.5f;
         public float orbitZoomSensitivity = 0.001f;
@@ -77,6 +80,23 @@ namespace ChroMapper_CameraMovement.Configuration
         public string orbitSubActiveKeyBinding = "<Keyboard>/ctrl";
         public string orbitMoveActiveKeyBinding = "<Mouse>/leftButton";
         public string orbitRotActiveKeyBinding = "<Mouse>/rightButton";
+        public bool subCameraNoUI = true;
+        public bool layoutCameraNoUI = true;
+        public bool subWindow = false;
+        public bool layoutWindow = false;
+        public float multiDislayCreateDelay = 0.1f;
+        public int mainDisplayPosX = 0;
+        public int mainDisplayPosY = 0;
+        public int mainDisplayWidth = 0;
+        public int mainDisplayHeight = 0;
+        public int subDisplay1PosX = 0;
+        public int subDisplay1PosY = 0;
+        public int subDisplay1Width = 0;
+        public int subDisplay1Height = 0;
+        public int subDisplay2PosX = 0;
+        public int subDisplay2PosY = 0;
+        public int subDisplay2Width = 0;
+        public int subDisplay2Height = 0;
 
         public static Options Instance {
             get {

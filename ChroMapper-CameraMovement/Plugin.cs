@@ -15,6 +15,7 @@ namespace ChroMapper_CameraMovement
         public static OrbitCameraController orbitCamera;
         public static Harmony _harmony;
         public static UI _ui;
+        public static int activeWindow = 1;
         public const string HARMONY_ID = "com.github.rynan4818.ChroMapper-CameraMovement";
 
         [Init]
@@ -37,15 +38,14 @@ namespace ChroMapper_CameraMovement
 
         private void SceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
-            if (arg0.buildIndex == 3) // Mapper scene
-            {
-                if (movement != null && movement.isActiveAndEnabled)
-                    return;
-                movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
-                orbitCamera = movement.gameObject.gameObject.AddComponent<OrbitCameraController>();
-                MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
-                _ui.AddMenu(mapEditorUI);
-            }
+            if (arg0.buildIndex != 3) // Mapper scene
+                return;
+            if (movement != null && movement.isActiveAndEnabled)
+                return;
+            movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
+            orbitCamera = movement.gameObject.gameObject.AddComponent<OrbitCameraController>();
+            MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
+            _ui.AddMenu(mapEditorUI);
         }
     }
 }

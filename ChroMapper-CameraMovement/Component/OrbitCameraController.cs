@@ -25,7 +25,7 @@ namespace ChroMapper_CameraMovement.Component
         public bool canRotCamera;
         public float mouseX;
         public float mouseY;
-        public Camera targetCamera { get; set; } = null;
+        public Camera[] targetCamera { get; set; } = { null, null, null };
         public GameObject targetObject { get; set; } = null;
         public Vector3 offset { get; set; } = Vector3.zero;
         public float distance { get; set; } = 5f;
@@ -85,7 +85,7 @@ namespace ChroMapper_CameraMovement.Component
             if (!canOrbitCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
-            if (targetCamera == null || targetObject == null) return;
+            if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             if (canRotCamera && canMoveCamera)
             {
                 if (canOrbitSubCamera)
@@ -101,31 +101,31 @@ namespace ChroMapper_CameraMovement.Component
             if (canMoveCamera)
             {
                 var inputHorizontal = mouseX * Options.Instance.orbitOffsetSensitivity;
-                var moveForward = targetCamera.transform.right * inputHorizontal;
+                var moveForward = targetCamera[MultiDisplayController.activeWindowNumber].transform.right * inputHorizontal;
                 offset -= moveForward;
                 offset = new Vector3(offset.x, offset.y - mouseY * Options.Instance.orbitOffsetSensitivity, offset.z);
             }
             var lookAtPos = targetObject.transform.position + offset;
             var da = azimuthalAngle * Mathf.Deg2Rad;
             var de = elevationAngle * Mathf.Deg2Rad;
-            targetCamera.transform.position = new Vector3(
+            targetCamera[MultiDisplayController.activeWindowNumber].transform.position = new Vector3(
                 lookAtPos.x + distance * Mathf.Sin(de) * Mathf.Cos(da),
                 lookAtPos.y + distance * Mathf.Cos(de),
                 lookAtPos.z + distance * Mathf.Sin(de) * Mathf.Sin(da)
             );
-            targetCamera.transform.LookAt(lookAtPos);
+            targetCamera[MultiDisplayController.activeWindowNumber].transform.LookAt(lookAtPos);
             targetPosObject.transform.localPosition = lookAtPos;
         }
 
         public void OnOrbitActive(InputAction.CallbackContext context)
         {
             if (!UI.keyDisable) return;
-            if (targetCamera == null || targetObject == null) return;
+            if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             canOrbitCamera = context.performed;
             if (canOrbitCamera)
             {
-                distance = Vector3.Distance(targetObject.transform.position, targetCamera.transform.position);
-                var planeCamera = Vector3.ProjectOnPlane(targetCamera.transform.position, Vector3.up);
+                distance = Vector3.Distance(targetObject.transform.position, targetCamera[MultiDisplayController.activeWindowNumber].transform.position);
+                var planeCamera = Vector3.ProjectOnPlane(targetCamera[MultiDisplayController.activeWindowNumber].transform.position, Vector3.up);
                 var planeTarget = Vector3.ProjectOnPlane(targetObject.transform.position, Vector3.up);
                 var diff = planeCamera - planeTarget;
                 var axis = Vector3.Cross(Vector3.forward, diff);
@@ -139,7 +139,7 @@ namespace ChroMapper_CameraMovement.Component
                     else
                         azimuthalAngle = 360 - azimuthalAngle + 90;
                 }
-                diff = targetCamera.transform.position - targetObject.transform.position;
+                diff = targetCamera[MultiDisplayController.activeWindowNumber].transform.position - targetObject.transform.position;
                 elevationAngle = Mathf.Clamp(Vector3.Angle(Vector3.up, diff), minElevationAngle, maxElevationAngle);
                 Plugin.movement.KeyDisable();
                 UI.DisableAction(actionMapsDisabled);
@@ -188,7 +188,7 @@ namespace ChroMapper_CameraMovement.Component
             if (!canOrbitCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
-            if (targetCamera == null || targetObject == null) return;
+            if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             if (canOrbitSubCamera)
             {
                 var value = context.ReadValue<float>();

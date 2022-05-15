@@ -18,6 +18,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static SettingMenuUI _settingMenuUI = new SettingMenuUI();
         public static BookmarkMenuUI _bookmarkMenuUI = new BookmarkMenuUI();
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
+        public static MultiDisplayUI _multiDisplayUI = new MultiDisplayUI();
         public static List<Type> queuedToDisable = new List<Type>();
         public static List<Type> queuedToEnable = new List<Type>();
         public static bool keyDisable { get; private set; } = false;
@@ -62,6 +63,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             _settingMenuUI.AddMenu(mapEditorUI);
             _bookmarkMenuUI.AddMenu(mapEditorUI);
             _cameraControlMenuUI.AddMenu(mapEditorUI);
+            _multiDisplayUI.AddMenu(mapEditorUI);
             KeyDisableCheck();
         }
 
@@ -88,8 +90,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static void KeyDisableCheck()
         {
             if (Options.Instance.mappingDisable && (_settingMenuUI._cameraMovementSettingMenu.activeSelf || _bookmarkMenuUI._cameraMovementBookmarkMenu.activeSelf ||
-                _cameraControlMenuUI._cameraControlMenu.activeSelf || Options.Instance.subCamera || Options.Instance.movement ||
-                Options.Instance.uIhidden || Options.Instance.bookmarkLines))
+                _cameraControlMenuUI._cameraControlMenu.activeSelf || _multiDisplayUI._cameraMovementMultiDisplay.activeSelf || Options.Instance.subCamera ||
+                Options.Instance.movement || Options.Instance.uIhidden || Options.Instance.bookmarkLines))
             {
                 DisableAction(actionMapsDisabled);
                 EnableAction(editActionMapsDisabled);
@@ -128,13 +130,13 @@ namespace ChroMapper_CameraMovement.UserInterface
             return button;
         }
 
-        public static (RectTransform, TextMeshProUGUI) AddLabel(Transform parent, string title, string text, Vector2 pos, Vector2? size = null)
+        public static (RectTransform, TextMeshProUGUI) AddLabel(Transform parent, string title, string text, Vector2 pos, float size = 110)
         {
             var entryLabel = new GameObject(title + " Label", typeof(TextMeshProUGUI));
             var rectTransform = ((RectTransform)entryLabel.transform);
             rectTransform.SetParent(parent);
 
-            MoveTransform(rectTransform, 110, 24, 0.5f, 1, pos.x, pos.y);
+            MoveTransform(rectTransform, size, 24, 0.5f, 1, pos.x, pos.y);
             var textComponent = entryLabel.GetComponent<TextMeshProUGUI>();
 
             textComponent.name = title;

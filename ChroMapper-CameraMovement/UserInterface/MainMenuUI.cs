@@ -30,7 +30,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraMovementMainMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
 
             //Main Menu
-            UI.AttachTransform(_cameraMovementMainMenu, 170, 240, 1, 1, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY, 1, 1);
+            UI.AttachTransform(_cameraMovementMainMenu, 170, 270, 1, 1, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY, 1, 1);
 
             Image imageMain = _cameraMovementMainMenu.AddComponent<Image>();
             imageMain.sprite = PersistentUI.Instance.Sprites.Background;
@@ -89,6 +89,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI._cameraControlMenuUI._cameraControlMenu.SetActive(check);
                 UI.KeyDisableCheck();
             });
+
             var mainMenuMoreSettingsButton = UI.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -185), () =>
             {
                 UI._settingMenuUI._cameraMovementSettingMenu.SetActive(true);
@@ -102,18 +103,30 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(mainMenuReloadButton.transform, 70, 25, 0.72f, 1, 0, -185);
 
-            var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -215), () =>
+            var mainMenuMultiDisplayButton = UI.AddButton(_cameraMovementMainMenu.transform, "Multi Display", "Multi Display", new Vector2(0, -215), () =>
+            {
+                UI._multiDisplayUI._cameraMovementMultiDisplay.SetActive(true);
+                UI.KeyDisableCheck();
+            });
+            UI.MoveTransform(mainMenuMultiDisplayButton.transform, 70, 25, 0.28f, 1, 0, -215);
+
+            //var mainMenuPluginOnOffButton = UI.AddButton(_cameraMovementMainMenu.transform, "Plugin On Off", "Plugin On/Off", new Vector2(0, -215), () =>
+            //{
+            //});
+            //UI.MoveTransform(mainMenuPluginOnOffButton.transform, 70, 25, 0.72f, 1, 0, -215);
+
+            var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -245), () =>
             {
                 Options.Instance.SettingSave();
             });
-            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -215);
+            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -245);
 
             var regexKey = new Regex(@"<\w+>/");
-            var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(0, -215), () =>
+            var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(0, -245), () =>
             {
                 ScriptMapperController.ScriptMapperRun();
             });
-            UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -215);
+            UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -245);
 
             _cameraMovementMainMenu.SetActive(false);
             UI._extensionBtn.Click = () =>

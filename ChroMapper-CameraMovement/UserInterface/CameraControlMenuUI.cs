@@ -19,6 +19,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         public UITextInput _cameraRotZinput;
         public UITextInput _cameraFOVinput;
         public UITextInput _cameraDistanceinput;
+        public Toggle _cameraControlSubToggle;
+        public Toggle _cameraControlLayToggle;
         public RectTransform _cameraMovementCameraControlMenuRect;
         public bool cameraPosRotNoUpdate = false;
 
@@ -273,10 +275,39 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var cameraControlSub = UI.AddCheckbox(_cameraControlMenu.transform, "Sub", "Sub", new Vector2(0, -40), Options.Instance.cameraControlSub, (check) =>
             {
+                if (check && !CameraMovementController.subCamera.gameObject.activeSelf)
+                {
+                    _cameraControlSubToggle.isOn = false;
+                    return;
+                }
+                if (check && Options.Instance.cameraControlLay)
+                {
+                    Options.Instance.cameraControlLay = false;
+                    _cameraControlLayToggle.isOn = false;
+                }
                 Options.Instance.cameraControlSub = check;
             });
             UI.MoveTransform(cameraControlSub.Item3.transform, 30, 16, 0, 1, 220, -40);
             UI.MoveTransform(cameraControlSub.Item1, 50, 16, 0, 1, 250, -40);
+            _cameraControlSubToggle = cameraControlSub.Item3;
+
+            var cameraControlLay = UI.AddCheckbox(_cameraControlMenu.transform, "Lay", "Lay", new Vector2(0, -40), Options.Instance.cameraControlLay, (check) =>
+            {
+                if (check && !CameraMovementController.layoutCamera.gameObject.activeSelf)
+                {
+                    _cameraControlLayToggle.isOn = false;
+                    return;
+                }
+                if (check && Options.Instance.cameraControlSub)
+                {
+                    Options.Instance.cameraControlSub = false;
+                    _cameraControlSubToggle.isOn = false;
+                }
+                Options.Instance.cameraControlLay = check;
+            });
+            UI.MoveTransform(cameraControlLay.Item3.transform, 30, 16, 0, 1, 260, -40);
+            UI.MoveTransform(cameraControlLay.Item1, 50, 16, 0, 1, 290, -40);
+            _cameraControlLayToggle = cameraControlLay.Item3;
 
             var regexKey = new Regex(@"<\w+>/");
             var cameraControlPreviewButton = UI.AddButton(_cameraControlMenu.transform, "Preview", $"Preview [{regexKey.Replace(Options.Instance.previewKeyBinding,"").ToUpper()}]", new Vector2(0, -40), () =>
@@ -284,7 +315,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 movementController.OnPreview();
             });
             cameraControlPreviewButton.Text.fontSize = 9;
-            UI.MoveTransform(cameraControlPreviewButton.transform, 50, 20, 0, 1, 270, -40);
+            UI.MoveTransform(cameraControlPreviewButton.transform, 50, 20, 0, 1, 320, -40);
 
             var cameraControlMenuPasteButton = UI.AddButton(_cameraControlMenu.transform, "Paste", "Paste", new Vector2(0, -40), () =>
             {
@@ -387,7 +418,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 movementController.CameraPositionAndRotationSet(new_position, new_rotation);
                 Settings.Instance.CameraFOV = fov;
             });
-            UI.MoveTransform(cameraControlMenuPasteButton.transform, 40, 20, 0, 1, 360, -40);
+            UI.MoveTransform(cameraControlMenuPasteButton.transform, 40, 20, 0, 1, 370, -40);
 
             var cameraControlMenuCopyButton = UI.AddButton(_cameraControlMenu.transform, "Copy", "Copy", new Vector2(0, -40), () =>
             {
@@ -404,14 +435,14 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 GUIUtility.systemCopyBuffer = text;
             });
-            UI.MoveTransform(cameraControlMenuCopyButton.transform, 40, 20, 0, 1, 410, -40);
+            UI.MoveTransform(cameraControlMenuCopyButton.transform, 40, 20, 0, 1, 415, -40);
 
             var bookmarkSetCheckbox = UI.AddCheckbox(_cameraControlMenu.transform, "q format", "q format", new Vector2(0, -40), Options.Instance.qFormat, (check) =>
             {
                 Options.Instance.qFormat = check;
             });
-            UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0, 1, 450, -40);
-            UI.MoveTransform(bookmarkSetCheckbox.Item1, 50, 16, 0, 1, 480, -40);
+            UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0, 1, 455, -40);
+            UI.MoveTransform(bookmarkSetCheckbox.Item1, 50, 16, 0, 1, 485, -40);
 
             _cameraControlMenu.SetActive(Options.Instance.cameraControl);
         }

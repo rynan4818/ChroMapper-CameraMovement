@@ -74,10 +74,12 @@ namespace ChroMapper_CameraMovement.Configuration
         public float orbitZoomSensitivity = 0.001f;
         public float orbitOffsetSensitivity = 0.01f;
         public float orbitFovSensitivity = 0.005f;
+        public float orbitZrotSensitivity = 0.01f;
         public float orbitMinDistance = 0.2f;
         public float orbitMaxDistance = 100f;
         public string orbitActiveKeyBinding = "<Keyboard>/alt";
         public string orbitSubActiveKeyBinding = "<Keyboard>/ctrl";
+        public string orbitZrotActiveKeyBinding = "<Keyboard>/shift";
         public string orbitMoveActiveKeyBinding = "<Mouse>/leftButton";
         public string orbitRotActiveKeyBinding = "<Mouse>/rightButton";
         public bool subCameraNoUI = true;

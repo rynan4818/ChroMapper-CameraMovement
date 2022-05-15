@@ -13,6 +13,7 @@ namespace ChroMapper_CameraMovement.Component
     {
         public InputAction orbitActiveAction;
         public InputAction orbitSubActiveAction;
+        public InputAction orbitZrotActiveAction;
         public InputAction moveActiveAction;
         public InputAction rotActiveAction;
         public InputAction mouseMoveAction;
@@ -21,8 +22,10 @@ namespace ChroMapper_CameraMovement.Component
         public GameObject targetPosObject;
         public bool canOrbitCamera;
         public bool canOrbitSubCamera;
+        public bool canOrbitZrotCamera;
         public bool canMoveCamera;
         public bool canRotCamera;
+        public bool cameraUpdate = false;
         public float mouseX;
         public float mouseY;
         public Camera[] targetCamera { get; set; } = { null, null, null };
@@ -55,6 +58,11 @@ namespace ChroMapper_CameraMovement.Component
             orbitSubActiveAction.started += OnOrbitSubActive;
             orbitSubActiveAction.performed += OnOrbitSubActive;
             orbitSubActiveAction.canceled += OnOrbitSubActive;
+            orbitZrotActiveAction = new InputAction("Orbit Zrot Active");
+            orbitZrotActiveAction.AddBinding(Options.Instance.orbitZrotActiveKeyBinding);
+            orbitZrotActiveAction.started += OnOrbitZrotActive;
+            orbitZrotActiveAction.performed += OnOrbitZrotActive;
+            orbitZrotActiveAction.canceled += OnOrbitZrotActive;
             moveActiveAction = new InputAction("Orbit Move Active");
             moveActiveAction.AddBinding(Options.Instance.orbitMoveActiveKeyBinding);
             moveActiveAction.started += OnMoveActive;
@@ -83,6 +91,7 @@ namespace ChroMapper_CameraMovement.Component
         private void LateUpdate()
         {
             if (!canOrbitCamera) return;
+            if (canOrbitZrotCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
@@ -108,16 +117,20 @@ namespace ChroMapper_CameraMovement.Component
                 offset -= moveForward;
                 offset = new Vector3(offset.x, offset.y - mouseY * Options.Instance.orbitOffsetSensitivity, offset.z);
             }
-            var lookAtPos = targetObject.transform.position + offset;
-            var da = azimuthalAngle * Mathf.Deg2Rad;
-            var de = elevationAngle * Mathf.Deg2Rad;
-            targetCamera[MultiDisplayController.activeWindowNumber].transform.position = new Vector3(
-                lookAtPos.x + distance * Mathf.Sin(de) * Mathf.Cos(da),
-                lookAtPos.y + distance * Mathf.Cos(de),
-                lookAtPos.z + distance * Mathf.Sin(de) * Mathf.Sin(da)
-            );
-            targetCamera[MultiDisplayController.activeWindowNumber].transform.LookAt(lookAtPos);
-            targetPosObject.transform.localPosition = lookAtPos;
+            if (cameraUpdate || canRotCamera || canMoveCamera)
+            {
+                var lookAtPos = targetObject.transform.position + offset;
+                var da = azimuthalAngle * Mathf.Deg2Rad;
+                var de = elevationAngle * Mathf.Deg2Rad;
+                targetCamera[MultiDisplayController.activeWindowNumber].transform.position = new Vector3(
+                    lookAtPos.x + distance * Mathf.Sin(de) * Mathf.Cos(da),
+                    lookAtPos.y + distance * Mathf.Cos(de),
+                    lookAtPos.z + distance * Mathf.Sin(de) * Mathf.Sin(da)
+                );
+                targetCamera[MultiDisplayController.activeWindowNumber].transform.LookAt(lookAtPos);
+                targetPosObject.transform.localPosition = lookAtPos;
+                cameraUpdate = false;
+            }
         }
 
         public void OnOrbitActive(InputAction.CallbackContext context)
@@ -147,6 +160,7 @@ namespace ChroMapper_CameraMovement.Component
                 Plugin.movement.KeyDisable();
                 UI.DisableAction(actionMapsDisabled);
                 orbitSubActiveAction.Enable();
+                orbitZrotActiveAction.Enable();
                 moveActiveAction.Enable();
                 rotActiveAction.Enable();
                 zoomActiveAction.Enable();
@@ -156,6 +170,7 @@ namespace ChroMapper_CameraMovement.Component
             else
             {
                 orbitSubActiveAction.Disable();
+                orbitZrotActiveAction.Disable();
                 moveActiveAction.Disable();
                 rotActiveAction.Disable();
                 zoomActiveAction.Disable();
@@ -171,6 +186,10 @@ namespace ChroMapper_CameraMovement.Component
         public void OnOrbitSubActive(InputAction.CallbackContext context)
         {
             canOrbitSubCamera = context.performed;
+        }
+        public void OnOrbitZrotActive(InputAction.CallbackContext context)
+        {
+            canOrbitZrotCamera = context.performed;
         }
         public void OnMoveActive(InputAction.CallbackContext context)
         {
@@ -200,11 +219,19 @@ namespace ChroMapper_CameraMovement.Component
                 else
                     targetCamera[MultiDisplayController.activeWindowNumber].fieldOfView -= value * Options.Instance.orbitFovSensitivity;
             }
+            else if (canOrbitZrotCamera)
+            {
+                var value = context.ReadValue<float>() * Options.Instance.orbitZrotSensitivity;
+                var cameraRot = targetCamera[MultiDisplayController.activeWindowNumber].transform.eulerAngles;
+                cameraRot.z += value;
+                targetCamera[MultiDisplayController.activeWindowNumber].transform.rotation = Quaternion.Euler(cameraRot);
+            }
             else
             {
                 var value = context.ReadValue<float>() * Options.Instance.orbitZoomSensitivity;
                 value = distance - value;
                 distance = Mathf.Clamp(value, Options.Instance.orbitMinDistance, Options.Instance.orbitMaxDistance);
+                cameraUpdate = true;
             }
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (!context.performed) return;

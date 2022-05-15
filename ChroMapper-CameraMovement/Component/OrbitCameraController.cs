@@ -89,7 +89,10 @@ namespace ChroMapper_CameraMovement.Component
             if (canRotCamera && canMoveCamera)
             {
                 if (canOrbitSubCamera)
-                    Settings.Instance.CameraFOV = Options.Instance.orbitDefaultFOV;
+                    if (MultiDisplayController.activeWindowNumber == 0)
+                        Settings.Instance.CameraFOV = Options.Instance.orbitDefaultFOV;
+                    else
+                        targetCamera[MultiDisplayController.activeWindowNumber].fieldOfView = Options.Instance.orbitDefaultFOV;
                 else
                     offset = Vector3.zero;
             }
@@ -192,7 +195,10 @@ namespace ChroMapper_CameraMovement.Component
             if (canOrbitSubCamera)
             {
                 var value = context.ReadValue<float>();
-                Settings.Instance.CameraFOV -= value * Options.Instance.orbitFovSensitivity;
+                if (MultiDisplayController.activeWindowNumber == 0)
+                    Settings.Instance.CameraFOV -= value * Options.Instance.orbitFovSensitivity;
+                else
+                    targetCamera[MultiDisplayController.activeWindowNumber].fieldOfView -= value * Options.Instance.orbitFovSensitivity;
             }
             else
             {

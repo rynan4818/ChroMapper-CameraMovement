@@ -13,6 +13,7 @@ namespace ChroMapper_CameraMovement
     {
         public static CameraMovementController movement;
         public static OrbitCameraController orbitCamera;
+        public static PlusCameraController plusCamera;
         public static Harmony _harmony;
         public static UI _ui;
         public static int activeWindow = 1;
@@ -44,6 +45,7 @@ namespace ChroMapper_CameraMovement
                 return;
             movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
             orbitCamera = movement.gameObject.gameObject.AddComponent<OrbitCameraController>();
+            plusCamera = movement.gameObject.AddComponent<PlusCameraController>();
             MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
             _ui.AddMenu(mapEditorUI);
         }

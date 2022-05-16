@@ -99,6 +99,16 @@ namespace ChroMapper_CameraMovement.Configuration
         public int subDisplay2PosY = 0;
         public int subDisplay2Width = 0;
         public int subDisplay2Height = 0;
+        public string plusActiveKeyBinding = "<Keyboard>/z";
+        public string plusZrotActiveKeyBinding = "<Mouse>/leftButton";
+        public string plusPosActiveKeyBinding = "<Mouse>/middleButton";
+        public string plusRotActiveKeyBinding = "<Mouse>/rightButton";
+        public float plusZrotSensitivity = 0.004165f;
+        public float plusPosSensitivity = 0.01f;
+        public float plusRotSensitivity = 0.03f;
+        public float plusZoomSensitivity = 0.003125f;
+        public float plusFovSensitivity = 0.005f;
+        public float plusDefaultFOV = 60f;
 
         public static Options Instance {
             get {

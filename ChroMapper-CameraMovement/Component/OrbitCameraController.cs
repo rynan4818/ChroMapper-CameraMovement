@@ -20,11 +20,11 @@ namespace ChroMapper_CameraMovement.Component
         public InputAction zoomActiveAction;
         public CustomStandaloneInputModule customStandaloneInputModule;
         public GameObject targetPosObject;
-        public bool canOrbitCamera;
-        public bool canOrbitSubCamera;
-        public bool canOrbitZrotCamera;
-        public bool canMoveCamera;
-        public bool canRotCamera;
+        public bool canOrbitCamera = false;
+        public bool canOrbitSubCamera = false;
+        public bool canOrbitZrotCamera = false;
+        public bool canMoveCamera = false;
+        public bool canRotCamera = false;
         public bool cameraUpdate = false;
         public float mouseX;
         public float mouseY;
@@ -180,6 +180,8 @@ namespace ChroMapper_CameraMovement.Component
                 canMoveCamera = false;
                 canRotCamera = false;
                 canOrbitSubCamera = false;
+                canOrbitZrotCamera = false;
+                cameraUpdate = false;
                 targetPosObject.SetActive(false);
             }
         }
@@ -221,10 +223,11 @@ namespace ChroMapper_CameraMovement.Component
             }
             else if (canOrbitZrotCamera)
             {
+                var camera = targetCamera[MultiDisplayController.activeWindowNumber].gameObject;
                 var value = context.ReadValue<float>() * Options.Instance.orbitZrotSensitivity;
-                var cameraRot = targetCamera[MultiDisplayController.activeWindowNumber].transform.eulerAngles;
+                var cameraRot = camera.transform.eulerAngles;
                 cameraRot.z += value;
-                targetCamera[MultiDisplayController.activeWindowNumber].transform.rotation = Quaternion.Euler(cameraRot);
+                camera.transform.rotation = Quaternion.Euler(cameraRot);
             }
             else
             {

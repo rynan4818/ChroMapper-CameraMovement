@@ -79,10 +79,12 @@ namespace ChroMapper_CameraMovement.Component
             if (Options.Instance.subWindow && Options.Instance.layoutWindow)
             {
                 Plugin.orbitCamera.targetCamera[1] = CameraMovementController.subCamera;
+                Plugin.orbitCamera.targetCamera[2] = CameraMovementController.layoutCamera;
+                Plugin.plusCamera.targetCamera[1] = CameraMovementController.subCamera;
+                Plugin.plusCamera.targetCamera[2] = CameraMovementController.layoutCamera;
                 CameraMovementController.subCamera.gameObject.SetActive(true);
                 CameraMovementController.subCamera.targetDisplay = 1;
                 CameraMovementController.subCamera.rect = new Rect(0, 0, 1, 1);
-                Plugin.orbitCamera.targetCamera[2] = CameraMovementController.layoutCamera;
                 CameraMovementController.layoutCamera.gameObject.SetActive(true);
                 CameraMovementController.layoutCamera.targetDisplay = 2;
                 subActive = true;
@@ -92,6 +94,8 @@ namespace ChroMapper_CameraMovement.Component
             {
                 Plugin.orbitCamera.targetCamera[1] = CameraMovementController.subCamera;
                 Plugin.orbitCamera.targetCamera[2] = null;
+                Plugin.plusCamera.targetCamera[1] = CameraMovementController.subCamera;
+                Plugin.plusCamera.targetCamera[2] = null;
                 CameraMovementController.subCamera.gameObject.SetActive(true);
                 CameraMovementController.subCamera.targetDisplay = 1;
                 CameraMovementController.subCamera.rect = new Rect(0, 0, 1, 1);
@@ -102,6 +106,8 @@ namespace ChroMapper_CameraMovement.Component
             {
                 Plugin.orbitCamera.targetCamera[1] = CameraMovementController.layoutCamera;
                 Plugin.orbitCamera.targetCamera[2] = null;
+                Plugin.plusCamera.targetCamera[1] = CameraMovementController.layoutCamera;
+                Plugin.plusCamera.targetCamera[2] = null;
                 CameraMovementController.subCamera.targetDisplay = 0;
                 CameraMovementController.layoutCamera.gameObject.SetActive(true);
                 CameraMovementController.layoutCamera.targetDisplay = 1;

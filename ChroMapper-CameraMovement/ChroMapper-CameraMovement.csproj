@@ -148,12 +148,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraPlus\CameraMovement.cs" />
+    <Compile Include="Component\DefaultCameraController.cs" />
     <Compile Include="Component\MultiDisplayController.cs" />
     <Compile Include="Component\BookmarkLinesController.cs" />
     <Compile Include="Component\BookmarkLinesRenderingOrderController.cs" />
     <Compile Include="CameraPlus\MovementScriptJson.cs" />
     <Compile Include="Component\DragWindowController.cs" />
     <Compile Include="Component\OrbitCameraController.cs" />
+    <Compile Include="Component\PlusCameraController.cs" />
     <Compile Include="Configuration\Options.cs" />
     <Compile Include="Controller\WindowController.cs" />
     <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />

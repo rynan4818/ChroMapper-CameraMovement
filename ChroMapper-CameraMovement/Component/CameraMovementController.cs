@@ -914,6 +914,7 @@ namespace ChroMapper_CameraMovement.Component
             Reload();
             Plugin.orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             Plugin.orbitCamera.targetObject = avatarHead;
+            Plugin.plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
             if (Plugin.activeWindow > 1)
                 multiDisplayController.SetTargetDisplay();

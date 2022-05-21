@@ -55,6 +55,8 @@ namespace ChroMapper_CameraMovement.CameraPlus
 
             public bool LoadFromJson(string jsonString)
             {
+                var duration_sum = 0f;
+                decimal duration_sumd = 0;
                 Movements.Clear();
                 MovementScriptJson movementScriptJson = null;
                 string sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
@@ -136,7 +138,14 @@ namespace ChroMapper_CameraMovement.CameraPlus
                         if (jsonmovement.TurnToHead != null) newMovement.TurnToHead = System.Convert.ToBoolean(jsonmovement.TurnToHead);
                         if (jsonmovement.TurnToHeadHorizontal != null) newMovement.TurnToHeadHorizontal = System.Convert.ToBoolean(jsonmovement.TurnToHeadHorizontal);
                         if (jsonmovement.Delay != null) newMovement.Delay = float.Parse(jsonmovement.Delay.Contains(sepCheck) ? jsonmovement.Delay.Replace(sepCheck, sep) : jsonmovement.Delay);
-                        if (jsonmovement.Duration != null) newMovement.Duration = Mathf.Clamp(float.Parse(jsonmovement.Duration.Contains(sepCheck) ? jsonmovement.Duration.Replace(sepCheck, sep) : jsonmovement.Duration), 0.01f, float.MaxValue); // Make sure duration is at least 0.01 seconds, to avoid a divide by zero error
+                        if (jsonmovement.Duration != null)
+                        {
+                            newMovement.Duration = Mathf.Clamp(float.Parse(jsonmovement.Duration.Contains(sepCheck) ? jsonmovement.Duration.Replace(sepCheck, sep) : jsonmovement.Duration), 0.01f, float.MaxValue); // Make sure duration is at least 0.01 seconds, to avoid a divide by zero error
+                            duration_sum += newMovement.Duration;
+                            var duration_d = decimal.Parse(jsonmovement.Duration.Contains(sepCheck) ? jsonmovement.Duration.Replace(sepCheck, sep) : jsonmovement.Duration, NumberStyles.Number | NumberStyles.AllowExponent);
+                            duration_sumd += duration_d;
+                            Debug.Log($"\t{jsonmovement.Duration}\t{newMovement.Duration}\t{duration_sumd}\t{duration_sum}\t{(int)(duration_sum / 60)}:{duration_sum % 60}");
+                        }
 
                         if (jsonmovement.EaseTransition != null)
                             newMovement.EaseTransition = System.Convert.ToBoolean(jsonmovement.EaseTransition);

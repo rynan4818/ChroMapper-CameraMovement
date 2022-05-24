@@ -72,6 +72,7 @@ namespace ChroMapper_CameraMovement.Component
             if (!canPlusCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
             if (canRotCamera && canPosCamera)
             {
@@ -91,12 +92,15 @@ namespace ChroMapper_CameraMovement.Component
         public void OnPlusActive(InputAction.CallbackContext context)
         {
             if (!UI.keyDisable) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
             canPlusCamera = context.performed;
             if (canPlusCamera)
             {
                 Plugin.movement.KeyDisable();
                 UI.DisableAction(actionMapsDisabled);
+                Plugin.defaultCamera.defaultActiveAction.Disable();
+                Plugin.orbitCamera.orbitActiveAction.Disable();
                 zRotActiveAction.Enable();
                 posActiveAction.Enable();
                 rotActiveAction.Enable();
@@ -110,6 +114,8 @@ namespace ChroMapper_CameraMovement.Component
                 rotActiveAction.Disable();
                 posActiveAction.Disable();
                 zRotActiveAction.Disable();
+                Plugin.orbitCamera.orbitActiveAction.Enable();
+                Plugin.defaultCamera.defaultActiveAction.Enable();
                 UI.EnableAction(actionMapsDisabled);
                 Plugin.movement.KeyEnable();
                 canZrotCamera = false;
@@ -134,6 +140,7 @@ namespace ChroMapper_CameraMovement.Component
             if (!canPlusCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
 
             var deltaMouseMovement = context.ReadValue<Vector2>();
@@ -159,6 +166,7 @@ namespace ChroMapper_CameraMovement.Component
             if (!canPlusCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
 
             var camera = targetCamera[MultiDisplayController.activeWindowNumber].gameObject;

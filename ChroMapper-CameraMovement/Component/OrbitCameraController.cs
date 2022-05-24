@@ -94,6 +94,7 @@ namespace ChroMapper_CameraMovement.Component
             if (canOrbitZrotCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             if (canRotCamera && canMoveCamera)
             {
@@ -136,6 +137,7 @@ namespace ChroMapper_CameraMovement.Component
         public void OnOrbitActive(InputAction.CallbackContext context)
         {
             if (!UI.keyDisable) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             canOrbitCamera = context.performed;
             if (canOrbitCamera)
@@ -159,6 +161,8 @@ namespace ChroMapper_CameraMovement.Component
                 elevationAngle = Mathf.Clamp(Vector3.Angle(Vector3.up, diff), minElevationAngle, maxElevationAngle);
                 Plugin.movement.KeyDisable();
                 UI.DisableAction(actionMapsDisabled);
+                Plugin.defaultCamera.defaultActiveAction.Disable();
+                Plugin.plusCamera.plusActiveAction.Disable();
                 orbitSubActiveAction.Enable();
                 orbitZrotActiveAction.Enable();
                 moveActiveAction.Enable();
@@ -175,6 +179,8 @@ namespace ChroMapper_CameraMovement.Component
                 rotActiveAction.Disable();
                 zoomActiveAction.Disable();
                 mouseMoveAction.Disable();
+                Plugin.defaultCamera.defaultActiveAction.Enable();
+                Plugin.plusCamera.plusActiveAction.Enable();
                 UI.EnableAction(actionMapsDisabled);
                 Plugin.movement.KeyEnable();
                 canMoveCamera = false;
@@ -212,6 +218,7 @@ namespace ChroMapper_CameraMovement.Component
             if (!canOrbitCamera) return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             if (canOrbitSubCamera)
             {

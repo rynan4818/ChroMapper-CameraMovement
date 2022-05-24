@@ -55,7 +55,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
 
             public bool LoadFromJson(string jsonString)
             {
-                var duration_sum = 0f;
+                float duration_sum = 0;
                 decimal duration_sumd = 0;
                 Movements.Clear();
                 MovementScriptJson movementScriptJson = null;
@@ -144,7 +144,6 @@ namespace ChroMapper_CameraMovement.CameraPlus
                             duration_sum += newMovement.Duration;
                             var duration_d = decimal.Parse(jsonmovement.Duration.Contains(sepCheck) ? jsonmovement.Duration.Replace(sepCheck, sep) : jsonmovement.Duration, NumberStyles.Number | NumberStyles.AllowExponent);
                             duration_sumd += duration_d;
-                            Debug.Log($"\t{jsonmovement.Duration}\t{newMovement.Duration}\t{duration_sumd}\t{duration_sum}\t{(int)(duration_sum / 60)}:{duration_sum % 60}");
                         }
 
                         if (jsonmovement.EaseTransition != null)
@@ -152,6 +151,8 @@ namespace ChroMapper_CameraMovement.CameraPlus
 
                         Movements.Add(newMovement);
                     }
+                    var duration_error = duration_sum - (float)duration_sumd;
+                    Debug.Log($"Duration total error: {Math.Round(duration_error, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
                     return true;
                 }
                 return false;

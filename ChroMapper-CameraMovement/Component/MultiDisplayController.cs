@@ -14,7 +14,7 @@ namespace ChroMapper_CameraMovement.Component
         public const string layoutWindowName = "CameraMovement Layout Camera";
         public const string defaultWindowName = "Unity Secondary Display";
         public static (int, int, int, int) mainPosSize;
-        public static int activeWindowNumber = 0;
+        public static int activeWindowNumber = -1;
 
         public void CreateDisplay()
         {
@@ -82,6 +82,8 @@ namespace ChroMapper_CameraMovement.Component
                 Plugin.orbitCamera.targetCamera[2] = CameraMovementController.layoutCamera;
                 Plugin.plusCamera.targetCamera[1] = CameraMovementController.subCamera;
                 Plugin.plusCamera.targetCamera[2] = CameraMovementController.layoutCamera;
+                Plugin.defaultCamera.targetCamera[1] = CameraMovementController.subCamera;
+                Plugin.defaultCamera.targetCamera[2] = CameraMovementController.layoutCamera;
                 CameraMovementController.subCamera.gameObject.SetActive(true);
                 CameraMovementController.subCamera.targetDisplay = 1;
                 CameraMovementController.subCamera.rect = new Rect(0, 0, 1, 1);
@@ -96,6 +98,8 @@ namespace ChroMapper_CameraMovement.Component
                 Plugin.orbitCamera.targetCamera[2] = null;
                 Plugin.plusCamera.targetCamera[1] = CameraMovementController.subCamera;
                 Plugin.plusCamera.targetCamera[2] = null;
+                Plugin.defaultCamera.targetCamera[1] = CameraMovementController.subCamera;
+                Plugin.defaultCamera.targetCamera[2] = null;
                 CameraMovementController.subCamera.gameObject.SetActive(true);
                 CameraMovementController.subCamera.targetDisplay = 1;
                 CameraMovementController.subCamera.rect = new Rect(0, 0, 1, 1);
@@ -108,6 +112,8 @@ namespace ChroMapper_CameraMovement.Component
                 Plugin.orbitCamera.targetCamera[2] = null;
                 Plugin.plusCamera.targetCamera[1] = CameraMovementController.layoutCamera;
                 Plugin.plusCamera.targetCamera[2] = null;
+                Plugin.defaultCamera.targetCamera[1] = CameraMovementController.layoutCamera;
+                Plugin.defaultCamera.targetCamera[2] = null;
                 CameraMovementController.subCamera.targetDisplay = 0;
                 CameraMovementController.layoutCamera.gameObject.SetActive(true);
                 CameraMovementController.layoutCamera.targetDisplay = 1;
@@ -163,14 +169,20 @@ namespace ChroMapper_CameraMovement.Component
 
         public void Update()
         {
+            if (Plugin.activeWindow == 1)
+            {
+                activeWindowNumber = 0;
+                return;
+            }
             var window = WindowController.getForegroundWindowHandle();
-            activeWindowNumber = 0;
-            for (int i = 1; i < Plugin.activeWindow; i++)
+            activeWindowNumber = -1;
+            for (int i = 0; i < Plugin.activeWindow; i++)
             {
                 if (windowInfos[i].Item2 == window)
                 {
-                    WindowController.windowAspectResize(windowInfos[i]);
                     activeWindowNumber = i;
+                    if (i > 0)
+                        WindowController.windowAspectResize(windowInfos[i]);
                     break;
                 }
             }

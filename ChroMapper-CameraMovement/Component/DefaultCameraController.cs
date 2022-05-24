@@ -5,107 +5,171 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using ChroMapper_CameraMovement.UserInterface;
-using ChroMapper_CameraMovement.Configuration;
 
 namespace ChroMapper_CameraMovement.Component
 {
     public class DefaultCameraController : MonoBehaviour
     {
         public InputAction defaultActiveAction;
-        public InputAction zRotActiveAction;
-        public InputAction posActiveAction;
+        public InputAction elevateActiveAction;
         public InputAction rotActiveAction;
         public InputAction moveActiveAction;
         public InputAction scrollActiveAction;
         public CustomStandaloneInputModule customStandaloneInputModule;
         public bool canDefaultCamera = false;
-        public bool canZrotCamera = false;
-        public bool canPosCamera = false;
-        public bool canRotCamera = false;
+        public bool disableMainDefaultCamera = false;
         public float mouseX;
         public float mouseY;
+        public float x;
+        public float y;
+        public float z;
         public Camera[] targetCamera { get; set; } = { null, null, null };
         private static readonly Type[] actionMapsEnabledWhenNodeEditing =
         {
-            typeof(CMInput.ISavingActions)
+            typeof(CMInput.ISavingActions),typeof(CMInput.ICameraActions)
+        };
+
+        private static readonly Type[] actionMapsDisableDefaultCamera =
+        {
+            typeof(CMInput.ICameraActions)
         };
 
         private static Type[] actionMapsDisabled => typeof(CMInput).GetNestedTypes()
             .Where(x => x.IsInterface && !actionMapsEnabledWhenNodeEditing.Contains(x)).ToArray();
         private void Start()
         {
+            //https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/manual/ActionBindings.html
             defaultActiveAction = new InputAction("DefaultCamera Active");
-            defaultActiveAction.AddBinding(Options.Instance.plusActiveKeyBinding);
+            defaultActiveAction.AddBinding("<Mouse>/rightButton");
             defaultActiveAction.started += OnDefaultActive;
             defaultActiveAction.performed += OnDefaultActive;
             defaultActiveAction.canceled += OnDefaultActive;
             defaultActiveAction.Enable();
-            zRotActiveAction = new InputAction("DefaultCamera Z Rot Active");
-            zRotActiveAction.AddBinding(Options.Instance.plusZrotActiveKeyBinding);
-            zRotActiveAction.started += OnZrotActive;
-            zRotActiveAction.performed += OnZrotActive;
-            zRotActiveAction.canceled += OnZrotActive;
-            posActiveAction = new InputAction("DefaultCamera Pos Active");
-            posActiveAction.AddBinding(Options.Instance.plusPosActiveKeyBinding);
-            posActiveAction.started += OnPosActive;
-            posActiveAction.performed += OnPosActive;
-            posActiveAction.canceled += OnPosActive;
-            rotActiveAction = new InputAction("DefaultCamera Rot Active");
-            rotActiveAction.AddBinding(Options.Instance.plusRotActiveKeyBinding);
-            rotActiveAction.started += OnRotActive;
-            rotActiveAction.performed += OnRotActive;
-            rotActiveAction.canceled += OnRotActive;
+            elevateActiveAction = new InputAction("DefaultCamera Elevate Action");
+            elevateActiveAction.AddCompositeBinding("1DAxis")
+                .With("positive", "<Keyboard>/space")
+                .With("negative", "<Keyboard>/ctrl");
+            elevateActiveAction.started += OnElevateCamera;
+            elevateActiveAction.performed += OnElevateCamera;
+            elevateActiveAction.canceled += OnElevateCamera;
             moveActiveAction = new InputAction("DefaultCamera Move Action");
-            moveActiveAction.AddBinding("<Mouse>/delta");
-            moveActiveAction.started += OnMoveAction;
-            moveActiveAction.performed += OnMoveAction;
-            moveActiveAction.canceled += OnMoveAction;
+            moveActiveAction.AddCompositeBinding("2DVector(mode=2)")
+                .With("up", "<Keyboard>/w")
+                .With("left", "<Keyboard>/a")
+                .With("down", "<Keyboard>/s")
+                .With("right", "<Keyboard>/d");
+            moveActiveAction.started += OnMoveCamera;
+            moveActiveAction.performed += OnMoveCamera;
+            moveActiveAction.canceled += OnMoveCamera;
+            rotActiveAction = new InputAction("DefaultCamera Rotate Action");
+            rotActiveAction.AddBinding("<Mouse>/delta");
+            rotActiveAction.started += OnRotateCamera;
+            rotActiveAction.performed += OnRotateCamera;
+            rotActiveAction.canceled += OnRotateCamera;
             scrollActiveAction = new InputAction("DefaultCamera Scroll Action");
             scrollActiveAction.AddBinding("<Mouse>/scroll/y");
             scrollActiveAction.started += OnScrollAction;
             scrollActiveAction.performed += OnScrollAction;
             scrollActiveAction.canceled += OnScrollAction;
             customStandaloneInputModule = GameObject.Find("EventSystem").GetComponent<CustomStandaloneInputModule>();
+            //キーバンドはdefaultの物を取りたい
+        }
+        private void LateUpdate()
+        {
+            if (PauseManager.IsPaused || SceneTransitionManager.IsLoading)
+                return;
+            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (MultiDisplayController.activeWindowNumber == 0)
+            {
+                if (disableMainDefaultCamera)
+                {
+                    UI.EnableAction(actionMapsDisableDefaultCamera);
+                    disableMainDefaultCamera = false;
+                }
+            }
+            else if (MultiDisplayController.activeWindowNumber > 0)
+            {
+                if (!disableMainDefaultCamera)
+                {
+                    UI.DisableAction(actionMapsDisableDefaultCamera);
+                    disableMainDefaultCamera = true;
+                }
+            }
+            if (MultiDisplayController.activeWindowNumber == -1) return;
+            if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
+            if (canDefaultCamera)
+            {
+                var movementSpeedInFrame = Settings.Instance.Camera_MovementSpeed * Time.deltaTime;
+                var sideTranslation = movementSpeedInFrame * new Vector3(x, 0, z);
+                targetCamera[MultiDisplayController.activeWindowNumber].transform.Translate(sideTranslation);
+                targetCamera[MultiDisplayController.activeWindowNumber].transform.Translate(movementSpeedInFrame * y * Vector3.up, Space.World);
+                var eulerAngles = targetCamera[MultiDisplayController.activeWindowNumber].transform.eulerAngles;
+                var ex = eulerAngles.x;
+                ex = ex > 180 ? ex - 360 : ex;
+                eulerAngles.x = Mathf.Clamp(ex + -mouseY, -89.5f, 89.5f);
+                eulerAngles.y += mouseX;
+                eulerAngles.z = 0;
+                targetCamera[MultiDisplayController.activeWindowNumber].transform.eulerAngles = eulerAngles;
+            }
+            else
+            {
+                z = x = 0;
+            }
         }
         public void OnDefaultActive(InputAction.CallbackContext context)
         {
             if (!UI.keyDisable) return;
+            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
+            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
             canDefaultCamera = context.performed;
             if (canDefaultCamera)
             {
-
+                Plugin.movement.KeyDisable();
+                UI.DisableAction(actionMapsDisabled);
+                Plugin.orbitCamera.orbitActiveAction.Disable();
+                Plugin.plusCamera.plusActiveAction.Disable();
+                rotActiveAction.Enable();
+                elevateActiveAction.Enable();
+                moveActiveAction.Enable();
+                scrollActiveAction.Enable();
+            }
+            else
+            {
+                scrollActiveAction.Disable();
+                moveActiveAction.Disable();
+                elevateActiveAction.Disable();
+                rotActiveAction.Disable();
+                Plugin.orbitCamera.orbitActiveAction.Enable();
+                Plugin.plusCamera.plusActiveAction.Enable();
+                UI.EnableAction(actionMapsDisabled);
+                Plugin.movement.KeyEnable();
             }
         }
-        public void OnZrotActive(InputAction.CallbackContext context)
+        public void OnMoveCamera(InputAction.CallbackContext context)
         {
-            canZrotCamera = context.performed;
+            var move = context.ReadValue<Vector2>();
+            x = move.x;
+            z = move.y;
         }
-        public void OnPosActive(InputAction.CallbackContext context)
+        public void OnElevateCamera(InputAction.CallbackContext context)
         {
-            canPosCamera = context.performed;
+            y = context.ReadValue<float>();
         }
-        public void OnRotActive(InputAction.CallbackContext context)
-        {
-            canRotCamera = context.performed;
-        }
-        public void OnMoveAction(InputAction.CallbackContext context)
+
+        public void OnRotateCamera(InputAction.CallbackContext context)
         {
             if (!canDefaultCamera) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
-            if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
 
             var deltaMouseMovement = context.ReadValue<Vector2>();
-            mouseX = deltaMouseMovement.x;
-            mouseY = deltaMouseMovement.y;
+            mouseX = deltaMouseMovement.x * Settings.Instance.Camera_MouseSensitivity / 10f;
+            mouseY = deltaMouseMovement.y * Settings.Instance.Camera_MouseSensitivity / 10f;
         }
         public void OnScrollAction(InputAction.CallbackContext context)
         {
             if (!canDefaultCamera) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
-            if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
 
         }
     }

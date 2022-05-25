@@ -71,7 +71,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             foreach (Type actionMap in actionMaps)
             {
-                Debug.Log($"Disable:{actionMap}");
+                Debug.Log($"Disable:{actionMap.ToString()}");
                 queuedToEnable.Remove(actionMap);
                 if (!queuedToDisable.Contains(actionMap))
                     queuedToDisable.Add(actionMap);
@@ -82,7 +82,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             foreach (Type actionMap in actionMaps)
             {
-                Debug.Log($"Enable:{actionMap}");
+                Debug.Log($"Enable:{actionMap.ToString()}");
                 queuedToDisable.Remove(actionMap);
                 if (!queuedToEnable.Contains(actionMap))
                     queuedToEnable.Add(actionMap);

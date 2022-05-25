@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
@@ -36,14 +35,7 @@ namespace ChroMapper_CameraMovement.Component
         public float elevationAngle { get; set; } = 90f;
         public float minElevationAngle { get; set; } = 0.01f;
         public float maxElevationAngle { get; set; } = 179.99f;
-
-        private static readonly Type[] actionMapsEnabledWhenNodeEditing =
-        {
-            typeof(CMInput.ISavingActions)
-        };
-
-        private static Type[] actionMapsDisabled => typeof(CMInput).GetNestedTypes()
-            .Where(x => x.IsInterface && !actionMapsEnabledWhenNodeEditing.Contains(x)).ToArray();
+        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions) };
 
         private void Start()
         {
@@ -159,8 +151,7 @@ namespace ChroMapper_CameraMovement.Component
                 }
                 diff = targetCamera[MultiDisplayController.activeWindowNumber].transform.position - targetObject.transform.position;
                 elevationAngle = Mathf.Clamp(Vector3.Angle(Vector3.up, diff), minElevationAngle, maxElevationAngle);
-                Plugin.movement.KeyDisable();
-                UI.DisableAction(actionMapsDisabled);
+                UI.DisableAction(actionMapsDisableTimeLine);
                 Plugin.defaultCamera.defaultActiveAction.Disable();
                 Plugin.plusCamera.plusActiveAction.Disable();
                 orbitSubActiveAction.Enable();
@@ -181,14 +172,13 @@ namespace ChroMapper_CameraMovement.Component
                 mouseMoveAction.Disable();
                 Plugin.defaultCamera.defaultActiveAction.Enable();
                 Plugin.plusCamera.plusActiveAction.Enable();
-                UI.EnableAction(actionMapsDisabled);
-                Plugin.movement.KeyEnable();
                 canMoveCamera = false;
                 canRotCamera = false;
                 canOrbitSubCamera = false;
                 canOrbitZrotCamera = false;
                 cameraUpdate = false;
                 targetPosObject.SetActive(false);
+                UI.EnableAction(actionMapsDisableTimeLine);
             }
         }
         public void OnOrbitSubActive(InputAction.CallbackContext context)

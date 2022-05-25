@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
@@ -25,13 +24,8 @@ namespace ChroMapper_CameraMovement.Component
         public float mouseX;
         public float mouseY;
         public Camera[] targetCamera { get; set; } = { null, null, null };
-        private static readonly Type[] actionMapsEnabledWhenNodeEditing =
-        {
-            typeof(CMInput.ISavingActions)
-        };
+        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions) };
 
-        private static Type[] actionMapsDisabled => typeof(CMInput).GetNestedTypes()
-            .Where(x => x.IsInterface && !actionMapsEnabledWhenNodeEditing.Contains(x)).ToArray();
         private void Start()
         {
             plusActiveAction = new InputAction("PlusCamera Active");
@@ -97,8 +91,7 @@ namespace ChroMapper_CameraMovement.Component
             canPlusCamera = context.performed;
             if (canPlusCamera)
             {
-                Plugin.movement.KeyDisable();
-                UI.DisableAction(actionMapsDisabled);
+                UI.DisableAction(actionMapsDisableTimeLine);
                 Plugin.defaultCamera.defaultActiveAction.Disable();
                 Plugin.orbitCamera.orbitActiveAction.Disable();
                 zRotActiveAction.Enable();
@@ -116,8 +109,7 @@ namespace ChroMapper_CameraMovement.Component
                 zRotActiveAction.Disable();
                 Plugin.orbitCamera.orbitActiveAction.Enable();
                 Plugin.defaultCamera.defaultActiveAction.Enable();
-                UI.EnableAction(actionMapsDisabled);
-                Plugin.movement.KeyEnable();
+                UI.EnableAction(actionMapsDisableTimeLine);
                 canZrotCamera = false;
                 canPosCamera = false;
                 canRotCamera = false;

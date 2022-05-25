@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
@@ -24,18 +23,9 @@ namespace ChroMapper_CameraMovement.Component
         public float y;
         public float z;
         public Camera[] targetCamera { get; set; } = { null, null, null };
-        private static readonly Type[] actionMapsEnabledWhenNodeEditing =
-        {
-            typeof(CMInput.ISavingActions),typeof(CMInput.ICameraActions)
-        };
+        private static readonly Type[] actionMapsDisableDefaultCamera = { typeof(CMInput.ICameraActions) };
+        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions) };
 
-        private static readonly Type[] actionMapsDisableDefaultCamera =
-        {
-            typeof(CMInput.ICameraActions)
-        };
-
-        private static Type[] actionMapsDisabled => typeof(CMInput).GetNestedTypes()
-            .Where(x => x.IsInterface && !actionMapsEnabledWhenNodeEditing.Contains(x)).ToArray();
         private void Start()
         {
             //https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/manual/ActionBindings.html
@@ -67,10 +57,6 @@ namespace ChroMapper_CameraMovement.Component
             rotActiveAction.performed += OnRotateCamera;
             rotActiveAction.canceled += OnRotateCamera;
             scrollActiveAction = new InputAction("DefaultCamera Scroll Action");
-            scrollActiveAction.AddBinding("<Mouse>/scroll/y");
-            scrollActiveAction.started += OnScrollAction;
-            scrollActiveAction.performed += OnScrollAction;
-            scrollActiveAction.canceled += OnScrollAction;
             customStandaloneInputModule = GameObject.Find("EventSystem").GetComponent<CustomStandaloneInputModule>();
             //キーバンドはdefaultの物を取りたい
         }
@@ -127,8 +113,7 @@ namespace ChroMapper_CameraMovement.Component
             canDefaultCamera = context.performed;
             if (canDefaultCamera)
             {
-                Plugin.movement.KeyDisable();
-                UI.DisableAction(actionMapsDisabled);
+                UI.DisableAction(actionMapsDisableTimeLine);
                 Plugin.orbitCamera.orbitActiveAction.Disable();
                 Plugin.plusCamera.plusActiveAction.Disable();
                 rotActiveAction.Enable();
@@ -144,8 +129,7 @@ namespace ChroMapper_CameraMovement.Component
                 rotActiveAction.Disable();
                 Plugin.orbitCamera.orbitActiveAction.Enable();
                 Plugin.plusCamera.plusActiveAction.Enable();
-                UI.EnableAction(actionMapsDisabled);
-                Plugin.movement.KeyEnable();
+                UI.EnableAction(actionMapsDisableTimeLine);
             }
         }
         public void OnMoveCamera(InputAction.CallbackContext context)
@@ -166,11 +150,6 @@ namespace ChroMapper_CameraMovement.Component
             var deltaMouseMovement = context.ReadValue<Vector2>();
             mouseX = deltaMouseMovement.x * Settings.Instance.Camera_MouseSensitivity / 10f;
             mouseY = deltaMouseMovement.y * Settings.Instance.Camera_MouseSensitivity / 10f;
-        }
-        public void OnScrollAction(InputAction.CallbackContext context)
-        {
-            if (!canDefaultCamera) return;
-
         }
     }
 }

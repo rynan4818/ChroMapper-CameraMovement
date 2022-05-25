@@ -740,6 +740,9 @@ namespace ChroMapper_CameraMovement.Component
             scriptMapperAction.Disable();
             dragWindowsAction.Disable();
             subCameraRectAction.Disable();
+            Plugin.orbitCamera.orbitActiveAction.Disable();
+            Plugin.plusCamera.plusActiveAction.Disable();
+            Plugin.defaultCamera.defaultActiveAction.Disable();
         }
 
         public void KeyEnable()
@@ -747,6 +750,9 @@ namespace ChroMapper_CameraMovement.Component
             previewAction.Enable();
             scriptMapperAction.Enable();
             dragWindowsAction.Enable();
+            Plugin.orbitCamera.orbitActiveAction.Enable();
+            Plugin.plusCamera.plusActiveAction.Enable();
+            Plugin.defaultCamera.defaultActiveAction.Enable();
         }
 
         private IEnumerator Start()

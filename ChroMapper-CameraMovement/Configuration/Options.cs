@@ -109,6 +109,13 @@ namespace ChroMapper_CameraMovement.Configuration
         public float plusZoomSensitivity = 0.003125f;
         public float plusFovSensitivity = 0.005f;
         public float plusDefaultFOV = 60f;
+        public string defaultCameraActiveKeyBinding = "<Mouse>/rightButton";
+        public string defaultCameraElevatePositiveKeyBinding = "<Keyboard>/space";
+        public string defaultCameraElevateNegativeKeyBinding = "<Keyboard>/ctrl";
+        public string defaultCameraMoveUpKeyBinding = "<Keyboard>/w";
+        public string defaultCameraMoveLeftKeyBinding = "<Keyboard>/a";
+        public string defaultCameraMoveDownKeyBinding = "<Keyboard>/s";
+        public string defaultCameraMoveRightKeyBinding = "<Keyboard>/d";
 
         public static Options Instance {
             get {

@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using ChroMapper_CameraMovement.UserInterface;
+using ChroMapper_CameraMovement.Configuration;
 
 namespace ChroMapper_CameraMovement.Component
 {
@@ -30,24 +31,24 @@ namespace ChroMapper_CameraMovement.Component
         {
             //https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/manual/ActionBindings.html
             defaultActiveAction = new InputAction("DefaultCamera Active");
-            defaultActiveAction.AddBinding("<Mouse>/rightButton");
+            defaultActiveAction.AddBinding(Options.Instance.defaultCameraActiveKeyBinding);
             defaultActiveAction.started += OnDefaultActive;
             defaultActiveAction.performed += OnDefaultActive;
             defaultActiveAction.canceled += OnDefaultActive;
             defaultActiveAction.Enable();
             elevateActiveAction = new InputAction("DefaultCamera Elevate Action");
             elevateActiveAction.AddCompositeBinding("1DAxis")
-                .With("positive", "<Keyboard>/space")
-                .With("negative", "<Keyboard>/ctrl");
+                .With("positive", Options.Instance.defaultCameraElevatePositiveKeyBinding)
+                .With("negative", Options.Instance.defaultCameraElevateNegativeKeyBinding);
             elevateActiveAction.started += OnElevateCamera;
             elevateActiveAction.performed += OnElevateCamera;
             elevateActiveAction.canceled += OnElevateCamera;
             moveActiveAction = new InputAction("DefaultCamera Move Action");
             moveActiveAction.AddCompositeBinding("2DVector(mode=2)")
-                .With("up", "<Keyboard>/w")
-                .With("left", "<Keyboard>/a")
-                .With("down", "<Keyboard>/s")
-                .With("right", "<Keyboard>/d");
+                .With("up", Options.Instance.defaultCameraMoveUpKeyBinding)
+                .With("left", Options.Instance.defaultCameraMoveLeftKeyBinding)
+                .With("down", Options.Instance.defaultCameraMoveDownKeyBinding)
+                .With("right", Options.Instance.defaultCameraMoveRightKeyBinding);
             moveActiveAction.started += OnMoveCamera;
             moveActiveAction.performed += OnMoveCamera;
             moveActiveAction.canceled += OnMoveCamera;
@@ -58,7 +59,6 @@ namespace ChroMapper_CameraMovement.Component
             rotActiveAction.canceled += OnRotateCamera;
             scrollActiveAction = new InputAction("DefaultCamera Scroll Action");
             customStandaloneInputModule = GameObject.Find("EventSystem").GetComponent<CustomStandaloneInputModule>();
-            //キーバンドはdefaultの物を取りたい
         }
         private void LateUpdate()
         {

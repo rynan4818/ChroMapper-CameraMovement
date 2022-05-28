@@ -400,3 +400,4 @@ FodyWeavers.xsd
 #ChroMapper-CameraMovement
 ChroMapper-CameraMovement-*.zip
 ChroMapper-CameraMovement*.dll
+temp/

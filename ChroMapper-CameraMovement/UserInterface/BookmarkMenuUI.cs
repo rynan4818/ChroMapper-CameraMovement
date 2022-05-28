@@ -242,7 +242,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(quickCommand6Button.transform, 50, 20, 0.1f, 1, 640, -15);
 
-            _cameraMovementBookmarkMenu.SetActive(Options.Instance.bookmarkEdit);
+            _cameraMovementBookmarkMenu.SetActive(Options.Instance.cameraMovementEnable && Options.Instance.bookmarkEdit);
         }
     }
 }

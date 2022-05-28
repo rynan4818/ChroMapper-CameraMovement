@@ -444,7 +444,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0, 1, 455, -40);
             UI.MoveTransform(bookmarkSetCheckbox.Item1, 50, 16, 0, 1, 485, -40);
 
-            _cameraControlMenu.SetActive(Options.Instance.cameraControl);
+            _cameraControlMenu.SetActive(Options.Instance.cameraMovementEnable && Options.Instance.cameraControl);
         }
     }
 }

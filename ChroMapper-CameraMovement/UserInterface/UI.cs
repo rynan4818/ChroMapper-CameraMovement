@@ -71,7 +71,6 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             foreach (Type actionMap in actionMaps)
             {
-                Debug.Log($"Disable:{actionMap.ToString()}");
                 queuedToEnable.Remove(actionMap);
                 if (!queuedToDisable.Contains(actionMap))
                     queuedToDisable.Add(actionMap);
@@ -82,7 +81,6 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             foreach (Type actionMap in actionMaps)
             {
-                Debug.Log($"Enable:{actionMap.ToString()}");
                 queuedToDisable.Remove(actionMap);
                 if (!queuedToEnable.Contains(actionMap))
                     queuedToEnable.Add(actionMap);
@@ -91,7 +89,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public static void KeyDisableCheck()
         {
-            if (Options.Instance.mappingDisable && (_settingMenuUI._cameraMovementSettingMenu.activeSelf || _bookmarkMenuUI._cameraMovementBookmarkMenu.activeSelf ||
+            if (Options.Instance.cameraMovementEnable && Options.Instance.mappingDisable && (_settingMenuUI._cameraMovementSettingMenu.activeSelf || _bookmarkMenuUI._cameraMovementBookmarkMenu.activeSelf ||
                 _cameraControlMenuUI._cameraControlMenu.activeSelf || _multiDisplayUI._cameraMovementMultiDisplay.activeSelf || Options.Instance.subCamera ||
                 Options.Instance.movement || Options.Instance.uIhidden || Options.Instance.bookmarkLines))
             {

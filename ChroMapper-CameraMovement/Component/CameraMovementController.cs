@@ -231,7 +231,7 @@ namespace ChroMapper_CameraMovement.Component
             avatarHairPosition.z += Options.Instance.originMatchOffsetZ;
             avatarHair.transform.position = avatarHairPosition;
             avatarHair.transform.localScale = new Vector3(Options.Instance.avatarHeadSize / 1.4f, Options.Instance.avatarHeadSize * 2.0f, Options.Instance.avatarHeadSize / 17f) * Options.Instance.avatarCameraScale;
-            if (Options.Instance.simpleAvatar && Options.Instance.avatar)
+            if (Options.Instance.simpleAvatar && Options.Instance.avatar && Options.Instance.cameraMovementEnable)
             {
                 avatarHead.gameObject.SetActive(true);
                 avatarArm.gameObject.SetActive(true);
@@ -253,8 +253,8 @@ namespace ChroMapper_CameraMovement.Component
             _cameraMovement.MovementPositionReset();
             _bookmarkController?.BookmarkWidthChange();
             _bookmarkController?.BookmarkTrackSet();
-            bookmarkLines.SetActive(Options.Instance.bookmarkLines);
-            if (Options.Instance.bookmarkLines)
+            bookmarkLines.SetActive(Options.Instance.bookmarkLines && Options.Instance.cameraMovementEnable);
+            if (Options.Instance.bookmarkLines && Options.Instance.cameraMovementEnable)
             {
                 EventBpmOffset(Options.Instance.bookmarkInsertOffset);
             }
@@ -264,10 +264,10 @@ namespace ChroMapper_CameraMovement.Component
             }
             if (!MultiDisplayController.subActive)
             {
-                subCamera.gameObject.SetActive(!(Options.Instance.movement || !Options.Instance.subCamera));
+                subCamera.gameObject.SetActive(!(Options.Instance.movement || !Options.Instance.subCamera) && Options.Instance.cameraMovementEnable);
                 subCamera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
             }
-            if (Options.Instance.uIhidden)
+            if (Options.Instance.uIhidden && Options.Instance.cameraMovementEnable)
             {
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
                 cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
@@ -352,6 +352,7 @@ namespace ChroMapper_CameraMovement.Component
         }
         public void WaveFormOffset()
         {
+            if (!Options.Instance.cameraMovementEnable) return;
             float offset;
             if (Options.Instance.bookmarkLines)
             {
@@ -382,7 +383,7 @@ namespace ChroMapper_CameraMovement.Component
                 Destroy(avatarModel);
                 Resources.UnloadUnusedAssets();
             }
-            if (Options.Instance.customAvatar && Options.Instance.avatar)
+            if (Options.Instance.customAvatar && Options.Instance.avatar && Options.Instance.cameraMovementEnable)
             {
                 if (currentAvatarFile != Options.Instance.avatarFileName)
                 {
@@ -403,7 +404,7 @@ namespace ChroMapper_CameraMovement.Component
 
         public IEnumerator CustomAvatarLoad()
         {
-            if (Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.avatar$", RegexOptions.IgnoreCase) && currentAvatarFile != Options.Instance.avatarFileName && Options.Instance.customAvatar)
+            if (Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.avatar$", RegexOptions.IgnoreCase) && currentAvatarFile != Options.Instance.avatarFileName && Options.Instance.customAvatar && Options.Instance.cameraMovementEnable)
             {
                 currentAvatarFile = "";
                 VRMAvatarController.AvatarDisable();
@@ -456,7 +457,7 @@ namespace ChroMapper_CameraMovement.Component
                 avatarPosition.y = Options.Instance.originMatchOffsetY;
                 avatarPosition.z = Options.Instance.originMatchOffsetZ;
                 avatarModel.transform.localPosition = avatarPosition;
-                if (Options.Instance.customAvatar && Options.Instance.avatar)
+                if (Options.Instance.customAvatar && Options.Instance.avatar && Options.Instance.cameraMovementEnable)
                 {
                     avatarModel.SetActive(true);
                 }
@@ -737,17 +738,28 @@ namespace ChroMapper_CameraMovement.Component
             _bookmarkController.atsc = atsc;
             _bookmarkController.Start();
             SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
-            Reload();
             orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             orbitCamera.targetObject = avatarHead;
             plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
             if (Plugin.activeWindow > 1)
                 multiDisplayController.SetTargetDisplay();
+            if (Options.Instance.cameraMovementEnable)
+                Reload();
+            else
+            {
+                avatarHead.SetActive(false);
+                avatarArm.SetActive(false);
+                avatarLeg.SetActive(false);
+                avatarBody.SetActive(false);
+                avatarHair.SetActive(false);
+                KeyDisable();
+            }
         }
         private void Update()
         {
             UI.QueuedActionMaps();
+            if (!Options.Instance.cameraMovementEnable) return;
             if (_reload || beforeSeconds != atsc.CurrentSeconds)
             {
                 _reload = false;

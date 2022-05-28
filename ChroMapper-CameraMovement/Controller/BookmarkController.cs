@@ -26,19 +26,23 @@ namespace ChroMapper_CameraMovement.Controller
         }
         public void BookmarkTrackSet()
         {
-            if (Options.Instance.bookmarkLines)
+            if (Options.Instance.bookmarkLines && Options.Instance.cameraMovementEnable)
                 bookmarkLinesController.RefreshBookmarkLines(bookmarkContainers);
         }
         public void BookmarkWidthChange()
         {
+            var bookmarkWidth = 10f;
+            if (Options.Instance.cameraMovementEnable)
+                bookmarkWidth = Options.Instance.bookmarkWidth;
             bookmarkContainers.ForEach(container =>
             {
                 var rectTransform = (RectTransform)container.transform;
-                rectTransform.sizeDelta = new Vector2(Options.Instance.bookmarkWidth, 20f);
+                rectTransform.sizeDelta = new Vector2(bookmarkWidth, 20f);
             });
         }
         public void BookMarkChangeUpdate()
         {
+            if (!Options.Instance.cameraMovementEnable) return;
             BookmarkContainerGet();
             BookmarkWidthChange();
             BookmarkTrackSet();

@@ -29,6 +29,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
         public bool turnToHead;
         public bool turnToHeadHorizontal;
         public float NowFOV = Settings.Instance.CameraFOV;
+        public DateTime movementsFileTime;
 
         public class Movements
         {
@@ -52,11 +53,19 @@ namespace ChroMapper_CameraMovement.CameraPlus
             public bool ActiveInPauseMenu = true;
             public bool TurnToHeadUseCameraSetting = false;
             public List<Movements> Movements = new List<Movements>();
+            public float MaxDurationError = 0;
+            public float MinDurationError = 0;
+            public float TotalDurationError = 0;
+            public bool durationErrorWarning = false;
 
             public bool LoadFromJson(string jsonString)
             {
+                durationErrorWarning = false;
                 float duration_sum = 0;
                 decimal duration_sumd = 0;
+                MaxDurationError = 0;
+                MinDurationError = 0;
+                TotalDurationError = 0;
                 Movements.Clear();
                 MovementScriptJson movementScriptJson = null;
                 string sep = CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
@@ -144,6 +153,11 @@ namespace ChroMapper_CameraMovement.CameraPlus
                             duration_sum += newMovement.Duration;
                             var duration_d = decimal.Parse(jsonmovement.Duration.Contains(sepCheck) ? jsonmovement.Duration.Replace(sepCheck, sep) : jsonmovement.Duration, NumberStyles.Number | NumberStyles.AllowExponent);
                             duration_sumd += duration_d;
+                            var duration_error = duration_sum - (float)duration_sumd;
+                            if (MaxDurationError < duration_error)
+                                MaxDurationError = duration_error;
+                            if (MinDurationError > duration_error)
+                                MinDurationError = duration_error;
                         }
 
                         if (jsonmovement.EaseTransition != null)
@@ -151,8 +165,20 @@ namespace ChroMapper_CameraMovement.CameraPlus
 
                         Movements.Add(newMovement);
                     }
-                    var duration_error = duration_sum - (float)duration_sumd;
-                    Debug.Log($"Duration total error: {Math.Round(duration_error, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
+                    TotalDurationError = duration_sum - (float)duration_sumd;
+                    Debug.Log($"Duration total error: {Math.Round(TotalDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
+                    Debug.Log($"Duration max error: {Math.Round(MaxDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
+                    Debug.Log($"Duration min error: {Math.Round(MinDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
+                    if (MaxDurationError > Options.Instance.durationErrorWarning)
+                    {
+                        durationErrorWarning = true;
+                        PersistentUI.Instance.DisplayMessage($"Duration max error: {Math.Round(MaxDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms", PersistentUI.DisplayMessageType.Bottom);
+                    }
+                    if (-MinDurationError > Options.Instance.durationErrorWarning)
+                    {
+                        durationErrorWarning = true;
+                        PersistentUI.Instance.DisplayMessage($"Duration min error: {Math.Round(MinDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms", PersistentUI.DisplayMessageType.Bottom);
+                    }
                     return true;
                 }
                 return false;
@@ -162,6 +188,9 @@ namespace ChroMapper_CameraMovement.CameraPlus
         public void CameraUpdate(float currentSeconds, GameObject cm_MapEditorCamera, Camera sub_camera, Vector3 turnToTarget)
         {
             if (!dataLoaded) return;
+
+            if (!data.durationErrorWarning && Options.Instance.maxDurationErrorOffset && !Options.Instance.movement)
+                currentSeconds += data.MaxDurationError;
 
             while (movementNextStartTime <= currentSeconds)
                 UpdatePosAndRot();
@@ -216,10 +245,12 @@ namespace ChroMapper_CameraMovement.CameraPlus
         public bool LoadCameraData(string pathFile)
         {
             string path = pathFile;
-            dataLoaded = false;
-
             if (File.Exists(path))
             {
+                var movementTimeStamp = File.GetLastWriteTime(path);
+                if (movementTimeStamp == movementsFileTime) return true;
+                movementsFileTime = movementTimeStamp;
+                dataLoaded = false;
                 string jsonText = File.ReadAllText(path);
                 if (data.LoadFromJson(jsonText))
                 {
@@ -236,6 +267,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
                     return true;
                 }
             }
+            dataLoaded = false;
             return false;
         }
 

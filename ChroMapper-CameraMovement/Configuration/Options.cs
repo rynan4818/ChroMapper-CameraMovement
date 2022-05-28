@@ -116,6 +116,8 @@ namespace ChroMapper_CameraMovement.Configuration
         public string defaultCameraMoveLeftKeyBinding = "<Keyboard>/a";
         public string defaultCameraMoveDownKeyBinding = "<Keyboard>/s";
         public string defaultCameraMoveRightKeyBinding = "<Keyboard>/d";
+        public bool maxDurationErrorOffset = true;
+        public float durationErrorWarning = 0.05f;
 
         public static Options Instance {
             get {

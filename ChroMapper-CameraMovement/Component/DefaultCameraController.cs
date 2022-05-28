@@ -114,8 +114,8 @@ namespace ChroMapper_CameraMovement.Component
             if (canDefaultCamera)
             {
                 UI.DisableAction(actionMapsDisableTimeLine);
-                Plugin.orbitCamera.orbitActiveAction.Disable();
-                Plugin.plusCamera.plusActiveAction.Disable();
+                CameraMovementController.orbitCamera.orbitActiveAction.Disable();
+                CameraMovementController.plusCamera.plusActiveAction.Disable();
                 rotActiveAction.Enable();
                 elevateActiveAction.Enable();
                 moveActiveAction.Enable();
@@ -127,8 +127,8 @@ namespace ChroMapper_CameraMovement.Component
                 moveActiveAction.Disable();
                 elevateActiveAction.Disable();
                 rotActiveAction.Disable();
-                Plugin.orbitCamera.orbitActiveAction.Enable();
-                Plugin.plusCamera.plusActiveAction.Enable();
+                CameraMovementController.orbitCamera.orbitActiveAction.Enable();
+                CameraMovementController.plusCamera.plusActiveAction.Enable();
                 UI.EnableAction(actionMapsDisableTimeLine);
             }
         }

@@ -26,6 +26,9 @@ namespace ChroMapper_CameraMovement.Component
         public static BookmarkLinesController bookmarkLinesController;
         public static VRMAvatarController vrmAvatarController;
         public static MultiDisplayController multiDisplayController;
+        public static OrbitCameraController orbitCamera;
+        public static PlusCameraController plusCamera;
+        public static DefaultCameraController defaultCamera;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
@@ -555,9 +558,9 @@ namespace ChroMapper_CameraMovement.Component
             scriptMapperAction.Disable();
             dragWindowsAction.Disable();
             subCameraRectAction.Disable();
-            Plugin.orbitCamera.orbitActiveAction.Disable();
-            Plugin.plusCamera.plusActiveAction.Disable();
-            Plugin.defaultCamera.defaultActiveAction.Disable();
+            orbitCamera.orbitActiveAction.Disable();
+            plusCamera.plusActiveAction.Disable();
+            defaultCamera.defaultActiveAction.Disable();
         }
 
         public void KeyEnable()
@@ -565,9 +568,9 @@ namespace ChroMapper_CameraMovement.Component
             previewAction.Enable();
             scriptMapperAction.Enable();
             dragWindowsAction.Enable();
-            Plugin.orbitCamera.orbitActiveAction.Enable();
-            Plugin.plusCamera.plusActiveAction.Enable();
-            Plugin.defaultCamera.defaultActiveAction.Enable();
+            orbitCamera.orbitActiveAction.Enable();
+            plusCamera.plusActiveAction.Enable();
+            defaultCamera.defaultActiveAction.Enable();
         }
 
         private IEnumerator Start()
@@ -577,6 +580,10 @@ namespace ChroMapper_CameraMovement.Component
             autoSave = FindObjectOfType<AutoSaveController>();
             spectrogramSideSwapper = FindObjectOfType<SpectrogramSideSwapper>();
             vrmAvatarController = new VRMAvatarController();
+
+            orbitCamera = this.gameObject.AddComponent<OrbitCameraController>();
+            plusCamera = this.gameObject.AddComponent<PlusCameraController>();
+            defaultCamera = this.gameObject.AddComponent<DefaultCameraController>();
 
             cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
             cm_measureGrid16_1 = GameObject.Find("1/16th Measure Grid");
@@ -731,9 +738,9 @@ namespace ChroMapper_CameraMovement.Component
             _bookmarkController.Start();
             SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
             Reload();
-            Plugin.orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
-            Plugin.orbitCamera.targetObject = avatarHead;
-            Plugin.plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
+            orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
+            orbitCamera.targetObject = avatarHead;
+            plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
             if (Plugin.activeWindow > 1)
                 multiDisplayController.SetTargetDisplay();

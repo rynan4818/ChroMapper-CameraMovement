@@ -152,8 +152,8 @@ namespace ChroMapper_CameraMovement.Component
                 diff = targetCamera[MultiDisplayController.activeWindowNumber].transform.position - targetObject.transform.position;
                 elevationAngle = Mathf.Clamp(Vector3.Angle(Vector3.up, diff), minElevationAngle, maxElevationAngle);
                 UI.DisableAction(actionMapsDisableTimeLine);
-                Plugin.defaultCamera.defaultActiveAction.Disable();
-                Plugin.plusCamera.plusActiveAction.Disable();
+                CameraMovementController.defaultCamera.defaultActiveAction.Disable();
+                CameraMovementController.plusCamera.plusActiveAction.Disable();
                 orbitSubActiveAction.Enable();
                 orbitZrotActiveAction.Enable();
                 moveActiveAction.Enable();
@@ -170,8 +170,8 @@ namespace ChroMapper_CameraMovement.Component
                 rotActiveAction.Disable();
                 zoomActiveAction.Disable();
                 mouseMoveAction.Disable();
-                Plugin.defaultCamera.defaultActiveAction.Enable();
-                Plugin.plusCamera.plusActiveAction.Enable();
+                CameraMovementController.defaultCamera.defaultActiveAction.Enable();
+                CameraMovementController.plusCamera.plusActiveAction.Enable();
                 canMoveCamera = false;
                 canRotCamera = false;
                 canOrbitSubCamera = false;

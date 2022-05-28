@@ -12,9 +12,6 @@ namespace ChroMapper_CameraMovement
     public class Plugin
     {
         public static CameraMovementController movement;
-        public static OrbitCameraController orbitCamera;
-        public static PlusCameraController plusCamera;
-        public static DefaultCameraController defaultCamera;
         public static Harmony _harmony;
         public static UI _ui;
         public static int activeWindow = 1;
@@ -45,9 +42,6 @@ namespace ChroMapper_CameraMovement
             if (movement != null && movement.isActiveAndEnabled)
                 return;
             movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
-            orbitCamera = movement.gameObject.AddComponent<OrbitCameraController>();
-            plusCamera = movement.gameObject.AddComponent<PlusCameraController>();
-            defaultCamera = movement.gameObject.AddComponent<DefaultCameraController>();
             MapEditorUI mapEditorUI = Object.FindObjectOfType<MapEditorUI>();
             _ui.AddMenu(mapEditorUI);
         }

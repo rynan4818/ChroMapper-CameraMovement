@@ -15,6 +15,7 @@ namespace ChroMapper_CameraMovement.Controller
         public static VRMLookAtHead lookAt { set; get; }
         public static Blinker m_blink { set; get; }
         public static Animation animation { set; get; }
+        public static bool loadActive { set; get; } = false;
 
         public async void LoadModelAsync()
         {
@@ -23,13 +24,28 @@ namespace ChroMapper_CameraMovement.Controller
                 Debug.LogError("Avatar File ERR!");
                 return;
             }
+            loadActive = true;
             if (avatar != null)
             {
                 GameObject.Destroy(avatar.gameObject);
                 avatar = null;
             }
             VrmUtility.MaterialGeneratorCallback materialCallback = (glTF_VRM_extensions vrm) => new VRMUrpMaterialDescriptorGenerator(vrm);
-            avatar = await VrmUtility.LoadAsync(Options.Instance.avatarFileName, new RuntimeOnlyAwaitCaller(), materialCallback);
+            try
+            {
+                avatar = await VrmUtility.LoadAsync(Options.Instance.avatarFileName, new RuntimeOnlyAwaitCaller(), materialCallback);
+            }
+            catch
+            {
+                Debug.LogWarning("VRM Avatar Load Error!");
+                if (avatar != null)
+                {
+                    GameObject.Destroy(avatar.gameObject);
+                    avatar = null;
+                }
+                loadActive = false;
+                return;
+            }
             avatar.EnableUpdateWhenOffscreen();
             avatar.ShowMeshes();
             AvatarTransformSet();
@@ -46,6 +62,7 @@ namespace ChroMapper_CameraMovement.Controller
             animation = avatar.GetComponent<Animation>();
             if (animation && animation.clip != null)
                 animation.Play(animation.clip.name);
+            loadActive = false;
         }
 
         public static void AvatarTransformSet()

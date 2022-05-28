@@ -794,6 +794,8 @@ namespace ChroMapper_CameraMovement.Component
             scriptMapperAction.Disable();
             dragWindowsAction.Disable();
             subCameraRectAction.Disable();
+            if (VRMAvatarController.loadActive)
+                Debug.LogWarning("VRM Avatar Load Active!");
         }
 
     }

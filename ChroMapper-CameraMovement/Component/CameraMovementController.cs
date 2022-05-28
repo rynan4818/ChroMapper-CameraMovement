@@ -265,10 +265,23 @@ namespace ChroMapper_CameraMovement.Component
             {
                 EventBpmOffset(0);
             }
+            orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
+            orbitCamera.fovTargetMainCamera = true;
+            plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
+            plusCamera.fovTargetMainCamera = true;
+            defaultCamera.targetCamera[0] = null;
             if (!MultiDisplayController.subActive)
             {
                 subCamera.gameObject.SetActive(!(Options.Instance.movement || !Options.Instance.subCamera) && Options.Instance.cameraMovementEnable);
                 subCamera.rect = new Rect(Options.Instance.subCameraRectX, Options.Instance.subCameraRectY, Options.Instance.subCameraRectW, Options.Instance.subCameraRectH);
+                if (Options.Instance.cameraKeyMouseControlSub && subCamera.gameObject.activeSelf && Options.Instance.cameraControlSub)
+                {
+                    orbitCamera.targetCamera[0] = subCamera.GetComponent<Camera>();
+                    orbitCamera.fovTargetMainCamera = false;
+                    plusCamera.targetCamera[0] = subCamera.GetComponent<Camera>();
+                    plusCamera.fovTargetMainCamera = false;
+                    defaultCamera.targetCamera[0] = subCamera.GetComponent<Camera>();
+                }
             }
             if (Options.Instance.uIhidden && Options.Instance.cameraMovementEnable)
             {
@@ -746,9 +759,7 @@ namespace ChroMapper_CameraMovement.Component
             _bookmarkController.atsc = atsc;
             _bookmarkController.Start();
             SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
-            orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             orbitCamera.targetObject = avatarHead;
-            plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
             if (Plugin.activeWindow > 1)
                 multiDisplayController.SetTargetDisplay();

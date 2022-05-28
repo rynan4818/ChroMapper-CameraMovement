@@ -119,6 +119,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool maxDurationErrorOffset = true;
         public float durationErrorWarning = 0.05f;
         public bool cameraMovementEnable = true;
+        public bool cameraKeyMouseControlSub = true;
 
         public static Options Instance {
             get {

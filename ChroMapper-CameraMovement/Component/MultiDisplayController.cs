@@ -90,6 +90,7 @@ namespace ChroMapper_CameraMovement.Component
                 CameraMovementController.layoutCamera.gameObject.SetActive(true);
                 CameraMovementController.layoutCamera.targetDisplay = 2;
                 subActive = true;
+                Plugin.movement.Reload();
                 return;
             }
             if (Options.Instance.subWindow)
@@ -118,8 +119,8 @@ namespace ChroMapper_CameraMovement.Component
                 CameraMovementController.layoutCamera.gameObject.SetActive(true);
                 CameraMovementController.layoutCamera.targetDisplay = 1;
                 subActive = false;
-                Plugin.movement.Reload();
             }
+            Plugin.movement.Reload();
         }
         public void SaveWindowLayout()
         {

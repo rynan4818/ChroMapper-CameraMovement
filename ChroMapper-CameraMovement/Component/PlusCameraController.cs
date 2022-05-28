@@ -24,6 +24,7 @@ namespace ChroMapper_CameraMovement.Component
         public float mouseX;
         public float mouseY;
         public Camera[] targetCamera { get; set; } = { null, null, null };
+        public bool fovTargetMainCamera { get; set; } = true;
         private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions) };
 
         private void Start()
@@ -70,7 +71,7 @@ namespace ChroMapper_CameraMovement.Component
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
             if (canRotCamera && canPosCamera)
             {
-                if (MultiDisplayController.activeWindowNumber == 0)
+                if (fovTargetMainCamera && MultiDisplayController.activeWindowNumber == 0)
                     Settings.Instance.CameraFOV = Options.Instance.plusDefaultFOV;
                 else
                     targetCamera[MultiDisplayController.activeWindowNumber].fieldOfView = Options.Instance.plusDefaultFOV;
@@ -171,7 +172,7 @@ namespace ChroMapper_CameraMovement.Component
             }
             else if (canRotCamera)
             {
-                if (MultiDisplayController.activeWindowNumber == 0)
+                if (fovTargetMainCamera && MultiDisplayController.activeWindowNumber == 0)
                     Settings.Instance.CameraFOV -= value * Options.Instance.plusFovSensitivity;
                 else
                     targetCamera[MultiDisplayController.activeWindowNumber].fieldOfView -= value * Options.Instance.plusFovSensitivity;

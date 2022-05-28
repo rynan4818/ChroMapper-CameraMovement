@@ -286,6 +286,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     _cameraControlLayToggle.isOn = false;
                 }
                 Options.Instance.cameraControlSub = check;
+                movementController.Reload();
             });
             UI.MoveTransform(cameraControlSub.Item3.transform, 30, 16, 0, 1, 220, -40);
             UI.MoveTransform(cameraControlSub.Item1, 50, 16, 0, 1, 250, -40);

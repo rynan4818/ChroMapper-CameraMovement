@@ -66,7 +66,8 @@ namespace ChroMapper_CameraMovement.Component
                 return;
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
-            if (MultiDisplayController.activeWindowNumber == 0)
+            if (MultiDisplayController.activeWindowNumber == -1) return;
+            if (MultiDisplayController.activeWindowNumber == 0 && targetCamera[MultiDisplayController.activeWindowNumber] == null)
             {
                 if (disableMainDefaultCamera)
                 {
@@ -74,7 +75,7 @@ namespace ChroMapper_CameraMovement.Component
                     disableMainDefaultCamera = false;
                 }
             }
-            else if (MultiDisplayController.activeWindowNumber > 0)
+            else if (targetCamera[MultiDisplayController.activeWindowNumber] != null || MultiDisplayController.activeWindowNumber > 0)
             {
                 if (!disableMainDefaultCamera)
                 {
@@ -82,7 +83,6 @@ namespace ChroMapper_CameraMovement.Component
                     disableMainDefaultCamera = true;
                 }
             }
-            if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
             if (canDefaultCamera)
             {

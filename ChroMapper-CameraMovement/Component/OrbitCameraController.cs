@@ -27,6 +27,7 @@ namespace ChroMapper_CameraMovement.Component
         public bool cameraUpdate = false;
         public float mouseX;
         public float mouseY;
+        public bool fovTargetMainCamera { get; set; } = true;
         public Camera[] targetCamera { get; set; } = { null, null, null };
         public GameObject targetObject { get; set; } = null;
         public Vector3 offset { get; set; } = Vector3.zero;
@@ -91,7 +92,7 @@ namespace ChroMapper_CameraMovement.Component
             if (canRotCamera && canMoveCamera)
             {
                 if (canOrbitSubCamera)
-                    if (MultiDisplayController.activeWindowNumber == 0)
+                    if (fovTargetMainCamera && MultiDisplayController.activeWindowNumber == 0)
                         Settings.Instance.CameraFOV = Options.Instance.orbitDefaultFOV;
                     else
                         targetCamera[MultiDisplayController.activeWindowNumber].fieldOfView = Options.Instance.orbitDefaultFOV;
@@ -213,7 +214,7 @@ namespace ChroMapper_CameraMovement.Component
             if (canOrbitSubCamera)
             {
                 var value = context.ReadValue<float>();
-                if (MultiDisplayController.activeWindowNumber == 0)
+                if (fovTargetMainCamera && MultiDisplayController.activeWindowNumber == 0)
                     Settings.Instance.CameraFOV -= value * Options.Instance.orbitFovSensitivity;
                 else
                     targetCamera[MultiDisplayController.activeWindowNumber].fieldOfView -= value * Options.Instance.orbitFovSensitivity;

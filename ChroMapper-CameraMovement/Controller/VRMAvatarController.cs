@@ -4,6 +4,8 @@ using VRM;
 using VRMShaders;
 using UniGLTF;
 using ChroMapper_CameraMovement.Configuration;
+using ChroMapper_CameraMovement.Component;
+using ChroMapper_CameraMovement.Util;
 
 namespace ChroMapper_CameraMovement.Controller
 {
@@ -48,6 +50,7 @@ namespace ChroMapper_CameraMovement.Controller
             }
             avatar.EnableUpdateWhenOffscreen();
             avatar.ShowMeshes();
+            UnityUtility.AllSetLayer(avatar.gameObject, CameraMovementController.avatarLayer);
             AvatarTransformSet();
             lookAt = avatar.GetComponent<VRMLookAtHead>();
             if (lookAt != null)

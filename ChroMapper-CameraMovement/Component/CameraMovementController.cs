@@ -12,11 +12,13 @@ using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.CameraPlus;
 using ChroMapper_CameraMovement.Controller;
 using ChroMapper_CameraMovement.UserInterface;
+using ChroMapper_CameraMovement.Util;
 
 namespace ChroMapper_CameraMovement.Component
 {
     public class CameraMovementController : MonoBehaviour
     {
+        public const int avatarLayer = 25;
         public CameraMovement _cameraMovement { get; set; }
         public BookmarkController _bookmarkController { get; set; }
         public static AudioTimeSyncController atsc;
@@ -189,6 +191,7 @@ namespace ChroMapper_CameraMovement.Component
         {
             StartCoroutine("CustomAvatarLoad");
             VRMAvatarLoad();
+            cm_MapEditorCamera.GetComponent<Camera>().cullingMask |= 1 << avatarLayer;
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
             var avatarHeadPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
             avatarHeadPosition.y += Options.Instance.originMatchOffsetY;
@@ -427,6 +430,7 @@ namespace ChroMapper_CameraMovement.Component
                             try
                             {
                                 avatarModel = (GameObject)Instantiate(assetBundleRequest.asset);
+                                UnityUtility.AllSetLayer(avatarModel, avatarLayer);
                                 currentAvatarFile = Options.Instance.avatarFileName;
                             }
                             catch
@@ -573,7 +577,6 @@ namespace ChroMapper_CameraMovement.Component
             plusCamera.plusActiveAction.Enable();
             defaultCamera.defaultActiveAction.Enable();
         }
-
         private IEnumerator Start()
         {
             _cameraMovement = new CameraMovement();
@@ -632,6 +635,11 @@ namespace ChroMapper_CameraMovement.Component
             avatarLeg = GameObject.CreatePrimitive(PrimitiveType.Cube);
             avatarBody = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             avatarHair = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            avatarHead.layer = avatarLayer;
+            avatarArm.layer = avatarLayer;
+            avatarLeg.layer = avatarLayer;
+            avatarBody.layer = avatarLayer;
+            avatarHair.layer = avatarLayer;
 
             //BookMarkTrack構築
             var measureLines = GameObject.Find("Moveable Grid/Measure Lines");

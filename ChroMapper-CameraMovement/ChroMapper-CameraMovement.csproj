@@ -175,6 +175,7 @@
     <Compile Include="Controller\ScriptMapperController.cs" />
     <Compile Include="Util\SimpleJSON.cs" />
     <Compile Include="Controller\VRMAvatarController.cs" />
+    <Compile Include="Util\UnityUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icon.png" />

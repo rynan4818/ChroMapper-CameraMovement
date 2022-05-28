@@ -5,6 +5,7 @@ using System.Globalization;
 using UnityEngine;
 using Newtonsoft.Json;
 using ChroMapper_CameraMovement.Configuration;
+using ChroMapper_CameraMovement.Component;
 
 namespace ChroMapper_CameraMovement.CameraPlus
 {
@@ -30,6 +31,8 @@ namespace ChroMapper_CameraMovement.CameraPlus
         public bool turnToHeadHorizontal;
         public float NowFOV = Settings.Instance.CameraFOV;
         public DateTime movementsFileTime;
+        public bool avatarLayer = true;
+        public bool beforeAvatarLayer = true;
 
         public class Movements
         {
@@ -235,6 +238,22 @@ namespace ChroMapper_CameraMovement.CameraPlus
             if (Options.Instance.movement)
                 Settings.Instance.CameraFOV = NowFOV;
             sub_camera.fieldOfView = NowFOV;
+            if (beforeAvatarLayer != avatarLayer)
+            {
+                beforeAvatarLayer = avatarLayer;
+                if (avatarLayer)
+                {
+                    if (Options.Instance.movement)
+                        cm_MapEditorCamera.GetComponent<Camera>().cullingMask |= 1 << CameraMovementController.avatarLayer;
+                    sub_camera.cullingMask |= 1 << CameraMovementController.avatarLayer;
+                }
+                else
+                {
+                    if (Options.Instance.movement)
+                        cm_MapEditorCamera.GetComponent<Camera>().cullingMask &= ~(1 << CameraMovementController.avatarLayer);
+                    sub_camera.cullingMask &= ~(1 << CameraMovementController.avatarLayer);
+                }
+            }
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
@@ -270,7 +289,6 @@ namespace ChroMapper_CameraMovement.CameraPlus
             dataLoaded = false;
             return false;
         }
-
         protected void FindShortestDelta(ref Vector3 from, ref Vector3 to)
         {
             if (Mathf.DeltaAngle(from.x, to.x) < 0)
@@ -280,7 +298,6 @@ namespace ChroMapper_CameraMovement.CameraPlus
             if (Mathf.DeltaAngle(from.z, to.z) < 0)
                 from.z += 360.0f;
         }
-
         protected void UpdatePosAndRot()
         {
             if (eventID >= data.Movements.Count)
@@ -296,6 +313,15 @@ namespace ChroMapper_CameraMovement.CameraPlus
 
             EndRot = new Vector3(data.Movements[eventID].EndRot.x, data.Movements[eventID].EndRot.y, data.Movements[eventID].EndRot.z);
             EndPos = new Vector3(data.Movements[eventID].EndPos.x, data.Movements[eventID].EndPos.y, data.Movements[eventID].EndPos.z);
+
+            if (data.Movements[eventID].SectionVisibleObject != null)
+                SetCullingMask(data.Movements[eventID].SectionVisibleObject);
+            else
+            {
+                int beforID = eventID > 0 ? eventID - 1 : data.Movements.Count - 1;
+                if (data.Movements[beforID].SectionVisibleObject != null && data.Movements[eventID].SectionVisibleObject == null)
+                    SetCullingMask();
+            }
 
             StartHeadOffset = new Vector3(data.Movements[eventID].StartHeadOffset.x, data.Movements[eventID].StartHeadOffset.y, data.Movements[eventID].StartHeadOffset.z);
             EndHeadOffset = new Vector3(data.Movements[eventID].EndHeadOffset.x, data.Movements[eventID].EndHeadOffset.y, data.Movements[eventID].EndHeadOffset.z);
@@ -332,7 +358,14 @@ namespace ChroMapper_CameraMovement.CameraPlus
                 return 0.5f * f * f * f + 1;
             }
         }
-
+        public void SetCullingMask(VisibleObject visibleObject = null)
+        {
+            if (visibleObject == null) visibleObject = new VisibleObject();
+            if (visibleObject.avatar.HasValue ? visibleObject.avatar.Value : Options.Instance.avatar)
+                avatarLayer = true;
+            else
+                avatarLayer = false;
+        }
         public void MovementPositionReset()
         {
             movementNextStartTime = 0;

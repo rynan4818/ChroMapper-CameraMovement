@@ -102,17 +102,13 @@ namespace ChroMapper_CameraMovement.Component
         public (bool, bool, bool, bool, bool, bool, Vector3, Quaternion, float) previewEve;
         public bool subCameraRectPos = true;
         public bool dragWindowKeyEnable { set; get; } = false;
-        public string ScriptGet()
+        public static string ScriptGet()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
         }
-        public string MapGet()
+        public static string MapGet()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, BeatSaberSongContainer.Instance.DifficultyData.BeatmapFilename).Replace("/", "\\");
-        }
-        public void MapSave()
-        {
-            autoSave.Save();
         }
         public void CameraPositionAndRotationSet(Vector3 position,Vector3 rotation)
         {
@@ -172,7 +168,7 @@ namespace ChroMapper_CameraMovement.Component
         {
             return new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset);
         }
-        public bool SavingThread()
+        public static bool SavingThread()
         {
             Type type = autoSave.GetType();
             FieldInfo field = type.GetField("savingThread", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);

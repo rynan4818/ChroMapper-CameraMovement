@@ -24,7 +24,7 @@ namespace ChroMapper_CameraMovement.Component
         public float z;
         public Camera[] targetCamera { get; set; } = { null, null, null };
         private static readonly Type[] actionMapsDisableDefaultCamera = { typeof(CMInput.ICameraActions) };
-        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions) };
+        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
 
         private void Start()
         {

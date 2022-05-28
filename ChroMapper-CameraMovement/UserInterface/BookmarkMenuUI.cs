@@ -102,21 +102,21 @@ namespace ChroMapper_CameraMovement.UserInterface
             var bookmarkMenuNewButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "New", "New", new Vector2(460, -22), () =>
             {
                 if (bookmarkMenuInputText.InputField.text.Trim() != "")
-                    movementController.BookmarkNew(bookmarkMenuInputText.InputField.text);
+                    movementController._bookmarkController.BookmarkNew(bookmarkMenuInputText.InputField.text);
             });
             UI.MoveTransform(bookmarkMenuNewButton.transform, 30, 20, 0.1f, 1, 500, -35);
 
             var bookmarkMenuChangeButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Change", "Change", new Vector2(460, -22), () =>
             {
                 if (currentBookmarkNo > 0)
-                    movementController.BookmarkChange(currentBookmarkNo);
+                    movementController._bookmarkController.BookmarkChange(currentBookmarkNo);
             });
             UI.MoveTransform(bookmarkMenuChangeButton.transform, 40, 20, 0.1f, 1, 535, -35);
 
             var bookmarkMenuDeleteButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Delete", "Delete", new Vector2(460, -22), () =>
             {
                 if (currentBookmarkNo > 0)
-                    movementController.BookmarkDelete(currentBookmarkNo);
+                    movementController._bookmarkController.BookmarkDelete(currentBookmarkNo);
             });
             UI.MoveTransform(bookmarkMenuDeleteButton.transform, 40, 20, 0.1f, 1, 575, -35);
 

@@ -203,7 +203,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var settingMenuBookmarkExportButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Bookmark Export", "Bookmark Export", new Vector2(0, -385), () =>
             {
-                movementController.BookmarkExport();
+                movementController._bookmarkController.BookmarkExport();
             });
             UI.MoveTransform(settingMenuBookmarkExportButton.transform, 70, 25, 0, 1, 280, -135);
 

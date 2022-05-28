@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections;
 using System.Reflection;
 using System.Threading;
 using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,16 +12,15 @@ using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.CameraPlus;
 using ChroMapper_CameraMovement.Controller;
 using ChroMapper_CameraMovement.UserInterface;
-using SFB;
 
 namespace ChroMapper_CameraMovement.Component
 {
     public class CameraMovementController : MonoBehaviour
     {
-        public CameraMovement _cameraMovement;
+        public CameraMovement _cameraMovement { get; set; }
+        public BookmarkController _bookmarkController { get; set; }
         public static AudioTimeSyncController atsc;
         public static AutoSaveController autoSave;
-        public static BookmarkManager bookmarkManager;
         public static SpectrogramSideSwapper spectrogramSideSwapper;
         public static EventsContainer eventContainer;
         public static BookmarkLinesController bookmarkLinesController;
@@ -99,33 +96,12 @@ namespace ChroMapper_CameraMovement.Component
         public Vector3 customEventsGridChildLocalOffset;
         public Vector3 spectrogramGridChildLocalOffset;
         public Vector3 waveformGridChildLocalOffset;
-        public List<BookmarkContainer> bookmarkContainers;
-        public bool init = false;
         public bool customEventsObject = false;
         public string currentAvatarFile = "";
         public bool previewMode = false;
         public (bool, bool, bool, bool, bool, bool, Vector3, Quaternion, float) previewEve;
         public bool subCameraRectPos = true;
         public bool dragWindowKeyEnable { set; get; } = false;
-        public void BookmarkContainerGet()
-        {
-            Type type = bookmarkManager.GetType();
-            FieldInfo field = type.GetField("bookmarkContainers", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-            bookmarkContainers = (List<BookmarkContainer>)(field.GetValue(bookmarkManager));
-        }
-        public void BookmarkTrackSet()
-        {
-            if (Options.Instance.bookmarkLines)
-                bookmarkLinesController.RefreshBookmarkLines(bookmarkContainers);
-        }
-        public void BookmarkWidthChange()
-        {
-            bookmarkContainers.ForEach(container =>
-            {
-                var rectTransform = (RectTransform)container.transform;
-                rectTransform.sizeDelta = new Vector2(Options.Instance.bookmarkWidth, 20f);
-            });
-        }
         public string ScriptGet()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
@@ -209,163 +185,6 @@ namespace ChroMapper_CameraMovement.Component
                 beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
             Reload();
         }
-        public void BookMarkChangeUpdate()
-        {
-            BookmarkContainerGet();
-            BookmarkWidthChange();
-            BookmarkTrackSet();
-            BookMarkUpdate();
-        }
-
-        public void BookMarkUpdate()
-        {
-            if (init)
-            {
-                if (bookmarkContainers.Count > 0)
-                {
-                    var lastBookmark = bookmarkContainers.FindLast(x => x.Data.Time <= atsc.CurrentBeat);
-                    if (bookmarkContainers.IndexOf(lastBookmark) == -1)
-                    {
-                        UI._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
-                    }
-                    else
-                    {
-                        UI._bookmarkMenuUI.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1, lastBookmark.Data.Time);
-                    }
-                }
-                else
-                {
-                    UI._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
-                }
-            }
-        }
-
-        public void BookmarkExport()
-        {
-            var paths = StandaloneFileBrowser.SaveFilePanel("Bookmark Export CSV File", BeatSaberSongContainer.Instance.Song.Directory, "bookmark.csv", "csv");
-            if (paths.Length > 0)
-            {
-                var sb = new StringBuilder();
-                bookmarkContainers.ForEach(container =>
-                {
-                    var row = $"{container.Data.Time},\"{container.Data.Name}\"";
-                    sb.AppendLine(row);
-                });
-                try
-                {
-                    using (var file = new StreamWriter(paths, false))
-                    {
-                        file.Write(sb.ToString());
-                    }
-                }
-                catch
-                {
-                    Debug.LogError("Bookmark CSV File Write ERROR");
-                }
-            }
-        }
-
-        public void BookmarkImport()
-        {
-            var paths = StandaloneFileBrowser.OpenFilePanel("Bookmark Import CSV File", BeatSaberSongContainer.Instance.Song.Directory, "csv", false)[0];
-            if (File.Exists(paths))
-            {
-                var replaceBookmak = new List<(float, string)>();
-                try
-                {
-                    using (var sr = new StreamReader(paths))
-                    {
-                        while (!sr.EndOfStream)
-                        {
-                            var line = sr.ReadLine();
-                            var values = line.Split(new Char[]{','}, 2);
-                            var name = values[1].Replace("\"", "");
-                            float time;
-                            if (float.TryParse(values[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out time))
-                            {
-                                replaceBookmak.Add((time, name));
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    Debug.LogError("Bookmark CSV File Import ERROR");
-                    return;
-                }
-                if (replaceBookmak.Count > 0)
-                {
-                    //このやり方は駄目なので、ちゃんとしたやリ方を考える
-                    /*
-                    bookmarkContainers.ForEach(container =>
-                    {
-                        Type type = container.GetType();
-                        MethodInfo method = type.GetMethod("HandleDeleteBookmark", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                        method.Invoke(container, new object[] { 0 });
-                    });
-                    replaceBookmak.ForEach(bookmark =>
-                    {
-                        atsc.MoveToTimeInBeats(bookmark.Item1);
-                        Type type = bookmarkManager.GetType();
-                        MethodInfo method;
-                        try
-                        {
-                            method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                            method.Invoke(bookmarkManager, new object[1] { bookmark.Item2 });
-                        }
-                        catch
-                        {
-                            //2022.2.7 "New bookmark dialog remade with CMUI"  SHA-1:795115393a1fb265ee6b77f7616941ce62b0e208 での変更対応
-                            method = type.GetMethod("CreateNewBookmark", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                            method.Invoke(bookmarkManager, new object[2] { bookmark.Item2, null });
-                        }
-                    });
-                    */
-                }
-            }
-        }
-
-        public void BookmarkChange(int bookmarkNo)
-        {
-            var bookmarkContainer = bookmarkContainers[bookmarkNo - 1];
-            PersistentUI.Instance.ShowInputBox("Mapper", "bookmark.update.dialog", (res) =>
-            {
-                Type type = bookmarkContainer.GetType();
-                MethodInfo method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                method.Invoke(bookmarkContainer, new object[] { res });
-            }
-            , null, bookmarkContainer.Data.Name);
-        }
-        public void BookmarkDelete(int bookmarkNo)
-        {
-            PersistentUI.Instance.ShowDialogBox("Mapper", "bookmark.delete", (res) =>
-            {
-                if (res == 0)
-                {
-                    var bookmarkContainer = bookmarkContainers[bookmarkNo - 1];
-                    Type type = bookmarkContainer.GetType();
-                    MethodInfo method = type.GetMethod("HandleDeleteBookmark", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                    method.Invoke(bookmarkContainer, new object[] { res });
-                }
-            }
-            , PersistentUI.DialogBoxPresetType.YesNo);
-        }
-        public void BookmarkNew(string bookmarkName)
-        {
-            Type type = bookmarkManager.GetType();
-            MethodInfo method;
-            try
-            {
-                method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                method.Invoke(bookmarkManager, new object[1] { bookmarkName });
-            }
-            catch
-            {
-                //2022.2.7 "New bookmark dialog remade with CMUI"  SHA-1:795115393a1fb265ee6b77f7616941ce62b0e208 での変更対応
-                method = type.GetMethod("CreateNewBookmark", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                method.Invoke(bookmarkManager, new object[2] { bookmarkName, null });
-            }
-        }
 
         public void Reload()
         {
@@ -433,8 +252,8 @@ namespace ChroMapper_CameraMovement.Component
             _reload = true;
             _cameraMovement.LoadCameraData(ScriptGet());
             _cameraMovement.MovementPositionReset();
-            BookmarkWidthChange();
-            BookmarkTrackSet();
+            _bookmarkController?.BookmarkWidthChange();
+            _bookmarkController?.BookmarkTrackSet();
             bookmarkLines.SetActive(Options.Instance.bookmarkLines);
             if (Options.Instance.bookmarkLines)
             {
@@ -910,13 +729,11 @@ namespace ChroMapper_CameraMovement.Component
             subCameraRectAction.Disable();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
-            bookmarkManager = FindObjectOfType<BookmarkManager>();
-
-            bookmarkManager.BookmarksUpdated += BookMarkChangeUpdate;
-            BookmarkContainerPatch.OnNewBookmarkName += BookMarkChangeUpdate;
+            _bookmarkController = new BookmarkController();
+            _bookmarkController.bookmarkLinesController = bookmarkLinesController;
+            _bookmarkController.atsc = atsc;
+            _bookmarkController.Start();
             SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
-            init = true;
-            BookMarkChangeUpdate();
             Reload();
             Plugin.orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             Plugin.orbitCamera.targetObject = avatarHead;
@@ -937,7 +754,7 @@ namespace ChroMapper_CameraMovement.Component
                     beforeSeconds = 0;
                 }
                 beforeSeconds = atsc.CurrentSeconds;
-                BookMarkUpdate();
+                _bookmarkController?.BookMarkUpdate();
                 _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, subCamera , AvatarPositionGet());
             }
             GameObject targetCamera;
@@ -966,10 +783,9 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
-            bookmarkManager.BookmarksUpdated -= BookMarkChangeUpdate;
-            BookmarkContainerPatch.OnNewBookmarkName -= BookMarkChangeUpdate;
+            _bookmarkController.OnDestroy();
             SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
             previewAction.Disable();
             scriptMapperAction.Disable();

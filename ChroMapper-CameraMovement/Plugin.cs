@@ -45,10 +45,10 @@ namespace ChroMapper_CameraMovement
             if (movement != null && movement.isActiveAndEnabled)
                 return;
             movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
-            orbitCamera = movement.gameObject.gameObject.AddComponent<OrbitCameraController>();
+            orbitCamera = movement.gameObject.AddComponent<OrbitCameraController>();
             plusCamera = movement.gameObject.AddComponent<PlusCameraController>();
             defaultCamera = movement.gameObject.AddComponent<DefaultCameraController>();
-            MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
+            MapEditorUI mapEditorUI = Object.FindObjectOfType<MapEditorUI>();
             _ui.AddMenu(mapEditorUI);
         }
     }

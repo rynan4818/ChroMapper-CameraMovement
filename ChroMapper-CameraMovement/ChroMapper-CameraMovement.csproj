@@ -157,6 +157,7 @@
     <Compile Include="Component\OrbitCameraController.cs" />
     <Compile Include="Component\PlusCameraController.cs" />
     <Compile Include="Configuration\Options.cs" />
+    <Compile Include="Controller\BookmarkController.cs" />
     <Compile Include="Controller\WindowController.cs" />
     <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />
     <Compile Include="HarmonyPatches\ShaderPatch.cs" />

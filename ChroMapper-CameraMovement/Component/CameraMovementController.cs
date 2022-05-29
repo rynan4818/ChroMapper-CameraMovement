@@ -684,6 +684,8 @@ namespace ChroMapper_CameraMovement.Component
             Array.Resize(ref otherTracks, otherTracks.Length + 1);
             otherTracks[otherTracks.Length - 1] = bookmarkLinesCanvas.gameObject.GetComponent<Track>();
             field.SetValue(audioTimeSyncController, otherTracks);
+            UnityUtility.AllSetLayer(measureLines, 11);
+            UnityUtility.AllSetLayer(bookmarkLines, 11);
 
             eventGridChild = GameObject.Find("Rotating/Event Grid").GetComponent<GridChild>();
             eventLabelChild = GameObject.Find("Rotating/Event Label").GetComponent<GridChild>();

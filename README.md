@@ -2,7 +2,7 @@
 [CameraPlus](https://github.com/Snow1226/CameraPlus)用の[MovementScript](https://github.com/Snow1226/CameraPlus/wiki/MovementScript)を読み込んで、作譜ツールの[ChroMapper](https://github.com/Caeden117/ChroMapper)でカメラワークの再現をするChroMapper用プラグインです。
 主に[Script Mapper](https://github.com/hibit-at/Scriptmapper)を使ったカメラスクリプトの作成を前提とした作りになっています。
 
-![image](https://user-images.githubusercontent.com/14249877/158151048-4d7dbe2e-0df6-4a9d-812a-b977847721b7.png)
+![image](https://user-images.githubusercontent.com/14249877/170858452-37e4b916-7bd1-4a0e-adbd-f737b534b707.png)
 
 # インストール方法
 1. [リリースページ](https://github.com/rynan4818/ChroMapper-CameraMovement/releases)から、最新版のプラグインのzipファイルをダウンロードして下さい。
@@ -50,7 +50,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 ## 各パネル説明
 譜面を読み込んでエディタ画面を出して下さい。**Tabキー**を押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。
 
-![image](https://user-images.githubusercontent.com/14249877/158151205-a13f2038-ec85-40e8-bc2d-374c5a0cb4f1.png)
+![image](https://user-images.githubusercontent.com/14249877/170858312-2cec4b44-fed5-4248-83b0-a2bbc6df1278.png)
 
 * CameraMovement ： CameraMovementプラグインの有効／無効切り替え。（作譜時に無効にする場合など)
 * Movement Enable ： カメラスクリプトに合わせてカメラが移動します。
@@ -69,7 +69,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。
 * Close ： パネルを閉じます。
 
-![image](https://user-images.githubusercontent.com/14249877/158151330-93cfb73b-0ca2-4d88-8c05-edb11b8e49b0.png)
+![image](https://user-images.githubusercontent.com/14249877/170858336-abb90373-8436-4430-b330-48980eff53a3.png)
 
 * Custom or VRM Avatar ： 読み込んだカスタムアバター・VRMアバターモデルを表示します。
 * Avatar File ： `*.vrm` VRMファイルもしくは、`*.avatar` [カスタムアバターのファイル](https://modelsaber.com/Avatars/)を`Select`ボタンで選択します。デフォルト設定はChroMapper.exeと同じフォルダにある[Sour Miku Black v2](https://modelsaber.com/Avatars/?id=1564625718&pc)になっています。
@@ -113,7 +113,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Delete ： 現在のブックマークを削除します。
 * Script Mapper Run [F3] ： ScriptMapperを実行します。メインメニューのそれと同じです。
 
-![image](https://user-images.githubusercontent.com/14249877/158151664-16964d70-680c-4625-ba72-133fed53bf96.png)
+![image](https://user-images.githubusercontent.com/14249877/170858357-af821054-add0-4c39-9c10-494e0fafc2ac.png)
 
 * Pos X ： メインカメラのX軸(横方向)位置です[単位m]
 * Pos Y ： メインカメラのY軸(高さ方向)位置です[単位m]
@@ -135,6 +135,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 上記項目はカメラを移動すると現在値を表示します。値を入力するとその状態にカメラが移動します。
 
+![image](https://user-images.githubusercontent.com/14249877/170858377-6005ae8a-3855-45df-bd36-77764418ef90.png)
 
 - Display Counts = * ： 現在のPCのディスプレイ数です。2以上で本機能を利用できます。3以上だとサブ・レイアウト検討の両方ウィンドウ化できます。
 - Sub Window ： サブカメラ用のウィンドウを表示します。

@@ -120,6 +120,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public float durationErrorWarning = 0.05f;
         public bool cameraMovementEnable = true;
         public bool cameraKeyMouseControlSub = true;
+        public int bookmarkLinesFontSize = 100;
 
         public static Options Instance {
             get {

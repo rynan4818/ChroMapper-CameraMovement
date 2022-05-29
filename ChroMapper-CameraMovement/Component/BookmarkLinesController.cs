@@ -2,6 +2,7 @@
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using ChroMapper_CameraMovement.Configuration;
 
 namespace ChroMapper_CameraMovement.Component
 {
@@ -13,6 +14,7 @@ namespace ChroMapper_CameraMovement.Component
         public Transform frontNoteGridScaling;
         public List<BookmarkContainer> bookmarkContainers = new List<BookmarkContainer>();
         public readonly Dictionary<BookmarkContainer, (TextMeshProUGUI, bool)> bookmarkTexts = new Dictionary<BookmarkContainer, (TextMeshProUGUI, bool)>();
+        public const float bookmarkXposition = -6f;
 
         public bool init;
         public float previousAtscBeat = -1;
@@ -51,10 +53,10 @@ namespace ChroMapper_CameraMovement.Component
                 if (!bookmarkTexts.ContainsKey(bookmark))
                 {
                     var text = Instantiate(bookmarkLinePrefab, parent);
-                    text.transform.localPosition = new Vector3(0, bookmark.Data.Time * EditorScaleController.EditorScale, 0);
+                    text.transform.localPosition = new Vector3(bookmarkXposition, bookmark.Data.Time * EditorScaleController.EditorScale, 0);
                     bookmarkTexts.Add(bookmark, (text, true));
                 }
-                bookmarkTexts[bookmark].Item1.text = $"{counter}: {bookmark.Data.Name}";
+                bookmarkTexts[bookmark].Item1.text = $"<mark=#{ColorUtility.ToHtmlStringRGB(bookmark.Data.Color)}50><size=30%><voffset=0.2><s> <indent=6> </s></voffset></size></mark> <size={Options.Instance.bookmarkLinesFontSize}%>{counter}: {bookmark.Data.Name}</size><color=#00000000>.</color>";
                 counter++;
             });
             checkContainers.ForEach(Container =>
@@ -91,7 +93,7 @@ namespace ChroMapper_CameraMovement.Component
         private void RefreshPositions()
         {
             foreach (var kvp in bookmarkContainers)
-                bookmarkTexts[kvp].Item1.transform.localPosition = new Vector3(0, kvp.Data.Time * EditorScaleController.EditorScale, 0);
+                bookmarkTexts[kvp].Item1.transform.localPosition = new Vector3(bookmarkXposition, kvp.Data.Time * EditorScaleController.EditorScale, 0);
         }
     }
 }

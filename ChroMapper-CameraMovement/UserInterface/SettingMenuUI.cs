@@ -198,21 +198,30 @@ namespace ChroMapper_CameraMovement.UserInterface
                     movementController.Reload();
                 }
             });
-            UI.MoveTransform(bookmarkAreaInput.Item1, 60, 16, 0, 1, 140, -135);
-            UI.MoveTransform(bookmarkAreaInput.Item3.transform, 40, 20, 0.1f, 1, 145, -135);
+            UI.MoveTransform(bookmarkAreaInput.Item1, 50, 16, 0, 1, 130, -135);
+            UI.MoveTransform(bookmarkAreaInput.Item3.transform, 40, 20, 0.1f, 1, 135, -135);
+
+            var bookmarkSizeInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Size", "Bookmark Size(%)", new Vector2(0, -225), Options.Instance.bookmarkLinesFontSize.ToString(), (value) =>
+            {
+                int res;
+                if (int.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                    Options.Instance.bookmarkLinesFontSize = res;
+            });
+            UI.MoveTransform(bookmarkSizeInput.Item1, 50, 16, 0, 1, 230, -135);
+            UI.MoveTransform(bookmarkSizeInput.Item3.transform, 40, 20, 0.1f, 1, 235, -135);
 
             var settingMenuBookmarkExportButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Bookmark Export", "Bookmark Export", new Vector2(0, -385), () =>
             {
                 movementController._bookmarkController.BookmarkExport();
             });
-            UI.MoveTransform(settingMenuBookmarkExportButton.transform, 70, 25, 0, 1, 280, -135);
+            UI.MoveTransform(settingMenuBookmarkExportButton.transform, 70, 25, 0, 1, 360, -135);
 
             /*
             var settingMenuBookmarkImportButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Bookmark Import", "Bookmark Import", new Vector2(0, -385), () =>
             {
                 movementController.BookmarkImport();
             });
-            UI.MoveTransform(settingMenuBookmarkImportButton.transform, 70, 25, 0, 1, 370, -135);
+            UI.MoveTransform(settingMenuBookmarkImportButton.transform, 70, 25, 0, 1, 450, -135);
             */
 
             var rectXInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub X", new Vector2(0, -245), Options.Instance.subCameraRectX.ToString(), (value) =>

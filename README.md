@@ -9,16 +9,6 @@
 
 2. ダウンロードしたzipファイルを解凍してChroMapperのインストールフォルダにある`Plugins`フォルダに`ChroMapper-CameraMovement.dll`をコピーします。
 
-- Ver1.4.0～1.4.1 では以下のファイルをChroMapperのインストールフォルダにコピーしていましたが、Ver1.4.2 よりChroMapper-CameraMovement.dllに統合したため不要になりました。Ver1.4.0～1.4.1をお使いの方は、不要なため削除して下さい。
-    - netstandard.dll
-    - Newtonsoft.Json.dll
-    - UniGLTF.dll
-    - UniHumanoid.dll
-    - VRM.dll
-    - VRMShaders.GLTF.IO.Runtime.dll
-    - VRMShaders.GLTF.UniUnlit.Runtime.dll
-    - vrmavatar.shaders
-
 3. [Script Mapper](https://github.com/hibit-at/Scriptmapper)をダウンロードして、ChroMapperのインストールフォルダ(ChroMapper.exeがあるフォルダ)に`scriptmapper.exe`をコピーします。
 
 # アバターについて
@@ -45,14 +35,24 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
     - ALT + マウスホイールで注視点との距離の変更
     - ALT + CTRL + マウスホイールでFOVの変更
     - ALT + CTRL + マウス左右同時クリックでFOVのリセット
+    - ALT + SHIFT + マウスホイールでカメラZ角度回転
+- CameraPlus相当のマウスによるカメラ移動モード
+    - Zキー + マウス右ドラッグでカメラ回転
+    - Zキー + 中ドラッグでカメラ移動
+    - Zキー + マウスホイールで視点方向前後移動 （右クリックは不要 ※CameraPlusと違います)
+    - Zキー + 左クリック + マウスホイールでZ角度回転
+    - Zキー + 左クリック + 中クリックでZを0度に設定
+    - Zキー + 右クリック + マウスホイールでFOVの変更
+    - Zキー + 右クリック + 中クリックでFOVのリセット
 
-※上記キーバインドは[設定ファイル](https://github.com/rynan4818/ChroMapper-CameraMovement#%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)の直接変更で変更可能
+※上記キーバインドや感度は[設定ファイル](https://github.com/rynan4818/ChroMapper-CameraMovement#%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)の直接変更で変更可能
 
 ## 各パネル説明
 譜面を読み込んでエディタ画面を出して下さい。**Tabキー**を押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。
 
 ![image](https://user-images.githubusercontent.com/14249877/158151205-a13f2038-ec85-40e8-bc2d-374c5a0cb4f1.png)
 
+* CameraMovement ： CameraMovementプラグインの有効／無効切り替え。（作譜時に無効にする場合など)
 * Movement Enable ： カメラスクリプトに合わせてカメラが移動します。
 * UI Hidden ： 作譜用のグリッドUI、ライティングブロック、音声波形などを消します。
 * NJS Editor Scale ： エディタスケールをNJSを反映(ゲーム内と同じ)にします。ChroMapper設定のAccurate Editor Scaleと同じです。
@@ -64,8 +64,10 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Camera Contral ： カメラコントロールのパネルを下に表示します。
 * More Seting ： 詳細設定パネルを表示します。
 * Reload ： 設定やスクリプトを読み込み直します
-* Setting Save : 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。
+* Multi Display ： マルチディスプレイパネルを表示します。
 * Script Mapper Run [F3] ： 譜面データを保存して、Script Mapperでブックマークをカメラスクリプトに変換します。F3キーでショートカット。
+* Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。
+* Close ： パネルを閉じます。
 
 ![image](https://user-images.githubusercontent.com/14249877/158151330-93cfb73b-0ca2-4d88-8c05-edb11b8e49b0.png)
 
@@ -84,8 +86,9 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Arm Size ： アバターの両手の長さ [単位 m]
 * Bookmark Width ： タイムラインのブックマークの表示幅を調整します。(デフォルトは10)
 * Bookmark Area ： Bookmark Linesで表示するために開けるスペース。
+* Bookmark Size(%) ： Bookmark Linesで表示する文字のサイズ(デフォルトは100%)
 * Bookmark Export ： ブックマークをCSVファイルに出力します。
-* Bookmark Import(未実装) ： ブックマークをCSVファイルから取り込みます。
+* ~~Bookmark Import ： ブックマークをCSVファイルから取り込みます。~~(未実装)
 * Sub X ： サブカメラの左下座標の画面横軸位置です。（0が左端、1が右端)
 * Sub Y ： サブカメラの左下座標の画面縦軸位置です。（0が下端、1が上端)
 * Cursor Key Move ： 押すとカーソルキーでSub X,Yを0.01単位で調整できます。Shiftを押しながらだと0.1単位。
@@ -93,7 +96,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Sub H ： サブカメラの画面の幅です。(1がメイン画面幅)
 * Cursor Key Size ： 押すとカーソルキーでSub W,Hを0.01単位で調整できます。Shiftを押しながらだと0.1単位。
 * Script File ： 譜面フォルダにある読み込むカメラスクリプトファイル名
-* Mapping Disable ： Camera Movementの機能有効中は譜面作成機能を抑制して、ノーツ等の誤編集を防止します。
+* Mapping Disable ： Camera Movementの機能有効中は譜面作成機能を抑制して、ノーツ等の誤編集を防止します。ただし、OFFにするとカメラ移動機能が制限されます。
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。(メイン設定の同名ボタンと機能は同じ)
 * Close ： More Settingパネルを閉じます。
 
@@ -123,12 +126,32 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Move Speed ： メインカメラの右クリック+WASDでの移動速度です。ChroMapper設定のVisualsのCamera Speedと同じです。[5以下も可能]
 * Look At ： メインカメラの角度をアバターの方向に向けます。
 * Sub : コントロール対象をサブカメラにします。
+* Lay : マルチウィンドウ時にコントロール対象をレイアウト検討カメラにします。
+* Obj : サブカメラ表示時に、カメラの3Dオブジェクトを表示します。
 * Preview[F4] : ゲーム内を正確に再現したプレビューモードにします、F4がショートカットキーで戻る時はF4です。
 * Paste : Script Mapperのqコマンド形式または、input.csv形式(タブ区切り)で、クリップボードからカメラ位置・角度・FOVを設定します。
 * Copy ： Script Mapperのinput.csv形式(タブ区切り)で、カメラ位置・角度・FOVをクリップボードにコピーします。
-* q format ： Copy時にScriptMapperのqコマンド形式でコピーします。
+* q fmt ： Copy時にScriptMapperのqコマンド形式でコピーします。
 
 上記項目はカメラを移動すると現在値を表示します。値を入力するとその状態にカメラが移動します。
+
+
+- Display Counts = * ： 現在のPCのディスプレイ数です。2以上で本機能を利用できます。3以上だとサブ・レイアウト検討の両方ウィンドウ化できます。
+- Sub Window ： サブカメラ用のウィンドウを表示します。
+- Layout Window ： レイアウト検討カメラのウィンドウを表示します。
+- Create Window ： 現在の設定でマルチディスプレイ機能を有効にします。
+- Save Window Layout ： 現在のウィンドウレイアウトを保存し、次回Create Windowした時に再現します。
+- Reset Window Layout ： ウィンドウレイアウトをリセットします。
+- Setting Save ： 現在の設定を保存します。
+- Close ： パネルを閉じます。
+
+※一度作成したウィンドウはUnityの仕様でChroMapperを終了するまで閉じることができません。
+
+※各ウィンドウでのカメラ操作は、カメラコントロールパネルの Sub 及び Lay チェック時に値で直接変更できる他、ウィンドウがアクティブ状態の場合は各モードでマウス・キーボードでコントロールできます。
+
+※サブ・レイアウト検討ウィンドウはモニタのアスペクト比に依存するため、サイズ変更はアスペクト比固定になっています。
+
+※マルチディスプレイモード時にメインウィンドウのサイズを変更すると、画面が崩れることがありますがウィンドウをドラッグで移動すると直ります。
 
 ## 設定ファイルについて
 設定ファイルはChroMapperの設定ファイルと同じフォルダ`ユーザ設定フォルダ(Users)\ユーザ名\AppData\LocalLow\BinaryElement\ChroMapper`の`cameramovement.json`に保存されます。
@@ -156,10 +179,35 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 | orbitFovSensitivity | 0.005 | 注視点カメラ移動のFOV変更感度です |
 | orbitMinDistance | 0.2 | 注視点カメラ移動のズーム最接近距離です |
 | orbitMaxDistance | 100 | 注視点カメラ移動のズーム最遠方距離です |
-| orbitActiveKeyBinding | ＜Keyboard＞/alt | 注視点カメラ移動のキーバンドです |
-| orbitSubActiveKeyBinding | ＜Keyboard＞/ctrl | 注視点カメラ移動のFOV変更キーバンドです |
-| orbitMoveActiveKeyBinding | ＜Mouse＞/leftButton | 注視点カメラ移動のオフセット移動キーバンドです |
-| orbitRotActiveKeyBinding | ＜Mouse＞/rightButton | 注視点カメラ移動のカメラ回転キーバンドです |
+| orbitActiveKeyBinding | ＜Keyboard＞/alt | 注視点カメラ移動のキーバインドです |
+| orbitSubActiveKeyBinding | ＜Keyboard＞/ctrl | 注視点カメラ移動のFOV変更キーバインドです |
+| orbitZrotActiveKeyBinding | ＜Keyboard＞/shift | 注視点カメラ移動のZカメラ回転キーバインドです |
+| orbitMoveActiveKeyBinding | ＜Mouse＞/leftButton | 注視点カメラ移動のオフセット移動キーバインドです |
+| orbitRotActiveKeyBinding | ＜Mouse＞/rightButton | 注視点カメラ移動のXYカメラ回転キーバインドです |
+| subCameraNoUI | True | TrueにするとサブカメラのUI表示を消します |
+| layoutCameraNoUI | True | Trueにするとレイアウト検討カメラのUI表示を消します |
+| multiDislayCreateDelay | 0.1 | マルチディスプレイ作成時のディレイ時間(秒)。作成時に異常動作する場合は値を増やして下さい |
+| plusActiveKeyBinding | ＜Keyboard＞/z | CameraPlus互換カメラ移動の有効キーバインドです |
+| plusZrotActiveKeyBinding | ＜Mouse＞/leftButton | CameraPlus互換カメラ移動のZカメラ回転キーバインドです |
+| plusPosActiveKeyBinding | ＜Mouse＞/middleButton | CameraPlus互換カメラ移動のカメラ移動キーバインドです |
+| plusRotActiveKeyBinding | ＜Mouse＞/rightButton | CameraPlus互換カメラ移動のXYカメラ回転キーバインドです |
+| plusZrotSensitivity | 0.004165 | CameraPlus互換カメラ移動のZ回転感度です |
+| plusPosSensitivity | 0.01 | CameraPlus互換カメラ移動のカメラ移動感度です |
+| plusRotSensitivity | 0.03 | CameraPlus互換カメラ移動のXYカメラ回転感度です |
+| plusZoomSensitivity | 0.003125 | CameraPlus互換カメラ移動の視点方向前後移動の感度です |
+| plusFovSensitivity | 0.005 | CameraPlus互換カメラ移動のFOV変更感度です |
+| plusDefaultFOV | 60 | CameraPlus互換カメラ移動のデフォルトFOVです |
+| defaultCameraActiveKeyBinding | ＜Mouse＞/rightButton | サブ・レイアウト検討カメラ用デフォルトカメラ移動の有効キーバインドです |
+| defaultCameraElevatePositiveKeyBinding | ＜Keyboard＞/space | サブ・レイアウト検討カメラ用デフォルトカメラ移動の上移動キーバインドです |
+| defaultCameraElevateNegativeKeyBinding | ＜Keyboard＞/ctrl | サブ・レイアウト検討カメラ用デフォルトカメラ移動の下移動キーバインドです |
+| defaultCameraMoveUpKeyBinding | ＜Keyboard＞/w | サブ・レイアウト検討カメラ用デフォルトカメラ移動の前移動キーバインドです |
+| defaultCameraMoveLeftKeyBinding | ＜Keyboard＞/a | サブ・レイアウト検討カメラ用デフォルトカメラ移動の左移動キーバインドです |
+| defaultCameraMoveDownKeyBinding | ＜Keyboard＞/s | サブ・レイアウト検討カメラ用デフォルトカメラ移動の後移動キーバインドです |
+| defaultCameraMoveRightKeyBinding | ＜Keyboard＞/d | サブ・レイアウト検討カメラ用デフォルトカメラ移動の右移動キーバインドです |
+| maxDurationErrorOffset | True | Trueにすると、サブカメラでDuration取込み誤差補正機能を有効にします |
+| durationErrorWarning | 0.05 | Duration取込み誤差補正機能の上限値(秒)です。この値を超えると補正されず警告表示します |
+| cameraKeyMouseControlSub | True | Trueにすると、非マルチディスプレイ時にサブカメラのキーボード・マウス移動対象にします |
+| subCameraModelTrailTime | 4 | サブカメラの3Dオブジェクトのトレイル表示時間(秒)です |
 
 ※キーバインドはUnityのInputSystem形式で設定してください。
 
@@ -170,18 +218,6 @@ ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイ
 
 # ToDo
 ※実生活がちょっと忙しくなってきているので、ゆっくり対応です。
-## プレリリース中
-* マルチディスプレイ表示モードの追加(プレビュー表示用、カメラレイアウト検討用）
-* サブカメラだけマッピング用のUI表示を消す
-* CameraPlus相当のマウス操作でのカメラ移動モードの追加
-* マルチディスプレイでのデフォルトカメラ操作
-
-## 実装中
-* duration取込み誤差分をオフセットして、ブックマーク位置でスタート画面になるようにする
-* プラグインのON/OFF機能の追加(通常作譜作業用にプラグインをワンタッチでON/OFFできるように)
-* アバター非表示コマンドの対応
-* カメラコントロールでサブカメラ対象の時に、カメラ操作もサブカメラを対象にする
-* サブカメラにオブジェクトを割り当てて、カメラ移動が見えるモードの追加
 
 ## 検討中
 * CameraMovementController.csが機能詰め込みすぎてるので整理する。
@@ -189,8 +225,18 @@ ChroMapperのブックマークはMMA2と同じ"B"キーですが、下のタイ
 
 ## 保留
 * ブックマークもノーツブロックのようにコピペ出来たら良いけど、だいぶムズい。
+* カメラ移動パスを描いて、それ通りに動くようなブックマークを自動生成できたら便利だけど、ムズ～
 
 ## 完了
+* ~~マルチディスプレイ表示モードの追加(プレビュー表示用、カメラレイアウト検討用）~~
+* ~~サブカメラだけマッピング用のUI表示を消す~~
+* ~~CameraPlus相当のマウス操作でのカメラ移動モードの追加~~
+* ~~マルチディスプレイでのデフォルトカメラ操作~~
+* ~~duration取込み誤差分をオフセットして、ブックマーク位置でスタート画面になるようにする~~
+* ~~プラグインのON/OFF機能の追加(通常作譜作業用にプラグインをワンタッチでON/OFFできるように)~~
+* ~~アバター非表示コマンドの対応~~
+* ~~カメラコントロールでサブカメラ対象の時に、カメラ操作もサブカメラを対象にする~~
+* ~~サブカメラにオブジェクトを割り当てて、カメラ移動が見えるモードの追加~~
 * ~~カメラ移動をWASDではなく、CADみたいに対象物(アバター)中心で回転操作で動かすモード~~
 * ~~現在のカメラ位置をinput.csvに出力するボタン（コピペは実装済み）~~ ※qコマンドが有用なのでこれ以上実装しない
 * ~~ノーツや壁のスピードをゲームと一致させる~~

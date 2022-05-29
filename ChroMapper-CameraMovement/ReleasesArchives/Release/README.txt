@@ -2,18 +2,7 @@
 
 ・ChroMapperのインストールフォルダにあるPluginsフォルダに ChroMapper-CameraMovement.dll をコピーします。
 
-※Ver1.4.0～1.4.1 では以下のファイルをChroMapperのインストールフォルダにコピーしていましたが、
-  Ver1.4.2 よりChroMapper-CameraMovement.dllに統合したため不要になりました。
-  Ver1.4.0～1.4.1 をお使いの方は、不要なため削除して下さい。
-
-        netstandard.dll
-        Newtonsoft.Json.dll    ... 以前はPluginsフォルダに入れていましたが変更しました。
-        UniGLTF.dll
-        UniHumanoid.dll
-        VRM.dll
-        VRMShaders.GLTF.IO.Runtime.dll
-        VRMShaders.GLTF.UniUnlit.Runtime.dll
-        vrmavatar.shaders
+・Script Mapper(https://github.com/hibit-at/Scriptmapper)をダウンロードして、ChroMapperのインストールフォルダ(ChroMapper.exeがあるフォルダ)にscriptmapper.exeをコピーします。
 
 ■ChroMapper-CameraMovementのライセンスについて
 

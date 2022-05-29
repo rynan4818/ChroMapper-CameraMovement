@@ -154,6 +154,22 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 ※マルチディスプレイモード時にメインウィンドウのサイズを変更すると、画面が崩れることがありますがウィンドウをドラッグで移動すると直ります。
 
+## Duration取込み誤差について
+カメラスクリプトはDuration(移動時間)の積算で表現していますが、CameraPlusやCameraMovementで取り込む際に有効桁数6~9桁(float)で丸められるため、ScriptMapperの出力内容によっては誤差が積算されてブックマークの位置に対してカメラ移動がズレる可能性があります。また、Durationは0.01秒未満の値は0.01秒に繰り上げるため、0.01秒未満のDurationがあるとズレが積算します。
+
+特に遅れる方向にズレやすく、CameraMovementで表示する際に後ろの方になると、ブックマークの位置では一つ前の最終カメラ位置になってしまうことがあるため、サブカメラのプレビューでは内部でズレを補正しています。この補正の上限値はデフォルトで0.05秒(50ms)で、これよりもズレが大きくなると下記エラーメッセージが表示され、ズレていることを分かるようにするため補正されなくなります。
+
+![image](https://user-images.githubusercontent.com/14249877/170859030-71a35442-9563-49e3-8af8-9ccf834c9328.png)
+
+ズレが発生した場合の対処方法は、ズレ対策されたScriptMapperを利用する。ScriptMapperの環境コマンドのオフセット `#offset0.1`(例0.1秒早める)を利用するなどがあります。
+
+取込み誤差は通常時にもログに表示していますので、どのくらいズレているか確認することも可能です。
+- Duration total error : スクリプト末尾時点でのズレ時間
+- Duration max error : スクリプトの最大ズレ時間
+- Duration min error : スクリプトのマイナス方向の最大ズレ時間
+
+ログ表示画面は通常ではChromapperのキーバインドでバッククオートになっていますが、日本語キーボードだと反応しないため、キーバンドのDebugのToggle Debug Consoleを変更して下さい。(F12など)
+
 ## 設定ファイルについて
 設定ファイルはChroMapperの設定ファイルと同じフォルダ`ユーザ設定フォルダ(Users)\ユーザ名\AppData\LocalLow\BinaryElement\ChroMapper`の`cameramovement.json`に保存されます。
 

@@ -121,6 +121,8 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool cameraMovementEnable = true;
         public bool cameraKeyMouseControlSub = true;
         public int bookmarkLinesFontSize = 100;
+        public bool subCameraModel = false;
+        public float subCameraModelTrailTime = 4f;
 
         public static Options Instance {
             get {

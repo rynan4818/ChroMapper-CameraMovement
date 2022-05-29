@@ -56,6 +56,8 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject avatarLeg;
         public static GameObject avatarHair;
         public static GameObject bookmarkLines;
+        public static GameObject subCameraArrow;
+        public static TrailRenderer subCameraArrowTrail;
         public static Camera subCamera;
         public static Camera layoutCamera;
         public static GameObject avatarModel;
@@ -250,6 +252,9 @@ namespace ChroMapper_CameraMovement.Component
                 avatarLeg.gameObject.SetActive(false);
                 avatarHair.gameObject.SetActive(false);
             }
+            subCameraArrow.SetActive(Options.Instance.subCameraModel);
+            subCameraArrowTrail.Clear();
+            OnPlayToggle(atsc.IsPlaying);
             beforeSeconds = 0;
             _reload = true;
             _cameraMovement.LoadCameraData(ScriptGet());
@@ -366,6 +371,14 @@ namespace ChroMapper_CameraMovement.Component
                 customEventsGridChild.LocalOffset = new Vector3(customEventsGridChildLocalOffset.x + offset, customEventsGridChildLocalOffset.y, customEventsGridChildLocalOffset.z);
             }
         }
+        public void OnPlayToggle(bool playing)
+        {
+            if (!Options.Instance.cameraMovementEnable || !Options.Instance.subCameraModel) return;
+            subCameraArrowTrail.enabled = playing;
+            if (!playing)
+                subCameraArrowTrail.Clear();
+        }
+
         public void WaveFormOffset()
         {
             if (!Options.Instance.cameraMovementEnable) return;
@@ -718,15 +731,53 @@ namespace ChroMapper_CameraMovement.Component
                 customEventsObject = false;
             }
 
-
             beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
 
             subCamera = new GameObject("Preview Camera").AddComponent<Camera>();
             subCamera.clearFlags = CameraClearFlags.SolidColor;
             subCamera.backgroundColor = new Color(0, 0, 0, 255);
+            subCameraArrow = new GameObject("Sub Camera Arrow");
+            subCameraArrow.transform.parent = subCamera.transform;
+            subCameraArrow.layer = 11;
+            subCameraArrowTrail = subCameraArrow.AddComponent<TrailRenderer>();
+            subCameraArrowTrail.material = new Material(Shader.Find("Sprites/Default"));
+            subCameraArrowTrail.material.SetColor("_Color", Color.HSVToRGB(0.2f, 1f, 1f));
+            subCameraArrowTrail.startWidth = 0.1f;
+            subCameraArrowTrail.endWidth = 0.02f;
+            subCameraArrowTrail.time = Options.Instance.subCameraModelTrailTime;
+            subCameraArrowTrail.enabled = false;
+
+            var subCameraArrowSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            subCameraArrowSphere.layer = 11;
+            subCameraArrowSphere.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+            subCameraArrowSphere.transform.localPosition = new Vector3(0, 0, -0.2f);
+            var subCameraArrowSphereMeshRenderer = subCameraArrowSphere.GetComponent<Renderer>();
+            subCameraArrowSphereMeshRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            subCameraArrowSphereMeshRenderer.material.SetColor("_Color", Color.HSVToRGB(0.8f, 1f, 1f));
+            subCameraArrowSphere.transform.parent = subCameraArrow.transform;
+
+            var subCameraArrowCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            subCameraArrowCube.layer = 11;
+            subCameraArrowCube.transform.localScale = new Vector3(0.4f, 0.4f, 0.8f);
+            subCameraArrowCube.transform.localPosition = new Vector3(0, 0, -0.6f);
+            var subCameraArrowCubeMeshRenderer = subCameraArrowCube.GetComponent<Renderer>();
+            subCameraArrowCubeMeshRenderer.material = new Material(Shader.Find("Sprites/Default"));
+            subCameraArrowCubeMeshRenderer.material.SetColor("_Color", Color.HSVToRGB(0.4f, 1f, 1f));
+            subCameraArrowCube.transform.parent = subCameraArrow.transform;
+
+            var subCameraArrowCube2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            subCameraArrowCube2.layer = 11;
+            subCameraArrowCube2.transform.localScale = new Vector3(0.3f, 0.5f, 0.3f);
+            subCameraArrowCube2.transform.localPosition = new Vector3(0, -0.4f, -0.6f);
+            var subCameraArrowCubeMeshRenderer2 = subCameraArrowCube2.GetComponent<Renderer>();
+            subCameraArrowCubeMeshRenderer2.material = new Material(Shader.Find("Sprites/Default"));
+            subCameraArrowCubeMeshRenderer2.material.SetColor("_Color", Color.HSVToRGB(0.5f, 1f, 1f));
+            subCameraArrowCube2.transform.parent = subCameraArrow.transform;
+
             if (Options.Instance.subCameraNoUI)
                 subCamera.cullingMask &= ~(1 << 11);
             subCamera.gameObject.SetActive(false);
+            subCameraArrow.SetActive(false);
 
             layoutCamera = new GameObject("Sub Camera").AddComponent<Camera>();
             layoutCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -761,6 +812,7 @@ namespace ChroMapper_CameraMovement.Component
             _bookmarkController.atsc = atsc;
             _bookmarkController.Start();
             SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
+            atsc.PlayToggle += OnPlayToggle;
             orbitCamera.targetObject = avatarHead;
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
             if (Plugin.activeWindow > 1)
@@ -823,6 +875,7 @@ namespace ChroMapper_CameraMovement.Component
         {
             _bookmarkController.OnDestroy();
             SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
+            atsc.PlayToggle -= OnPlayToggle;
             previewAction.Disable();
             scriptMapperAction.Disable();
             dragWindowsAction.Disable();

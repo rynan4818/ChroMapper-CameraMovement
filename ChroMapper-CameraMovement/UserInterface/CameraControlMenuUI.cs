@@ -310,13 +310,21 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(cameraControlLay.Item1, 50, 16, 0, 1, 290, -40);
             _cameraControlLayToggle = cameraControlLay.Item3;
 
+            var cameramodel = UI.AddCheckbox(_cameraControlMenu.transform, "Obj", "Obj", new Vector2(0, -40), Options.Instance.subCameraModel, (check) =>
+            {
+                Options.Instance.subCameraModel = check;
+                movementController.Reload();
+            });
+            UI.MoveTransform(cameramodel.Item3.transform, 30, 16, 0, 1, 300, -40);
+            UI.MoveTransform(cameramodel.Item1, 50, 16, 0, 1, 330, -40);
+
             var regexKey = new Regex(@"<\w+>/");
             var cameraControlPreviewButton = UI.AddButton(_cameraControlMenu.transform, "Preview", $"Preview [{regexKey.Replace(Options.Instance.previewKeyBinding,"").ToUpper()}]", new Vector2(0, -40), () =>
             {
                 movementController.OnPreview();
             });
             cameraControlPreviewButton.Text.fontSize = 9;
-            UI.MoveTransform(cameraControlPreviewButton.transform, 50, 20, 0, 1, 320, -40);
+            UI.MoveTransform(cameraControlPreviewButton.transform, 50, 20, 0, 1, 355, -40);
 
             var cameraControlMenuPasteButton = UI.AddButton(_cameraControlMenu.transform, "Paste", "Paste", new Vector2(0, -40), () =>
             {
@@ -419,7 +427,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 movementController.CameraPositionAndRotationSet(new_position, new_rotation);
                 Settings.Instance.CameraFOV = fov;
             });
-            UI.MoveTransform(cameraControlMenuPasteButton.transform, 40, 20, 0, 1, 370, -40);
+            UI.MoveTransform(cameraControlMenuPasteButton.transform, 35, 20, 0, 1, 400, -40);
 
             var cameraControlMenuCopyButton = UI.AddButton(_cameraControlMenu.transform, "Copy", "Copy", new Vector2(0, -40), () =>
             {
@@ -436,14 +444,14 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 GUIUtility.systemCopyBuffer = text;
             });
-            UI.MoveTransform(cameraControlMenuCopyButton.transform, 40, 20, 0, 1, 415, -40);
+            UI.MoveTransform(cameraControlMenuCopyButton.transform, 30, 20, 0, 1, 435, -40);
 
-            var bookmarkSetCheckbox = UI.AddCheckbox(_cameraControlMenu.transform, "q format", "q format", new Vector2(0, -40), Options.Instance.qFormat, (check) =>
+            var bookmarkSetCheckbox = UI.AddCheckbox(_cameraControlMenu.transform, "q fmt", "q fmt", new Vector2(0, -40), Options.Instance.qFormat, (check) =>
             {
                 Options.Instance.qFormat = check;
             });
-            UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0, 1, 455, -40);
-            UI.MoveTransform(bookmarkSetCheckbox.Item1, 50, 16, 0, 1, 485, -40);
+            UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0, 1, 470, -40);
+            UI.MoveTransform(bookmarkSetCheckbox.Item1, 50, 16, 0, 1, 500, -40);
 
             _cameraControlMenu.SetActive(Options.Instance.cameraMovementEnable && Options.Instance.cameraControl);
         }

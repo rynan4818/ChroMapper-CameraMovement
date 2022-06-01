@@ -313,6 +313,8 @@ SimpleJSONの著作権表記・ライセンスは以下の通りです。
 ## アイコン素材
 - ICONION
 - http://iconion.com/ja/
+- Google Fonts (Monochrome Photos)
+- https://fonts.google.com/icons?selected=Material+Icons:monochrome_photos:
 
 ## プラグイン製作の参考
 `CameraPlus`フォルダのファイルは、すのーさんの[CameraPlus](https://github.com/Snow1226/CameraPlus)のソースコードをコピー・修正して使用しています。カメラ移動部分の処理は全く同じです。

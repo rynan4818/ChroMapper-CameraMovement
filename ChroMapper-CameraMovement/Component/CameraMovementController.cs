@@ -263,13 +263,9 @@ namespace ChroMapper_CameraMovement.Component
             _bookmarkController?.BookmarkTrackSet();
             bookmarkLines.SetActive(Options.Instance.bookmarkLines && Options.Instance.cameraMovementEnable);
             if (Options.Instance.bookmarkLines && Options.Instance.cameraMovementEnable)
-            {
                 EventBpmOffset(Options.Instance.bookmarkInsertOffset);
-            }
             else
-            {
                 EventBpmOffset(0);
-            }
             orbitCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             orbitCamera.fovTargetMainCamera = true;
             plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();

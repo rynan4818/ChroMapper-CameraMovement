@@ -52,13 +52,13 @@ namespace ChroMapper_CameraMovement.UserInterface
                 var subWindowCheck = UI.AddCheckbox(_cameraMovementMultiDisplay.transform, "Sub Window", "Sub Window", new Vector2(0, -40), Options.Instance.subWindow, (check) =>
                 {
                     _message.text = "";
-                    if (Plugin.activeWindow == 3)
+                    if (MultiDisplayController.activeWindow == 3)
                     {
                         _subWindow.isOn = true;
                         _message.text = deleteDisplayMessage;
                         return;
                     }
-                    if (Plugin.activeWindow == 2 && !check && !Options.Instance.layoutWindow)
+                    if (MultiDisplayController.activeWindow == 2 && !check && !Options.Instance.layoutWindow)
                     {
                         Options.Instance.layoutWindow = true;
                         _layoutWindow.isOn = true;
@@ -79,13 +79,13 @@ namespace ChroMapper_CameraMovement.UserInterface
                 var layoutWindowCheck = UI.AddCheckbox(_cameraMovementMultiDisplay.transform, "Layout Window", "Layout Window", new Vector2(0, -40), Options.Instance.layoutWindow, (check) =>
                 {
                     _message.text = "";
-                    if (Plugin.activeWindow == 3)
+                    if (MultiDisplayController.activeWindow == 3)
                     {
                         _layoutWindow.isOn = true;
                         _message.text = deleteDisplayMessage;
                         return;
                     }
-                    if (Plugin.activeWindow == 2 && !check && !Options.Instance.subWindow)
+                    if (MultiDisplayController.activeWindow == 2 && !check && !Options.Instance.subWindow)
                     {
                         Options.Instance.subWindow = true;
                         _subWindow.isOn = true;
@@ -106,21 +106,28 @@ namespace ChroMapper_CameraMovement.UserInterface
                 var createButton = UI.AddButton(_cameraMovementMultiDisplay.transform, "Create Window", "Create Window", new Vector2(0, -250), () =>
                 {
                     CameraMovementController.multiDisplayController.CreateDisplay();
-                    _message.text = "Window Create!";
+                    if (MultiDisplayController.createDisplayActive)
+                        _message.text = "Window Create!";
+                    else
+                        _message.text = "";
                 });
                 UI.MoveTransform(createButton.transform, 70, 25, 0, 1, 50, -140);
 
                 var saveLayoutButton = UI.AddButton(_cameraMovementMultiDisplay.transform, "Save Layout", "Save Window Layout", new Vector2(0, -250), () =>
                 {
-                    CameraMovementController.multiDisplayController.SaveWindowLayout();
-                    _message.text = "Save Window Layout!";
+                   if(CameraMovementController.multiDisplayController.SaveWindowLayout())
+                        _message.text = "Save Window Layout!";
+                    else
+                        _message.text = "";
                 });
                 UI.MoveTransform(saveLayoutButton.transform, 70, 25, 0, 1, 140, -140);
 
                 var resetLayoutButton = UI.AddButton(_cameraMovementMultiDisplay.transform, "Reset Layout", "Reset Window Layout", new Vector2(0, -250), () =>
                 {
-                    CameraMovementController.multiDisplayController.ResetWindowLayout();
-                    _message.text = "Reset Layout!";
+                    if(CameraMovementController.multiDisplayController.ResetWindowLayout())
+                        _message.text = "Reset Layout!";
+                    else
+                        _message.text = "";
                 });
                 UI.MoveTransform(resetLayoutButton.transform, 70, 25, 0, 1, 230, -140);
 
@@ -132,9 +139,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI.MoveTransform(saveButton.transform, 70, 25, 0, 1, 140, -170);
             }
             else
-            {
                 _message.text = "Not multi-display!";
-            }
 
             var closeButton = UI.AddButton(_cameraMovementMultiDisplay.transform, "Close", "Close", new Vector2(0, -415), () =>
             {

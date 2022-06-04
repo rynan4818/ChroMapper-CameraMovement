@@ -811,7 +811,7 @@ namespace ChroMapper_CameraMovement.Component
             atsc.PlayToggle += OnPlayToggle;
             orbitCamera.targetObject = avatarHead;
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
-            if (Plugin.activeWindow > 1)
+            if (MultiDisplayController.activeWindow > 1)
                 multiDisplayController.SetTargetDisplay();
             if (Options.Instance.cameraMovementEnable)
                 Reload();

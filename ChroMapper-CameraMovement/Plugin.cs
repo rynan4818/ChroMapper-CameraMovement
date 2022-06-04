@@ -16,7 +16,6 @@ namespace ChroMapper_CameraMovement
         public static CameraMovementController movement;
         public static Harmony _harmony;
         public static UI _ui;
-        public static int activeWindow = 1;
         public const string HARMONY_ID = "com.github.rynan4818.ChroMapper-CameraMovement";
 
         [Init]

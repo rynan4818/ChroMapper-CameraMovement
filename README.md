@@ -18,11 +18,28 @@
 
 VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan4818/ChroMapper-VRMAvatar)を作りました。VRMアバターをChroMapperに読み込む単独で動くプラグインです。
 
-# 使用法
+# 使用方法
 
-本ツールとScriptMapperを使った記事を書いてみました。
+本ツールとScriptMapperを使った記事を書きました。セットアップから基本的な操作方法と説明を記載しています。
 
 **[BeatSaberでカメラを動かしてみよう](https://note.com/rynan/n/n2830a21add26)**
+
+## 機能紹介動画
+
+今までのアップデートで追加してきた機能の紹介動画です。機能が多くて下記説明を読むのも大変だと思いますので、ざっと動画を見てもらえると知らなかった機能とかあるかもしれません。
+
+- [Ver1.0.0まで機能紹介動画](https://twitter.com/rynan4818/status/1492868565921579011?s=20&t=sDuS3Ew127ExSiUebxdTLA)
+    - 基本機能の紹介 ※初期なのでUIがだいぶ違いますが、操作方法は今と変わりません。
+- [CameraMovement と BeatSaber(CameraPlus)の画面比較動画](https://youtu.be/ZEhcCY9EFpE)
+    - 非常に正確なのがわかります。現在はプレビューモードではNJSも一致するので、BeatSaberの身長設定によるノーツや壁位置のズレ以外ほぼ再現できます。
+- [Ver1.5.0までの機能紹介動画](https://twitter.com/rynan4818/status/1502950283735109636?s=20&t=kzGRpQTjtwDhuhOPy0V0FQ)
+    - プレビューモード、サブカメラ画面のカーソルキーによる調整
+- [Ver1.6.0での機能紹介動画](https://twitter.com/rynan4818/status/1510573231933366274?s=20&t=BChL5cWunZmsZKswDj1G8A)
+    - 注視点カメラ移動モード
+- [Ver1.7.0までの機能紹介動画](https://twitter.com/rynan4818/status/1530848482982268929?s=20&t=dwN0-rcI4IEsX7qHFMwbRw)
+    - ブックマーク文字サイズ変更、サブカメラのカメラ操作、マルチディスプレイ、アバター非表示対応
+
+そのうち全体を通した動画も作りたいですね。
 
 ## キーボードショートカット
 - F4 でプレビュー表示のON/OFF

@@ -263,7 +263,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(cameraControlMenuMoveSpeed.Item3.transform, 40, 20, 0.1f, 1, 75, -40);
             cameraControlMenuMoveSpeed.Item3.InputField.textComponent.fontSize = 14;
 
-            var cameraControlMenuLookAtButton = UI.AddButton(_cameraControlMenu.transform, "Look At", "Look At", new Vector2(0, -40), () =>
+            var cameraControlMenuLookAtButton = UI.AddButton(_cameraControlMenu.transform, "Look At", "LookAt", new Vector2(0, -40), () =>
             {
                 var position = movementController.CameraPositionGet();
                 var direction = movementController.AvatarPositionGet() - position;
@@ -271,7 +271,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 var new_rotation = lookRotation.eulerAngles;
                 movementController.CameraPositionAndRotationSet(position, new_rotation);
             });
-            UI.MoveTransform(cameraControlMenuLookAtButton.transform, 50, 20, 0, 1, 175, -40);
+            UI.MoveTransform(cameraControlMenuLookAtButton.transform, 40, 20, 0, 1, 170, -40);
 
             var cameraControlSub = UI.AddCheckbox(_cameraControlMenu.transform, "Sub", "Sub", new Vector2(0, -40), Options.Instance.cameraControlSub, (check) =>
             {
@@ -288,8 +288,8 @@ namespace ChroMapper_CameraMovement.UserInterface
                 Options.Instance.cameraControlSub = check;
                 movementController.Reload();
             });
-            UI.MoveTransform(cameraControlSub.Item3.transform, 30, 16, 0, 1, 220, -40);
-            UI.MoveTransform(cameraControlSub.Item1, 50, 16, 0, 1, 250, -40);
+            UI.MoveTransform(cameraControlSub.Item3.transform, 30, 16, 0, 1, 210, -40);
+            UI.MoveTransform(cameraControlSub.Item1, 50, 16, 0, 1, 240, -40);
             _cameraControlSubToggle = cameraControlSub.Item3;
 
             var cameraControlLay = UI.AddCheckbox(_cameraControlMenu.transform, "Lay", "Lay", new Vector2(0, -40), Options.Instance.cameraControlLay, (check) =>
@@ -306,8 +306,8 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 Options.Instance.cameraControlLay = check;
             });
-            UI.MoveTransform(cameraControlLay.Item3.transform, 30, 16, 0, 1, 260, -40);
-            UI.MoveTransform(cameraControlLay.Item1, 50, 16, 0, 1, 290, -40);
+            UI.MoveTransform(cameraControlLay.Item3.transform, 30, 16, 0, 1, 250, -40);
+            UI.MoveTransform(cameraControlLay.Item1, 50, 16, 0, 1, 280, -40);
             _cameraControlLayToggle = cameraControlLay.Item3;
 
             var cameramodel = UI.AddCheckbox(_cameraControlMenu.transform, "Obj", "Obj", new Vector2(0, -40), Options.Instance.subCameraModel, (check) =>
@@ -315,16 +315,16 @@ namespace ChroMapper_CameraMovement.UserInterface
                 Options.Instance.subCameraModel = check;
                 movementController.Reload();
             });
-            UI.MoveTransform(cameramodel.Item3.transform, 30, 16, 0, 1, 300, -40);
-            UI.MoveTransform(cameramodel.Item1, 50, 16, 0, 1, 330, -40);
+            UI.MoveTransform(cameramodel.Item3.transform, 30, 16, 0, 1, 290, -40);
+            UI.MoveTransform(cameramodel.Item1, 50, 16, 0, 1, 320, -40);
 
             var regexKey = new Regex(@"<\w+>/");
-            var cameraControlPreviewButton = UI.AddButton(_cameraControlMenu.transform, "Preview", $"Preview [{regexKey.Replace(Options.Instance.previewKeyBinding,"").ToUpper()}]", new Vector2(0, -40), () =>
+            var cameraControlPreviewButton = UI.AddButton(_cameraControlMenu.transform, "Preview", $"Prv[{regexKey.Replace(Options.Instance.previewKeyBinding,"").ToUpper()}]", new Vector2(0, -40), () =>
             {
                 movementController.OnPreview();
             });
             cameraControlPreviewButton.Text.fontSize = 9;
-            UI.MoveTransform(cameraControlPreviewButton.transform, 50, 20, 0, 1, 355, -40);
+            UI.MoveTransform(cameraControlPreviewButton.transform, 35, 20, 0, 1, 330, -40);
 
             var cameraControlMenuPasteButton = UI.AddButton(_cameraControlMenu.transform, "Paste", "Paste", new Vector2(0, -40), () =>
             {
@@ -427,7 +427,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 movementController.CameraPositionAndRotationSet(new_position, new_rotation);
                 Settings.Instance.CameraFOV = fov;
             });
-            UI.MoveTransform(cameraControlMenuPasteButton.transform, 35, 20, 0, 1, 400, -40);
+            UI.MoveTransform(cameraControlMenuPasteButton.transform, 35, 20, 0, 1, 365, -40);
 
             var cameraControlMenuCopyButton = UI.AddButton(_cameraControlMenu.transform, "Copy", "Copy", new Vector2(0, -40), () =>
             {
@@ -444,7 +444,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 GUIUtility.systemCopyBuffer = text;
             });
-            UI.MoveTransform(cameraControlMenuCopyButton.transform, 30, 20, 0, 1, 435, -40);
+            UI.MoveTransform(cameraControlMenuCopyButton.transform, 60, 20, 0, 1, 420, -40);
 
             var bookmarkSetCheckbox = UI.AddCheckbox(_cameraControlMenu.transform, "q fmt", "q fmt", new Vector2(0, -40), Options.Instance.qFormat, (check) =>
             {

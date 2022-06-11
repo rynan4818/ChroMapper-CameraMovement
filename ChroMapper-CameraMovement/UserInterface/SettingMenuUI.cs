@@ -311,11 +311,19 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(mappingDisableCheck.Item3.transform, 30, 16, 0, 1, 170, -185);
             UI.MoveTransform(mappingDisableCheck.Item1, 70, 16, 0, 1, 210, -185);
 
+            var bookmarkLinesTopCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "bookmark Lines Top", "bookmark Lines Top", new Vector2(0, -140), Options.Instance.bookmarkLinesShowOnTop, (check) =>
+            {
+                Options.Instance.bookmarkLinesShowOnTop = check;
+                CameraMovementController.bookmarkLinesCanvas.GetComponent<BookmarkLinesRenderingOrderController>().BookmakLinesCameraINIT(Options.Instance.bookmarkLinesShowOnTop);
+            });
+            UI.MoveTransform(bookmarkLinesTopCheck.Item3.transform, 30, 16, 0, 1, 260, -185);
+            UI.MoveTransform(bookmarkLinesTopCheck.Item1, 70, 16, 0, 1, 300, -185);
+
             var saveButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -250), () =>
             {
                 Options.Instance.SettingSave();
             });
-            UI.MoveTransform(saveButton.transform, 70, 25, 0, 1, 350, -190);
+            UI.MoveTransform(saveButton.transform, 60, 25, 0, 1, 380, -190);
 
             var closeButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", new Vector2(0, -415), () =>
             {
@@ -323,7 +331,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI.KeyDisableCheck();
                 movementController.SubCameraRectDisable();
             });
-            UI.MoveTransform(closeButton.transform, 70, 25, 0, 1, 440, -190);
+            UI.MoveTransform(closeButton.transform, 50, 25, 0, 1, 440, -190);
 
             _cameraMovementSettingMenu.SetActive(false);
         }

@@ -18,7 +18,9 @@ namespace ChroMapper_CameraMovement.Component
 {
     public class CameraMovementController : MonoBehaviour
     {
+        public const int mappingLayer = 11;
         public const int avatarLayer = 25;
+        public const int bookmarkLinesLayer = 26;
         public CameraMovement _cameraMovement { get; set; }
         public BookmarkController _bookmarkController { get; set; }
         public static AudioTimeSyncController atsc;
@@ -56,6 +58,7 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject avatarLeg;
         public static GameObject avatarHair;
         public static GameObject bookmarkLines;
+        public static GameObject bookmarkLinesCanvas;
         public static GameObject subCameraArrow;
         public static TrailRenderer subCameraArrowTrail;
         public static Camera subCamera;
@@ -671,12 +674,16 @@ namespace ChroMapper_CameraMovement.Component
             bookmarkLines.transform.parent = moveableGrid.transform;
             bookmarkLines.gameObject.GetComponent<GridChild>().Order = 1;
             bookmarkLines.gameObject.GetComponent<GridChild>().LocalOffset = new Vector3(1.6f, 0, 0);
-            var bookmarkLinesCanvas = bookmarkLines.transform.Find("Measure Lines Canvas").gameObject;
+            bookmarkLinesCanvas = bookmarkLines.transform.Find("Measure Lines Canvas").gameObject;
             bookmarkLinesCanvas.name = "Bookmark Lines Canvas";
             Destroy(bookmarkLinesCanvas.gameObject.GetComponent<MeasureLinesRenderingOrderController>());
             bookmarkLinesCanvas.gameObject.GetComponent<Track>().ObjectParentTransform = bookmarkLinesCanvas.gameObject.GetComponent<RectTransform>();
             var bookmarkLinesRenderingOrderController = bookmarkLinesCanvas.AddComponent<BookmarkLinesRenderingOrderController>();
             bookmarkLinesRenderingOrderController.effectingCanvas = bookmarkLinesCanvas.gameObject.GetComponent<Canvas>();
+            bookmarkLinesRenderingOrderController.bookmarkLines = bookmarkLines;
+            bookmarkLinesRenderingOrderController.cm_MapEditorCamera = cm_MapEditorCamera;
+            bookmarkLinesRenderingOrderController.bookmarkLinesLayer = bookmarkLinesLayer;
+            bookmarkLinesRenderingOrderController.BookmakLinesCameraINIT(Options.Instance.bookmarkLinesShowOnTop);
             var bookmarkLine = bookmarkLinesCanvas.transform.Find("Measure Line").gameObject;
             bookmarkLine.name = "Bookmark Line";
             bookmarkLinesController = moveableGrid.AddComponent<BookmarkLinesController>();
@@ -693,8 +700,8 @@ namespace ChroMapper_CameraMovement.Component
             Array.Resize(ref otherTracks, otherTracks.Length + 1);
             otherTracks[otherTracks.Length - 1] = bookmarkLinesCanvas.gameObject.GetComponent<Track>();
             field.SetValue(audioTimeSyncController, otherTracks);
-            UnityUtility.AllSetLayer(measureLines, 11);
-            UnityUtility.AllSetLayer(bookmarkLines, 11);
+            UnityUtility.AllSetLayer(measureLines, mappingLayer);
+            UnityUtility.AllSetLayer(bookmarkLines, bookmarkLinesLayer);
 
             eventGridChild = GameObject.Find("Rotating/Event Grid").GetComponent<GridChild>();
             eventLabelChild = GameObject.Find("Rotating/Event Label").GetComponent<GridChild>();
@@ -734,7 +741,7 @@ namespace ChroMapper_CameraMovement.Component
             subCamera.backgroundColor = new Color(0, 0, 0, 255);
             subCameraArrow = new GameObject("Sub Camera Arrow");
             subCameraArrow.transform.parent = subCamera.transform;
-            subCameraArrow.layer = 11;
+            subCameraArrow.layer = mappingLayer;
             subCameraArrowTrail = subCameraArrow.AddComponent<TrailRenderer>();
             subCameraArrowTrail.material = new Material(Shader.Find("Sprites/Default"));
             subCameraArrowTrail.material.SetColor("_Color", Color.HSVToRGB(0.2f, 1f, 1f));
@@ -744,7 +751,7 @@ namespace ChroMapper_CameraMovement.Component
             subCameraArrowTrail.enabled = false;
 
             var subCameraArrowSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            subCameraArrowSphere.layer = 11;
+            subCameraArrowSphere.layer = mappingLayer;
             subCameraArrowSphere.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
             subCameraArrowSphere.transform.localPosition = new Vector3(0, 0, -0.2f);
             var subCameraArrowSphereMeshRenderer = subCameraArrowSphere.GetComponent<Renderer>();
@@ -753,7 +760,7 @@ namespace ChroMapper_CameraMovement.Component
             subCameraArrowSphere.transform.parent = subCameraArrow.transform;
 
             var subCameraArrowCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            subCameraArrowCube.layer = 11;
+            subCameraArrowCube.layer = mappingLayer;
             subCameraArrowCube.transform.localScale = new Vector3(0.4f, 0.4f, 0.8f);
             subCameraArrowCube.transform.localPosition = new Vector3(0, 0, -0.6f);
             var subCameraArrowCubeMeshRenderer = subCameraArrowCube.GetComponent<Renderer>();
@@ -762,7 +769,7 @@ namespace ChroMapper_CameraMovement.Component
             subCameraArrowCube.transform.parent = subCameraArrow.transform;
 
             var subCameraArrowCube2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            subCameraArrowCube2.layer = 11;
+            subCameraArrowCube2.layer = mappingLayer;
             subCameraArrowCube2.transform.localScale = new Vector3(0.3f, 0.5f, 0.3f);
             subCameraArrowCube2.transform.localPosition = new Vector3(0, -0.4f, -0.6f);
             var subCameraArrowCubeMeshRenderer2 = subCameraArrowCube2.GetComponent<Renderer>();
@@ -771,7 +778,10 @@ namespace ChroMapper_CameraMovement.Component
             subCameraArrowCube2.transform.parent = subCameraArrow.transform;
 
             if (Options.Instance.subCameraNoUI)
-                subCamera.cullingMask &= ~(1 << 11);
+            {
+                subCamera.cullingMask &= ~(1 << mappingLayer);
+                subCamera.cullingMask &= ~(1 << bookmarkLinesLayer);
+            }
             subCamera.gameObject.SetActive(false);
             subCameraArrow.SetActive(false);
 
@@ -779,7 +789,10 @@ namespace ChroMapper_CameraMovement.Component
             layoutCamera.clearFlags = CameraClearFlags.SolidColor;
             layoutCamera.backgroundColor = new Color(0, 0, 0, 255);
             if (Options.Instance.layoutCameraNoUI)
-                layoutCamera.cullingMask &= ~(1 << 11);
+            {
+                layoutCamera.cullingMask &= ~(1 << mappingLayer);
+                layoutCamera.cullingMask &= ~(1 << bookmarkLinesLayer);
+            }
             layoutCamera.gameObject.SetActive(false);
 
             previewAction = new InputAction("Preview", binding: Options.Instance.previewKeyBinding);

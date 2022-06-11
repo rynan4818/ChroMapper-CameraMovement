@@ -97,6 +97,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Cursor Key Size ： 押すとカーソルキーでSub W,Hを0.01単位で調整できます。Shiftを押しながらだと0.1単位。
 * Script File ： 譜面フォルダにある読み込むカメラスクリプトファイル名
 * Mapping Disable ： Camera Movementの機能有効中は譜面作成機能を抑制して、ノーツ等の誤編集を防止します。ただし、OFFにするとカメラ移動機能が制限されます。
+* bookmark Lines Top ： Bookmark Linesを全てのオブジェクトの最前面に表示します。
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。(メイン設定の同名ボタンと機能は同じ)
 * Close ： More Settingパネルを閉じます。
 
@@ -181,7 +182,6 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 |:---|:---|:---|
 | scriptMapperExe | scriptmapper.exe | ScriptMapperの実行ファイル名です。フォルダパスはChroMapper.exeの場所です |
 | scriptMapperLog | log_latest.txt | ScriptMapperのログファイル名です。フォルダパスは編集中の譜面フォルダです |
-| bookmarkLinesShowOnTop | False | Trueにすると、ブックマーク床面表示を最前面にします |
 | avatarCameraScale | 1.5 | ChroMapper内のUnity単位をBeatSaberと合わせるための倍率です |
 | originMatchOffsetY | -0.5 | ChroMapper内のY座標原点をBeatSaberと合わせるためのオフセット値です[avatarCameraScale反映前] |
 | originMatchOffsetZ | -1.5 | ChroMapper内のZ座標原点をBeatSaberと合わせるためのオフセット値です[avatarCameraScale反映前] |

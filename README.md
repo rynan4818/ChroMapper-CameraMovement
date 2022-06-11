@@ -164,7 +164,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 ![image](https://user-images.githubusercontent.com/14249877/170859030-71a35442-9563-49e3-8af8-9ccf834c9328.png)
 
-ズレが発生した場合の対処方法は、ズレ対策されたScriptMapperを利用する。ScriptMapperの環境コマンドのオフセット `#offset0.1`(例0.1秒早める)を利用するなどがあります。
+ズレが発生した場合の対処方法は、Version1.07以降のズレ対策されたScriptMapperを利用する。ScriptMapperの環境コマンドのオフセット `#offset0.1`(例0.1秒早める)を利用するなどがあります。
 
 取込み誤差は通常時にもログに表示していますので、どのくらいズレているか確認することも可能です。
 - Duration total error : スクリプト末尾時点でのズレ時間

@@ -69,7 +69,7 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。
 * Close ： パネルを閉じます。
 
-![image](https://user-images.githubusercontent.com/14249877/170858336-abb90373-8436-4430-b330-48980eff53a3.png)
+![image](https://user-images.githubusercontent.com/14249877/173173694-493c7e73-fe88-4fee-99ed-5a9b339ccc0a.png)
 
 * Custom or VRM Avatar ： 読み込んだカスタムアバター・VRMアバターモデルを表示します。
 * Avatar File ： `*.vrm` VRMファイルもしくは、`*.avatar` [カスタムアバターのファイル](https://modelsaber.com/Avatars/)を`Select`ボタンで選択します。デフォルト設定はChroMapper.exeと同じフォルダにある[Sour Miku Black v2](https://modelsaber.com/Avatars/?id=1564625718&pc)になっています。

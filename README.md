@@ -9,6 +9,8 @@
 
 2. ダウンロードしたzipファイルを解凍してChroMapperのインストールフォルダにある`Plugins`フォルダに`ChroMapper-CameraMovement.dll`をコピーします。
 
+    ※ChroMapperのインストールフォルダはドライブ名から保存フォルダまで半角英数字だけの場所にしないと、プラグインの読み込みでエラーが出る場合があります。デスクトップ等は止めて、C:\TOOL\ChroMapper 等を作成してインストールして下さい。
+
 3. [Script Mapper](https://github.com/hibit-at/Scriptmapper)をダウンロードして、ChroMapperのインストールフォルダ(ChroMapper.exeがあるフォルダ)に`scriptmapper.exe`をコピーします。
 
 # アバターについて

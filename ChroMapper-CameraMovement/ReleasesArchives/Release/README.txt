@@ -61,3 +61,6 @@ https://github.com/Snow1226/CameraPlus/blob/master/LICENSE
 
 UIの参考としてLolighterを流用しています、著作権表記・ライセンスは以下の通りです。
 https://github.com/KivalEvan/ChroMapper-Lolighter/blob/main/LICENSE
+
+BlendShapeの参考としてVirtualMotionCaptureを流用しています、著作権表記・ライセンスは以下の通りです。
+https://github.com/sh-akira/VirtualMotionCapture/blob/master/LICENSE

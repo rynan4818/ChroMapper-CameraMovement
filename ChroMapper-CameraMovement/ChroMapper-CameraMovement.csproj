@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraPlus\CameraMovement.cs" />
+    <Compile Include="Component\BlendShapeController.cs" />
     <Compile Include="Component\DefaultCameraController.cs" />
     <Compile Include="Component\MultiDisplayController.cs" />
     <Compile Include="Component\BookmarkLinesController.cs" />

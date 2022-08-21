@@ -33,6 +33,7 @@ namespace ChroMapper_CameraMovement.Component
         public static OrbitCameraController orbitCamera;
         public static PlusCameraController plusCamera;
         public static DefaultCameraController defaultCamera;
+        public static BlendShapeController blendShapeController;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_GridX;
         public static GameObject cm_interface;
@@ -52,6 +53,9 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject cm_BPMChangeLable;
         public static GameObject cm_MeasureLinesCanvas;
         public static GameObject cm_UIMode;
+        public static GameObject cm_customEventsFrontBase;
+        public static GameObject cm_customEventsBackBase;
+        public static GameObject cm_customEventsLable;
         public static GameObject avatarHead;
         public static GameObject avatarArm;
         public static GameObject avatarBody;
@@ -300,6 +304,10 @@ namespace ChroMapper_CameraMovement.Component
                 cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", 0);
                 cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = false;
                 spectrogramSideSwapper.IsNoteSide = true;
+                //Grid   Spectrogram  Note  Rotation  Event  BPM Change  CustomEvent
+                //Order  -1  , 3      0     1         2      4           5
+                //offset 3.5 , 2.5    0     0         0.5    0.5         1.5
+                //SwapSides()は Spectrogram Grid のorder を -1 と 3、offset を 3.5f　と 2.5fで切り替える
                 spectrogramSideSwapper.SwapSides();
                 EventBpmOffset(200f);
                 if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
@@ -311,7 +319,7 @@ namespace ChroMapper_CameraMovement.Component
                 {
                     cm_EventFrontBase.SetActive(false);
                     cm_EventBackBase.SetActive(false);
-                    cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = false;
+                    cm_eventLabel.GetComponent<Canvas>().enabled = false;
                     profMode = eventContainer.PropagationEditing;
                     eventContainer.PropagationEditing = EventsContainer.PropMode.Prop;
                 }
@@ -319,7 +327,13 @@ namespace ChroMapper_CameraMovement.Component
                 {
                     cm_BPMchangeFrontBase.SetActive(false);
                     cm_BPMchangeBackBase.SetActive(false);
-                    cm_BPMChangeLable.gameObject.GetComponent<Canvas>().enabled = false;
+                    cm_BPMChangeLable.GetComponent<Canvas>().enabled = false;
+                }
+                if (customEventsObject)
+                {
+                    cm_customEventsFrontBase.SetActive(false);
+                    cm_customEventsBackBase.SetActive(false);
+                    cm_customEventsLable.GetComponent<Canvas>().enabled = false;
                 }
             }
             else
@@ -345,14 +359,20 @@ namespace ChroMapper_CameraMovement.Component
                 {
                     cm_EventFrontBase.SetActive(true);
                     cm_EventBackBase.SetActive(true);
-                    cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = true;
+                    cm_eventLabel.GetComponent<Canvas>().enabled = true;
                     eventContainer.PropagationEditing = profMode;
                 }
                 if (Settings.Instance.Load_Others)
                 {
                     cm_BPMchangeFrontBase.SetActive(true);
                     cm_BPMchangeBackBase.SetActive(true);
-                    cm_BPMChangeLable.gameObject.GetComponent<Canvas>().enabled = true;
+                    cm_BPMChangeLable.GetComponent<Canvas>().enabled = true;
+                }
+                if (customEventsObject)
+                {
+                    cm_customEventsFrontBase.SetActive(true);
+                    cm_customEventsBackBase.SetActive(true);
+                    cm_customEventsLable.GetComponent<Canvas>().enabled = true;
                 }
             }
         }
@@ -718,22 +738,6 @@ namespace ChroMapper_CameraMovement.Component
             spectrogramGridChildLocalOffset = spectrogramGridChild.LocalOffset;
             waveformGridChildLocalOffset = waveformGridChild.LocalOffset;
 
-            try
-            {
-                customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
-                customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
-                customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
-                customEventsChildLocalOffset = customEventsChild.LocalOffset; ;
-                customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
-                customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
-                customEventsObject = true;
-            }
-            catch
-            {
-                Debug.LogWarning("CameraMovement:customEvents object err");
-                customEventsObject = false;
-            }
-
             beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
 
             subCamera = new GameObject("Preview Camera").AddComponent<Camera>();
@@ -815,7 +819,33 @@ namespace ChroMapper_CameraMovement.Component
             subCameraRectAction.performed += OnSubCameraRect;
             subCameraRectAction.Disable();
 
-            yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
+            yield return new WaitForSeconds(0.5f); //待機しないとエラーになる物用
+
+            //待機後でないとカスタムイベントオブジェクトが見つからないので、ここに置く。
+            try
+            {
+                customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
+                customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
+                customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
+                cm_customEventsFrontBase = GameObject.Find("Custom Events Grid Front Scaling Offset/Base");
+                cm_customEventsBackBase = GameObject.Find("Custom Events Grid Back Scaling Offset/Base");
+                cm_customEventsLable = GameObject.Find("Custom Events Grid Labels/Labels");
+                customEventsChildLocalOffset = customEventsChild.LocalOffset;
+                customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
+                customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
+                customEventsObject = true;
+                if (cm_customEventsFrontBase == null || cm_customEventsBackBase == null || cm_customEventsLable == null)
+                    customEventsObject = false;
+            }
+            catch
+            {
+                Debug.LogWarning("CameraMovement:customEvents object err");
+                customEventsObject = false;
+            }
+            blendShapeController = this.gameObject.AddComponent<BlendShapeController>();
+            blendShapeController._atsc = atsc;
+
+            //BookmarkManagerのStart()が0.1秒待つので待機後に実行
             _bookmarkController = new BookmarkController();
             _bookmarkController.bookmarkLinesController = bookmarkLinesController;
             _bookmarkController.atsc = atsc;

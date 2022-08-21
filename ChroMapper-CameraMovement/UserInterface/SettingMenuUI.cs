@@ -125,14 +125,6 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(lookAtCheck.Item3.transform, 30, 16, 0, 1, 330, -85);
             UI.MoveTransform(lookAtCheck.Item1, 70, 16, 0, 1, 370, -85);
 
-            var animationCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "VRM Animation", "VRM Animation", new Vector2(0, -190), Options.Instance.avatarAnimation, (check) =>
-            {
-                Options.Instance.avatarAnimation = check;
-                movementController.Reload();
-            });
-            UI.MoveTransform(animationCheck.Item3.transform, 30, 16, 0, 1, 410, -85);
-            UI.MoveTransform(animationCheck.Item1, 70, 16, 0, 1, 450, -85);
-
             var simpleAvatarCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Simple Avatar", "Simple Avatar", new Vector2(0, -140), Options.Instance.simpleAvatar, (check) =>
             {
                 Options.Instance.simpleAvatar = check;

@@ -339,7 +339,7 @@ SimpleJSONの著作権表記・ライセンスは以下の通りです。
 - https://fonts.google.com/icons?selected=Material+Icons:monochrome_photos:
 
 ## プラグイン製作の参考
-`CameraPlus`フォルダのファイルは、すのーさんの[CameraPlus](https://github.com/Snow1226/CameraPlus)のソースコードをコピー・修正して使用しています。カメラ移動部分の処理は全く同じです。
+`CameraPlus`フォルダのファイルは、すのーさん製作の[CameraPlus](https://github.com/Snow1226/CameraPlus)のソースコードをコピー・修正して使用しています。カメラ移動部分の処理は全く同じです。
 
 CameraPlusの著作権表記・ライセンスは以下の通りです。
 - https://github.com/Snow1226/CameraPlus/blob/master/LICENSE
@@ -348,3 +348,8 @@ CameraPlusの著作権表記・ライセンスは以下の通りです。
 
 Lolighterの著作権表記・ライセンスは以下の通りです。
 - https://github.com/KivalEvan/ChroMapper-Lolighter/blob/main/LICENSE
+
+`VRMAvatarController.cs`のBlendShape周りは、あきらさん製作の[VirtualMotionCapture](https://github.com/sh-akira/VirtualMotionCapture)のソースコードをコピー・修正して使用しています。
+
+VirtualMotionCaptureの著作権表記・ライセンスは以下の通りです。
+- https://github.com/sh-akira/VirtualMotionCapture/blob/master/LICENSE

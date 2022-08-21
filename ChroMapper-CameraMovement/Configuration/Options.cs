@@ -14,7 +14,6 @@ namespace ChroMapper_CameraMovement.Configuration
         public string avatarFileName = Path.Combine(Environment.CurrentDirectory, "Sour Miku Black v2.avatar");
         public bool avatarBlinker = true;
         public bool avatarLookAt = true;
-        public bool avatarAnimation = true;
         public bool movement = false;
         public bool turnToHead = false;
         public bool avatar = true;

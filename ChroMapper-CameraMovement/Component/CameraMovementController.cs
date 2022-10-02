@@ -84,6 +84,7 @@ namespace ChroMapper_CameraMovement.Component
         public Color measureGridColor4_1;
         public Color measureGridColor1;
         public Color baseTransparentColor;
+        public Color interfaceColor;
         public Vector3 beforePositon = Vector3.zero;
         public Quaternion beforeRotation = Quaternion.Euler(0, 0, 0);
         public float beforeFOV = Settings.Instance.CameraFOV;
@@ -301,7 +302,11 @@ namespace ChroMapper_CameraMovement.Component
                 cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
                 cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
-                cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", 0);
+
+                if (cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.shader.name == "Unlit/Transparent Colored")
+                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
+                else
+                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", 0);
                 cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = false;
                 spectrogramSideSwapper.IsNoteSide = true;
                 //Grid   Spectrogram  Note  Rotation  Event  BPM Change  CustomEvent
@@ -346,7 +351,10 @@ namespace ChroMapper_CameraMovement.Component
                 cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor4_1);
                 cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor1);
                 cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseTransparentColor);
-                cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", interfaceOpacity);
+                if (cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.shader.name == "Unlit/Transparent Colored")
+                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", interfaceColor);
+                else
+                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", interfaceOpacity);
                 cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = true;
                 spectrogramSideSwapper.IsNoteSide = !beforeWaveFormIsNoteSide;
                 spectrogramSideSwapper.SwapSides();
@@ -653,7 +661,10 @@ namespace ChroMapper_CameraMovement.Component
             measureGridColor4_1 = cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
             measureGridColor1 = cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
             baseTransparentColor = cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
-            interfaceOpacity = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_OPACITY");
+            if (cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.shader.name == "Unlit/Transparent Colored")
+                interfaceColor = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
+            else
+                interfaceOpacity = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_OPACITY");
             gridXBaseAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_BaseAlpha");
             gridXGridAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
             gridGridAlpha = cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");

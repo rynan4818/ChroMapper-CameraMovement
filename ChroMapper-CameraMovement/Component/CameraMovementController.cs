@@ -278,7 +278,7 @@ namespace ChroMapper_CameraMovement.Component
             orbitCamera.fovTargetMainCamera = true;
             plusCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             plusCamera.fovTargetMainCamera = true;
-            defaultCamera.targetCamera[0] = null;
+            defaultCamera.targetCamera[0] = cm_MapEditorCamera.GetComponent<Camera>();
             if (!MultiDisplayController.subActive)
             {
                 subCamera.gameObject.SetActive(!(Options.Instance.movement || !Options.Instance.subCamera) && Options.Instance.cameraMovementEnable);

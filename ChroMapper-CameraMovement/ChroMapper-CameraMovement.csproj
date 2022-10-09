@@ -166,6 +166,7 @@
     <Compile Include="Controller\WindowController.cs" />
     <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />
     <Compile Include="HarmonyPatches\BookmarkRenderingControllerPatch.cs" />
+    <Compile Include="HarmonyPatches\CameraControllerPatch.cs" />
     <Compile Include="HarmonyPatches\ShaderPatch.cs" />
     <Compile Include="HarmonyPatches\SpectrogramSideSwapperPatch.cs" />
     <Compile Include="Component\CameraMovementController.cs" />

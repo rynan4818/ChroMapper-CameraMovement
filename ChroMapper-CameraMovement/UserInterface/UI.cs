@@ -8,6 +8,8 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 using ChroMapper_CameraMovement.Configuration;
+using UnityEngine.InputSystem;
+using ChroMapper_CameraMovement.HarmonyPatches;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -22,6 +24,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static List<Type> queuedToDisable = new List<Type>();
         public static List<Type> queuedToEnable = new List<Type>();
         public static bool keyDisable { get; private set; } = false;
+        public static Vector2 savedMousePos = Vector2.zero;
 
         private static readonly Type[] editActionMapsDisabled =
         {
@@ -36,7 +39,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         private static readonly Type[] actionMapsEnabledWhenNodeEditing =
         {
-            typeof(CMInput.ICameraActions), typeof(CMInput.IBeatmapObjectsActions),
+            typeof(CMInput.IBeatmapObjectsActions),
             typeof(CMInput.ISavingActions), typeof(CMInput.ITimelineActions)
         };
 
@@ -112,6 +115,23 @@ namespace ChroMapper_CameraMovement.UserInterface
             if (queuedToEnable.Any())
                 CMInputCallbackInstaller.ClearDisabledActionMaps(typeof(UI), queuedToEnable.ToArray());
             queuedToEnable.Clear();
+        }
+
+        public static void SetLockState(bool lockMouse)
+        {
+            var mouseLocked = Cursor.lockState == CursorLockMode.Locked;
+            if (lockMouse && !mouseLocked)
+            {
+                savedMousePos = Mouse.current.position.ReadValue();
+                Cursor.lockState = CursorLockMode.Locked;
+                CameraControllerPatch.OriginalSetLockStateDisable = true;
+            }
+            else if (!lockMouse && mouseLocked)
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Mouse.current.WarpCursorPosition(new Vector2(savedMousePos.x, Screen.height - savedMousePos.y));
+                CameraControllerPatch.OriginalSetLockStateDisable = false;
+            }
         }
 
         // i ended up copying Top_Cat's CM-JS UI helper, too useful to make my own tho

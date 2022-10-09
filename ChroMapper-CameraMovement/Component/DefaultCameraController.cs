@@ -14,17 +14,16 @@ namespace ChroMapper_CameraMovement.Component
         public InputAction elevateActiveAction;
         public InputAction rotActiveAction;
         public InputAction moveActiveAction;
-        public InputAction scrollActiveAction;
+        public InputAction zRotResetActiveAction;
         public CustomStandaloneInputModule customStandaloneInputModule;
         public bool canDefaultCamera = false;
-        public bool disableMainDefaultCamera = false;
+        public bool zRotReset = false;
         public float mouseX;
         public float mouseY;
         public float x;
         public float y;
         public float z;
         public Camera[] targetCamera { get; set; } = { null, null, null };
-        private static readonly Type[] actionMapsDisableDefaultCamera = { typeof(CMInput.ICameraActions) };
         private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
 
         private void Start()
@@ -57,7 +56,11 @@ namespace ChroMapper_CameraMovement.Component
             rotActiveAction.started += OnRotateCamera;
             rotActiveAction.performed += OnRotateCamera;
             rotActiveAction.canceled += OnRotateCamera;
-            scrollActiveAction = new InputAction("DefaultCamera Scroll Action");
+            zRotResetActiveAction = new InputAction("DefaultCamera ZrotReset Action");
+            zRotResetActiveAction.AddBinding(Options.Instance.defaultCameraZrotResetKeyBinding);
+            zRotResetActiveAction.started += OnZrotResetActive;
+            zRotResetActiveAction.performed += OnZrotResetActive;
+            zRotResetActiveAction.canceled += OnZrotResetActive;
             customStandaloneInputModule = GameObject.Find("EventSystem").GetComponent<CustomStandaloneInputModule>();
         }
         private void LateUpdate()
@@ -67,22 +70,6 @@ namespace ChroMapper_CameraMovement.Component
             if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
-            if (MultiDisplayController.activeWindowNumber == 0 && targetCamera[MultiDisplayController.activeWindowNumber] == null)
-            {
-                if (disableMainDefaultCamera)
-                {
-                    UI.EnableAction(actionMapsDisableDefaultCamera);
-                    disableMainDefaultCamera = false;
-                }
-            }
-            else if (targetCamera[MultiDisplayController.activeWindowNumber] != null || MultiDisplayController.activeWindowNumber > 0)
-            {
-                if (!disableMainDefaultCamera)
-                {
-                    UI.DisableAction(actionMapsDisableDefaultCamera);
-                    disableMainDefaultCamera = true;
-                }
-            }
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
             if (canDefaultCamera)
             {
@@ -95,13 +82,12 @@ namespace ChroMapper_CameraMovement.Component
                 ex = ex > 180 ? ex - 360 : ex;
                 eulerAngles.x = Mathf.Clamp(ex + -mouseY, -89.5f, 89.5f);
                 eulerAngles.y += mouseX;
-                eulerAngles.z = 0;
+                if (zRotReset || Options.Instance.defaultCameraZrotReset)
+                    eulerAngles.z = 0;
                 targetCamera[MultiDisplayController.activeWindowNumber].transform.eulerAngles = eulerAngles;
             }
             else
-            {
                 z = x = 0;
-            }
         }
         public void OnDefaultActive(InputAction.CallbackContext context)
         {
@@ -119,17 +105,19 @@ namespace ChroMapper_CameraMovement.Component
                 rotActiveAction.Enable();
                 elevateActiveAction.Enable();
                 moveActiveAction.Enable();
-                scrollActiveAction.Enable();
+                zRotResetActiveAction.Enable();
+                UI.SetLockState(true);
             }
             else
             {
-                scrollActiveAction.Disable();
+                zRotResetActiveAction.Disable();
                 moveActiveAction.Disable();
                 elevateActiveAction.Disable();
                 rotActiveAction.Disable();
                 CameraMovementController.orbitCamera.orbitActiveAction.Enable();
                 CameraMovementController.plusCamera.plusActiveAction.Enable();
                 UI.EnableAction(actionMapsDisableTimeLine);
+                UI.SetLockState(false);
             }
         }
         public void OnMoveCamera(InputAction.CallbackContext context)
@@ -150,6 +138,10 @@ namespace ChroMapper_CameraMovement.Component
             var deltaMouseMovement = context.ReadValue<Vector2>();
             mouseX = deltaMouseMovement.x * Settings.Instance.Camera_MouseSensitivity / 10f;
             mouseY = deltaMouseMovement.y * Settings.Instance.Camera_MouseSensitivity / 10f;
+        }
+        public void OnZrotResetActive(InputAction.CallbackContext context)
+        {
+            zRotReset = context.performed;
         }
     }
 }

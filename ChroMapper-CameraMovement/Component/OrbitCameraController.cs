@@ -36,7 +36,7 @@ namespace ChroMapper_CameraMovement.Component
         public float elevationAngle { get; set; } = 90f;
         public float minElevationAngle { get; set; } = 0.01f;
         public float maxElevationAngle { get; set; } = 179.99f;
-        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions) };
+        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
 
         private void Start()
         {
@@ -162,6 +162,8 @@ namespace ChroMapper_CameraMovement.Component
                 zoomActiveAction.Enable();
                 mouseMoveAction.Enable();
                 targetPosObject.SetActive(true);
+                if (MultiDisplayController.activeWindowNumber == 0)
+                    UI.SetLockState(true);
             }
             else
             {
@@ -180,6 +182,8 @@ namespace ChroMapper_CameraMovement.Component
                 cameraUpdate = false;
                 targetPosObject.SetActive(false);
                 UI.EnableAction(actionMapsDisableTimeLine);
+                if (MultiDisplayController.activeWindowNumber == 0)
+                    UI.SetLockState(false);
             }
         }
         public void OnOrbitSubActive(InputAction.CallbackContext context)

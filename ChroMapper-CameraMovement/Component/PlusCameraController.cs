@@ -25,7 +25,7 @@ namespace ChroMapper_CameraMovement.Component
         public float mouseY;
         public Camera[] targetCamera { get; set; } = { null, null, null };
         public bool fovTargetMainCamera { get; set; } = true;
-        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions) };
+        private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
 
         private void Start()
         {
@@ -100,6 +100,8 @@ namespace ChroMapper_CameraMovement.Component
                 rotActiveAction.Enable();
                 moveActiveAction.Enable();
                 scrollActiveAction.Enable();
+                if (MultiDisplayController.activeWindowNumber == 0)
+                    UI.SetLockState(true);
             }
             else
             {
@@ -114,6 +116,8 @@ namespace ChroMapper_CameraMovement.Component
                 canZrotCamera = false;
                 canPosCamera = false;
                 canRotCamera = false;
+                if (MultiDisplayController.activeWindowNumber == 0)
+                    UI.SetLockState(false);
             }
         }
         public void OnZrotActive(InputAction.CallbackContext context)

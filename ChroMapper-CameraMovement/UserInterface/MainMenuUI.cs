@@ -122,7 +122,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI.KeyDisableCheck();
             });
 
-            var mainMenuMoreSettingsButton = UI.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", new Vector2(0, -185), () =>
+            var mainMenuMoreSettingsButton = UI.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
                 UI._settingMenuUI._cameraMovementSettingMenu.SetActive(true);
@@ -130,14 +130,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(mainMenuMoreSettingsButton.transform, 70, 25, 0.28f, 1, 0, -185);
 
-            var mainMenuReloadButton = UI.AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", new Vector2(0, -185), () =>
+            var mainMenuReloadButton = UI.AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
                 movementController.Reload();
             });
             UI.MoveTransform(mainMenuReloadButton.transform, 70, 25, 0.72f, 1, 0, -185);
 
-            var mainMenuMultiDisplayButton = UI.AddButton(_cameraMovementMainMenu.transform, "Multi Display", "Multi Display", new Vector2(0, -215), () =>
+            var mainMenuMultiDisplayButton = UI.AddButton(_cameraMovementMainMenu.transform, "Multi Display", "Multi Display", () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
                 UI._multiDisplayUI._cameraMovementMultiDisplay.SetActive(true);
@@ -146,20 +146,20 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(mainMenuMultiDisplayButton.transform, 70, 25, 0.28f, 1, 0, -215);
 
             var regexKey = new Regex(@"<\w+>/");
-            var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(0, -245), () =>
+            var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
                 ScriptMapperController.ScriptMapperRun();
             });
             UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -215);
 
-            var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", new Vector2(0, -245), () =>
+            var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", () =>
             {
                 Options.Instance.SettingSave();
             });
             UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -245);
 
-            var mainMenuCloseButton = UI.AddButton(_cameraMovementMainMenu.transform, "Close", "Close", new Vector2(0, -245), () =>
+            var mainMenuCloseButton = UI.AddButton(_cameraMovementMainMenu.transform, "Close", "Close", () =>
             {
                 _cameraMovementMainMenu.SetActive(false);
             });

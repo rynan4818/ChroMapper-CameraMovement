@@ -138,58 +138,69 @@ namespace ChroMapper_CameraMovement.UserInterface
         // after askin TC if it's one of the only way, he let me use this
         public static UIButton AddButton(Transform parent, string title, string text, Vector2 pos, UnityAction onClick)
         {
-            var button = UnityEngine.Object.Instantiate(PersistentUI.Instance.ButtonPrefab, parent);
+            var button = AddButton(parent, title, text, onClick);
             MoveTransform(button.transform, 100, 25, 0.5f, 1, pos.x, pos.y);
-
+            return button;
+        }
+        public static UIButton AddButton(Transform parent, string title, string text, UnityAction onClick)
+        {
+            return AddButton(parent, title, text, 12, onClick);
+        }
+        public static UIButton AddButton(Transform parent, string title, string text, float fontSize, UnityAction onClick)
+        {
+            var button = UnityEngine.Object.Instantiate(PersistentUI.Instance.ButtonPrefab, parent);
             button.name = title;
             button.Button.onClick.AddListener(onClick);
-
             button.SetText(text);
             button.Text.enableAutoSizing = false;
-            button.Text.fontSize = 12;
+            button.Text.fontSize = fontSize;
             return button;
         }
 
         public static (RectTransform, TextMeshProUGUI) AddLabel(Transform parent, string title, string text, Vector2 pos, float size = 110)
         {
+            var label = AddLabel(parent, title, text);
+            MoveTransform(label.Item1, size, 24, 0.5f, 1, pos.x, pos.y);
+            return label;
+        }
+        public static (RectTransform, TextMeshProUGUI) AddLabel(Transform parent, string title, string text, TextAlignmentOptions alignment = TextAlignmentOptions.Center, float fontSize = 16)
+        {
             var entryLabel = new GameObject(title + " Label", typeof(TextMeshProUGUI));
-            var rectTransform = ((RectTransform)entryLabel.transform);
+            var rectTransform = (RectTransform)entryLabel.transform;
             rectTransform.SetParent(parent);
-
-            MoveTransform(rectTransform, size, 24, 0.5f, 1, pos.x, pos.y);
             var textComponent = entryLabel.GetComponent<TextMeshProUGUI>();
-
             textComponent.name = title;
             textComponent.font = PersistentUI.Instance.ButtonPrefab.Text.font;
-            textComponent.alignment = TextAlignmentOptions.Center;
-            textComponent.fontSize = 16;
+            textComponent.alignment = alignment;
+            textComponent.fontSize = fontSize;
             textComponent.text = text;
             return (rectTransform, textComponent);
         }
 
         public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, Vector2 pos, string value, UnityAction<string> onChange)
         {
-            var entryLabel = new GameObject(title + " Label", typeof(TextMeshProUGUI));
-            var rectTransform = ((RectTransform)entryLabel.transform);
-            rectTransform.SetParent(parent);
-
-            MoveTransform(rectTransform, 50, 16, 0.5f, 1, pos.x - 47.5f, pos.y);
-            var textComponent = entryLabel.GetComponent<TextMeshProUGUI>();
-
-            textComponent.name = title;
-            textComponent.font = PersistentUI.Instance.ButtonPrefab.Text.font;
-            textComponent.alignment = TextAlignmentOptions.Right;
-            textComponent.fontSize = 12;
-            textComponent.text = text;
-
+            var textInput = AddTextInput(parent, title, text, value, onChange);
+            MoveTransform(textInput.Item1, 50, 16, 0.5f, 1, pos.x - 47.5f, pos.y);
+            MoveTransform(textInput.Item3.transform, 75, 20, 0.5f, 1, pos.x + 27.5f, pos.y);
+            return textInput;
+        }
+        public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, string value, UnityAction<string> onChange)
+        {
+            var label = AddLabel(parent, title, text, TextAlignmentOptions.Right, 12);
+            return (label.Item1, label.Item2, AddTextInput(parent, value, onChange));
+        }
+        public static UITextInput AddTextInput(Transform parent, string value, UnityAction<string> onChange)
+        {
+            return AddTextInput(parent, value, TextAlignmentOptions.Left, 10, onChange);
+        }
+        public static UITextInput AddTextInput(Transform parent, string value, TextAlignmentOptions alignment,float fontSize , UnityAction<string> onChange)
+        {
             var textInput = UnityEngine.Object.Instantiate(PersistentUI.Instance.TextInputPrefab, parent);
-            MoveTransform(textInput.transform, 75, 20, 0.5f, 1, pos.x + 27.5f, pos.y);
             textInput.GetComponent<Image>().pixelsPerUnitMultiplier = 3;
             textInput.InputField.text = value;
             textInput.InputField.onFocusSelectAll = false;
-            textInput.InputField.textComponent.alignment = TextAlignmentOptions.Left;
-            textInput.InputField.textComponent.fontSize = 10;
-
+            textInput.InputField.textComponent.alignment = alignment;
+            textInput.InputField.textComponent.fontSize = fontSize;
             textInput.InputField.onValueChanged.AddListener(onChange);
             textInput.InputField.onEndEdit.AddListener(delegate {
                 KeyDisableCheck();
@@ -199,35 +210,42 @@ namespace ChroMapper_CameraMovement.UserInterface
                 DisableAction(actionMapsDisabled);
                 Plugin.movement.KeyDisable();
             });
-            return (rectTransform, textComponent, textInput);
+            return textInput;
         }
 
         public static (RectTransform, TextMeshProUGUI, Toggle) AddCheckbox(Transform parent, string title, string text, Vector2 pos, bool value, UnityAction<bool> onClick)
         {
-            var entryLabel = new GameObject(title + " Label", typeof(TextMeshProUGUI));
-            var rectTransform = ((RectTransform)entryLabel.transform);
-            rectTransform.SetParent(parent);
-            MoveTransform(rectTransform, 80, 16, 0.5f, 1, pos.x + 10, pos.y + 5);
-            var textComponent = entryLabel.GetComponent<TextMeshProUGUI>();
-
-            textComponent.name = title;
-            textComponent.font = PersistentUI.Instance.ButtonPrefab.Text.font;
-            textComponent.alignment = TextAlignmentOptions.Left;
-            textComponent.fontSize = 12;
-            textComponent.text = text;
-
+            var checkBox = AddCheckbox(parent, title, text, value, onClick);
+            MoveTransform(checkBox.Item1, 80, 16, 0.5f, 1, pos.x + 10, pos.y + 5);
+            MoveTransform(checkBox.Item3.transform, 100, 25, 0.5f, 1, pos.x, pos.y);
+            return checkBox;
+        }
+        public static (RectTransform, TextMeshProUGUI, Toggle) AddCheckbox(Transform parent, string title, string text, bool value, UnityAction<bool> onClick)
+        {
+            var label = AddLabel(parent, title, text, TextAlignmentOptions.Left, 12);
+            return (label.Item1, label.Item2, AddCheckbox(parent, value, onClick));
+        }
+        public static Toggle AddCheckbox(Transform parent, bool value, UnityAction<bool> onClick)
+        {
             var original = GameObject.Find("Strobe Generator").GetComponentInChildren<Toggle>(true);
             var toggleObject = UnityEngine.Object.Instantiate(original, parent.transform);
-            MoveTransform(toggleObject.transform, 100, 25, 0.5f, 1, pos.x, pos.y);
-
             var toggleComponent = toggleObject.GetComponent<Toggle>();
             var colorBlock = toggleComponent.colors;
             colorBlock.normalColor = Color.white;
             toggleComponent.colors = colorBlock;
             toggleComponent.isOn = value;
-
             toggleComponent.onValueChanged.AddListener(onClick);
-            return (rectTransform, textComponent, toggleComponent);
+            return toggleComponent;
+        }
+
+        public static UIDropdown AddDropdown(Transform parent, List<string> options)
+        {
+            var dropdown = UnityEngine.Object.Instantiate(PersistentUI.Instance.DropdownPrefab, parent);
+            dropdown.SetOptions(options);
+            var image = dropdown.GetComponent<Image>();
+            image.color = new Color(0.35f, 0.35f, 0.35f, 1f);
+            image.pixelsPerUnitMultiplier = 1.5f;
+            return dropdown;
         }
 
         public static RectTransform AttachTransform(GameObject obj, float sizeX, float sizeY, float anchorX, float anchorY, float anchorPosX, float anchorPosY, float pivotX = 0.5f, float pivotY = 0.5f)

@@ -68,8 +68,10 @@ namespace ChroMapper_CameraMovement.Configuration
         public float settingMenuUIAnchoredPosY = 0;
         public float multiDisplayMenuUIAnchoredPosX = 0;
         public float multiDisplayMenuUIAnchoredPosY = 0;
-        public float blendShapeMenuUIAnchoredPosX = 0;
-        public float blendShapeMenuUIAnchoredPosY = 0;
+        public float blendShapeMenuUIAnchoredPosX = -50;
+        public float blendShapeMenuUIAnchoredPosY = -100;
+        public float blendShapeSetUIAnchoredPosX = -365;
+        public float blendShapeSetUIAnchoredPosY = -100;
         public float orbitDefaultFOV = 60f;
         public float orbitRotSensitivity = 0.5f;
         public float orbitZoomSensitivity = 0.001f;

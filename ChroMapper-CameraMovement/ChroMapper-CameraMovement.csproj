@@ -173,6 +173,7 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserInterface\BlendShapeMenuUI.cs" />
+    <Compile Include="UserInterface\BlendShapeSetUI.cs" />
     <Compile Include="UserInterface\BookmarkMenuUI.cs" />
     <Compile Include="UserInterface\CameraControlMenuUI.cs" />
     <Compile Include="UserInterface\MainMenuUI.cs" />

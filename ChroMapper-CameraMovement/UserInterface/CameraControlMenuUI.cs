@@ -9,7 +9,6 @@ namespace ChroMapper_CameraMovement.UserInterface
 {
     public class CameraControlMenuUI
     {
-        public CameraMovementController movementController;
         public GameObject _cameraControlMenu;
         public UITextInput _cameraPosXinput;
         public UITextInput _cameraPosYinput;
@@ -64,10 +63,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                 _cameraFOVinput.InputField.onValueChanged.RemoveAllListeners();
                 _cameraDistanceinput.InputField.onValueChanged.RemoveAllListeners();
 
-                var cameraPosition = movementController.CameraPositionGet();
-                CameraPosRotTextSet(cameraPosition, movementController.CameraTransformGet().eulerAngles);
-                _cameraFOVinput.InputField.text = movementController.CameraFOVGet().ToString("0.#");
-                var distance = Vector3.Distance(movementController.AvatarPositionGet(), cameraPosition).ToString("0.#");
+                var cameraPosition = Plugin.movement.CameraPositionGet();
+                CameraPosRotTextSet(cameraPosition, Plugin.movement.CameraTransformGet().eulerAngles);
+                _cameraFOVinput.InputField.text = Plugin.movement.CameraFOVGet().ToString("0.#");
+                var distance = Vector3.Distance(Plugin.movement.AvatarPositionGet(), cameraPosition).ToString("0.#");
                 _cameraDistanceinput.InputField.text = distance;
 
                 _cameraPosXinput.InputField.onValueChanged.AddListener(posXChange);
@@ -86,8 +85,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         }
         public void CameraPosRotSet(CameraItem item, float value)
         {
-            var position = movementController.CameraPositionGet();
-            var rotation = movementController.CameraTransformGet().eulerAngles;
+            var position = Plugin.movement.CameraPositionGet();
+            var rotation = Plugin.movement.CameraTransformGet().eulerAngles;
             switch (item)
             {
                 case CameraItem.PosX:
@@ -109,7 +108,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     rotation.z = value;
                     break;
             }
-            movementController.CameraPositionAndRotationSet(position, rotation);
+            Plugin.movement.CameraPositionAndRotationSet(position, rotation);
             cameraPosRotNoUpdate = true;
         }
 
@@ -118,23 +117,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             Options.Instance.cameraControlUIAnchoredPosX = _cameraControlMenu.GetComponent<RectTransform>().anchoredPosition.x;
             Options.Instance.cameraControlUIAnchoredPosY = _cameraControlMenu.GetComponent<RectTransform>().anchoredPosition.y;
         }
-        public void AddMenu(MapEditorUI mapEditorUI)
+        public void AddMenu(CanvasGroup topBarCanvas)
         {
-            movementController = Plugin.movement;
-            var parent = mapEditorUI.MainUIGroup[5];
-            _cameraControlMenu = new GameObject("Camera Control");
-            _cameraControlMenu.transform.parent = parent.transform;
-            _cameraControlMenu.AddComponent<DragWindowController>();
-            _cameraControlMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
-            _cameraControlMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
-
             // Camera Control
-            _cameraMovementCameraControlMenuRect = UI.AttachTransform(_cameraControlMenu, 500, 55, 0.7f, 0.2f, Options.Instance.cameraControlUIAnchoredPosX, Options.Instance.cameraControlUIAnchoredPosY, 1, 1);
-
-            Image imageCameraControl = _cameraControlMenu.AddComponent<Image>();
-            imageCameraControl.sprite = PersistentUI.Instance.Sprites.Background;
-            imageCameraControl.type = Image.Type.Sliced;
-            imageCameraControl.color = new Color(0.24f, 0.24f, 0.24f);
+            _cameraControlMenu = UI.SetMenu(new GameObject("CameraMovement Camera Control"), topBarCanvas, AnchoredPosSave, 500, 55, Options.Instance.cameraControlUIAnchoredPosX, Options.Instance.cameraControlUIAnchoredPosY, 0.7f, 0.2f);
 
             posXChange = (value) =>
             {
@@ -225,7 +211,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    movementController.CameraFOVSet(res);
+                    Plugin.movement.CameraFOVSet(res);
                     cameraPosRotNoUpdate = true;
                 }
             };
@@ -240,9 +226,9 @@ namespace ChroMapper_CameraMovement.UserInterface
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
-                    var new_position = movementController.AvatarPositionGet() - movementController.CameraTransformGet().forward * res;
-                    var rotation = movementController.CameraTransformGet().eulerAngles;
-                    movementController.CameraPositionAndRotationSet(new_position, rotation);
+                    var new_position = Plugin.movement.AvatarPositionGet() - Plugin.movement.CameraTransformGet().forward * res;
+                    var rotation = Plugin.movement.CameraTransformGet().eulerAngles;
+                    Plugin.movement.CameraPositionAndRotationSet(new_position, rotation);
                 }
             };
             var cameraControlMenuDistanceinput = UI.AddTextInput(_cameraControlMenu.transform, "Dist", "Dist", "", distanceChange);
@@ -265,11 +251,11 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var cameraControlMenuLookAtButton = UI.AddButton(_cameraControlMenu.transform, "Look At", "LookAt", () =>
             {
-                var position = movementController.CameraPositionGet();
-                var direction = movementController.AvatarPositionGet() - position;
+                var position = Plugin.movement.CameraPositionGet();
+                var direction = Plugin.movement.AvatarPositionGet() - position;
                 var lookRotation = Quaternion.LookRotation(direction);
                 var new_rotation = lookRotation.eulerAngles;
-                movementController.CameraPositionAndRotationSet(position, new_rotation);
+                Plugin.movement.CameraPositionAndRotationSet(position, new_rotation);
             });
             UI.MoveTransform(cameraControlMenuLookAtButton.transform, 40, 20, 0, 1, 170, -40);
 
@@ -286,7 +272,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     _cameraControlLayToggle.isOn = false;
                 }
                 Options.Instance.cameraControlSub = check;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(cameraControlSub.Item3.transform, 30, 16, 0, 1, 210, -40);
             UI.MoveTransform(cameraControlSub.Item1, 50, 16, 0, 1, 240, -40);
@@ -313,7 +299,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var cameramodel = UI.AddCheckbox(_cameraControlMenu.transform, "Obj", "Obj", Options.Instance.subCameraModel, (check) =>
             {
                 Options.Instance.subCameraModel = check;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(cameramodel.Item3.transform, 30, 16, 0, 1, 290, -40);
             UI.MoveTransform(cameramodel.Item1, 50, 16, 0, 1, 320, -40);
@@ -321,15 +307,15 @@ namespace ChroMapper_CameraMovement.UserInterface
             var regexKey = new Regex(@"<\w+>/");
             var cameraControlPreviewButton = UI.AddButton(_cameraControlMenu.transform, "Preview", $"Prv[{regexKey.Replace(Options.Instance.previewKeyBinding,"").ToUpper()}]", () =>
             {
-                movementController.OnPreview();
+                Plugin.movement.OnPreview();
             });
             cameraControlPreviewButton.Text.fontSize = 9;
             UI.MoveTransform(cameraControlPreviewButton.transform, 35, 20, 0, 1, 330, -40);
 
             var cameraControlMenuPasteButton = UI.AddButton(_cameraControlMenu.transform, "Paste", "Paste", () =>
             {
-                var position = movementController.CameraPositionGet();
-                var rotation = movementController.CameraTransformGet().eulerAngles;
+                var position = Plugin.movement.CameraPositionGet();
+                var rotation = Plugin.movement.CameraTransformGet().eulerAngles;
                 var cp = GUIUtility.systemCopyBuffer;
                 string[] text;
                 bool tabFormat = true;
@@ -378,7 +364,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 Vector3 new_rotation;
                 if (tabFormat && text.Length > i && Regex.IsMatch(text[i], "true", RegexOptions.IgnoreCase))
                 {
-                    var direction = movementController.AvatarPositionGet() - new_position;
+                    var direction = Plugin.movement.AvatarPositionGet() - new_position;
                     var lookRotation = Quaternion.LookRotation(direction);
                     new_rotation = lookRotation.eulerAngles;
                     i += 3;
@@ -424,15 +410,15 @@ namespace ChroMapper_CameraMovement.UserInterface
                 {
                     fov = Settings.Instance.CameraFOV;
                 }
-                movementController.CameraPositionAndRotationSet(new_position, new_rotation);
+                Plugin.movement.CameraPositionAndRotationSet(new_position, new_rotation);
                 Settings.Instance.CameraFOV = fov;
             });
             UI.MoveTransform(cameraControlMenuPasteButton.transform, 35, 20, 0, 1, 365, -40);
 
             var cameraControlMenuCopyButton = UI.AddButton(_cameraControlMenu.transform, "Copy", "Copy", () =>
             {
-                var positon = movementController.CameraPositionGet();
-                var rotation = movementController.CameraTransformGet().eulerAngles;
+                var positon = Plugin.movement.CameraPositionGet();
+                var rotation = Plugin.movement.CameraTransformGet().eulerAngles;
                 string text;
                 if (Options.Instance.qFormat)
                 {

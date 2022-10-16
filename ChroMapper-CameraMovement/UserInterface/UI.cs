@@ -10,6 +10,7 @@ using TMPro;
 using ChroMapper_CameraMovement.Configuration;
 using UnityEngine.InputSystem;
 using ChroMapper_CameraMovement.HarmonyPatches;
+using ChroMapper_CameraMovement.Component;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -21,6 +22,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static BookmarkMenuUI _bookmarkMenuUI = new BookmarkMenuUI();
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
         public static MultiDisplayUI _multiDisplayUI = new MultiDisplayUI();
+        public static BlendShapeMenuUI _blendShapeMenuUI = new BlendShapeMenuUI();
+        public static BlendShapeSetUI _blendShapeSetUI = new BlendShapeSetUI();
         public static List<Type> queuedToDisable = new List<Type>();
         public static List<Type> queuedToEnable = new List<Type>();
         public static bool keyDisable { get; private set; } = false;
@@ -62,11 +65,14 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public void AddMenu(MapEditorUI mapEditorUI)
         {
-            _mainMenuUI.AddMenu(mapEditorUI);
-            _settingMenuUI.AddMenu(mapEditorUI);
-            _bookmarkMenuUI.AddMenu(mapEditorUI);
-            _cameraControlMenuUI.AddMenu(mapEditorUI);
-            _multiDisplayUI.AddMenu(mapEditorUI);
+            var topBarCanvas = mapEditorUI.MainUIGroup[5];
+            _mainMenuUI.AddMenu(topBarCanvas);
+            _settingMenuUI.AddMenu(topBarCanvas);
+            _bookmarkMenuUI.AddMenu(topBarCanvas);
+            _cameraControlMenuUI.AddMenu(topBarCanvas);
+            _multiDisplayUI.AddMenu(topBarCanvas);
+            _blendShapeMenuUI.AddMenu(topBarCanvas);
+            _blendShapeSetUI.AddMenu(topBarCanvas);
             KeyDisableCheck();
         }
 
@@ -134,8 +140,6 @@ namespace ChroMapper_CameraMovement.UserInterface
             }
         }
 
-        // i ended up copying Top_Cat's CM-JS UI helper, too useful to make my own tho
-        // after askin TC if it's one of the only way, he let me use this
         public static UIButton AddButton(Transform parent, string title, string text, Vector2 pos, UnityAction onClick)
         {
             var button = AddButton(parent, title, text, onClick);
@@ -157,10 +161,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             return button;
         }
 
-        public static (RectTransform, TextMeshProUGUI) AddLabel(Transform parent, string title, string text, Vector2 pos, float size = 110)
+        public static (RectTransform, TextMeshProUGUI) AddLabel(Transform parent, string title, string text, Vector2 pos, float width = 110, float height = 24)
         {
             var label = AddLabel(parent, title, text);
-            MoveTransform(label.Item1, size, 24, 0.5f, 1, pos.x, pos.y);
+            MoveTransform(label.Item1, width, height, 0.5f, 1, pos.x, pos.y);
             return label;
         }
         public static (RectTransform, TextMeshProUGUI) AddLabel(Transform parent, string title, string text, TextAlignmentOptions alignment = TextAlignmentOptions.Center, float fontSize = 16)
@@ -238,32 +242,54 @@ namespace ChroMapper_CameraMovement.UserInterface
             return toggleComponent;
         }
 
-        public static UIDropdown AddDropdown(Transform parent, List<string> options)
+        public static UIDropdown AddDropdown(Transform parent, List<string> options, int value, UnityAction<int> onChange)
         {
             var dropdown = UnityEngine.Object.Instantiate(PersistentUI.Instance.DropdownPrefab, parent);
             dropdown.SetOptions(options);
+            dropdown.Dropdown.onValueChanged.AddListener(onChange);
+            dropdown.Dropdown.SetValueWithoutNotify(value);
             var image = dropdown.GetComponent<Image>();
             image.color = new Color(0.35f, 0.35f, 0.35f, 1f);
             image.pixelsPerUnitMultiplier = 1.5f;
             return dropdown;
         }
+        public static GameObject SetMenu(GameObject obj, CanvasGroup canvas, Action posSave, float sizeX, float sizeY, float anchorPosX, float anchorPosY, float anchorX = 1, float anchorY = 1, float pivotX = 1, float pivotY = 1)
+        {
+            SetMenu(obj, canvas, posSave);
+            AttachTransform(obj, sizeX, sizeY, anchorX, anchorY, anchorPosX, anchorPosY, pivotX, pivotY);
+            AttachImage(obj, new Color(0.24f, 0.24f, 0.24f));
+            return obj;
+        }
 
+        public static GameObject SetMenu(GameObject obj, CanvasGroup canvas, Action posSave)
+        {
+            obj.transform.parent = canvas.transform;
+            var dragWindow = obj.AddComponent<DragWindowController>();
+            dragWindow.canvas = canvas.GetComponent<Canvas>();
+            dragWindow.OnDragWindow += posSave;
+            return obj;
+        }
+        public static void AttachImage(GameObject obj, Color color)
+        {
+            var imageSetting = obj.AddComponent<Image>();
+            imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
+            imageSetting.type = Image.Type.Sliced;
+            imageSetting.color = color;
+        }
         public static RectTransform AttachTransform(GameObject obj, float sizeX, float sizeY, float anchorX, float anchorY, float anchorPosX, float anchorPosY, float pivotX = 0.5f, float pivotY = 0.5f)
         {
             RectTransform rectTransform = obj.AddComponent<RectTransform>();
-            rectTransform.localScale = new Vector3(1, 1, 1);
-            rectTransform.sizeDelta = new Vector2(sizeX, sizeY);
-            rectTransform.pivot = new Vector2(pivotX, pivotY);
-            rectTransform.anchorMin = rectTransform.anchorMax = new Vector2(anchorX, anchorY);
-            rectTransform.anchoredPosition = new Vector3(anchorPosX, anchorPosY, 0);
-
+            MoveTransform(rectTransform, sizeX, sizeY, anchorX, anchorY, anchorPosX, anchorPosY, pivotX, pivotY);
             return rectTransform;
         }
 
         public static void MoveTransform(Transform transform, float sizeX, float sizeY, float anchorX, float anchorY, float anchorPosX, float anchorPosY, float pivotX = 0.5f, float pivotY = 0.5f)
         {
             if (!(transform is RectTransform rectTransform)) return;
-
+            MoveTransform(rectTransform, sizeX, sizeY, anchorX, anchorY, anchorPosX, anchorPosY, pivotX, pivotY);
+        }
+        public static void MoveTransform(RectTransform rectTransform, float sizeX, float sizeY, float anchorX, float anchorY, float anchorPosX, float anchorPosY, float pivotX = 0.5f, float pivotY = 0.5f)
+        {
             rectTransform.localScale = new Vector3(1, 1, 1);
             rectTransform.sizeDelta = new Vector2(sizeX, sizeY);
             rectTransform.pivot = new Vector2(pivotX, pivotY);

@@ -10,7 +10,6 @@ namespace ChroMapper_CameraMovement.UserInterface
 {
     public class BookmarkMenuUI
     {
-        public CameraMovementController movementController;
         public GameObject _cameraMovementBookmarkMenu;
         public TextMeshProUGUI currentBookmarkLabelText;
         public TextMeshProUGUI bookmarkMenuInputLabel;
@@ -45,23 +44,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             Options.Instance.bookmarkUIAnchoredPosY = _cameraMovementBookmarkMenu.GetComponent<RectTransform>().anchoredPosition.y;
         }
 
-        public void AddMenu(MapEditorUI mapEditorUI)
+        public void AddMenu(CanvasGroup topBarCanvas)
         {
-            movementController = Plugin.movement;
-            var parent = mapEditorUI.MainUIGroup[5];
-            _cameraMovementBookmarkMenu = new GameObject("CameraMovement Bookmark");
-            _cameraMovementBookmarkMenu.transform.parent = parent.transform;
-            _cameraMovementBookmarkMenu.AddComponent<DragWindowController>();
-            _cameraMovementBookmarkMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
-            _cameraMovementBookmarkMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
-
             //Bookmark
-            UI.AttachTransform(_cameraMovementBookmarkMenu, 750, 55, 0.7f, 0.09f, Options.Instance.bookmarkUIAnchoredPosX, Options.Instance.bookmarkUIAnchoredPosY, 1, 1);
-
-            Image imageBookmark = _cameraMovementBookmarkMenu.AddComponent<Image>();
-            imageBookmark.sprite = PersistentUI.Instance.Sprites.Background;
-            imageBookmark.type = Image.Type.Sliced;
-            imageBookmark.color = new Color(0.24f, 0.24f, 0.24f);
+            _cameraMovementBookmarkMenu = UI.SetMenu(new GameObject("CameraMovement Bookmark"), topBarCanvas, AnchoredPosSave, 750, 55, Options.Instance.bookmarkUIAnchoredPosX, Options.Instance.bookmarkUIAnchoredPosY, 0.7f, 0.09f);
 
             var currentBookmarkLabel = UI.AddLabel(_cameraMovementBookmarkMenu.transform, "", "", TextAlignmentOptions.Left, 12);
             UI.MoveTransform(currentBookmarkLabel.Item1, 400, 20, 0.1f, 1, 210, -15);
@@ -102,21 +88,21 @@ namespace ChroMapper_CameraMovement.UserInterface
             var bookmarkMenuNewButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "New", "New", () =>
             {
                 if (bookmarkMenuInputText.InputField.text.Trim() != "")
-                    movementController._bookmarkController.BookmarkNew(bookmarkMenuInputText.InputField.text);
+                    Plugin.movement._bookmarkController.BookmarkNew(bookmarkMenuInputText.InputField.text);
             });
             UI.MoveTransform(bookmarkMenuNewButton.transform, 30, 20, 0.1f, 1, 515, -35);
 
             var bookmarkMenuChangeButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Change", "Change", () =>
             {
                 if (currentBookmarkNo > 0)
-                    movementController._bookmarkController.BookmarkChange(currentBookmarkNo);
+                    Plugin.movement._bookmarkController.BookmarkChange(currentBookmarkNo);
             });
             UI.MoveTransform(bookmarkMenuChangeButton.transform, 40, 20, 0.1f, 1, 550, -35);
 
             var bookmarkMenuDeleteButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Delete", "Delete", () =>
             {
                 if (currentBookmarkNo > 0)
-                    movementController._bookmarkController.BookmarkDelete(currentBookmarkNo);
+                    Plugin.movement._bookmarkController.BookmarkDelete(currentBookmarkNo);
             });
             UI.MoveTransform(bookmarkMenuDeleteButton.transform, 40, 20, 0.1f, 1, 590, -35);
 

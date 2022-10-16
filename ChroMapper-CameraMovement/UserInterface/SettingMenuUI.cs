@@ -10,7 +10,6 @@ namespace ChroMapper_CameraMovement.UserInterface
     public class SettingMenuUI
     {
         public GameObject _cameraMovementSettingMenu;
-        public CameraMovementController movementController;
         public UITextInput _avatarFileInputText;
         public UITextInput subRectX;
         public UITextInput subRectY;
@@ -31,37 +30,24 @@ namespace ChroMapper_CameraMovement.UserInterface
             subRectH.InputField.text = Options.Instance.subCameraRectH.ToString("0.##");
         }
 
-        public void AddMenu(MapEditorUI mapEditorUI)
+        public void AddMenu(CanvasGroup topBarCanvas)
         {
-            movementController = Plugin.movement;
-            var parent = mapEditorUI.MainUIGroup[5];
-            _cameraMovementSettingMenu = new GameObject("CameraMovement Setting Menu");
-            _cameraMovementSettingMenu.transform.parent = parent.transform;
-            _cameraMovementSettingMenu.AddComponent<DragWindowController>();
-            _cameraMovementSettingMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
-            _cameraMovementSettingMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
-
             //More Settings Menu
-            UI.AttachTransform(_cameraMovementSettingMenu, 500, 210, 1, 1, Options.Instance.settingMenuUIAnchoredPosX, Options.Instance.settingMenuUIAnchoredPosY, 1, 1);
-
-            Image imageSetting = _cameraMovementSettingMenu.AddComponent<Image>();
-            imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
-            imageSetting.type = Image.Type.Sliced;
-            imageSetting.color = new Color(0.24f, 0.24f, 0.24f);
+            _cameraMovementSettingMenu = UI.SetMenu(new GameObject("CameraMovement Setting Menu"), topBarCanvas, AnchoredPosSave, 500, 210, Options.Instance.settingMenuUIAnchoredPosX, Options.Instance.settingMenuUIAnchoredPosY);
 
             UI.AddLabel(_cameraMovementSettingMenu.transform, "More Settings", "More Settings", new Vector2(0, -15));
 
             var avatarCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Custom VRM Avatar", "Custom or VRM Avatar", Options.Instance.customAvatar, (check) =>
             {
                 Options.Instance.customAvatar = check;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(avatarCheck.Item3.transform, 30, 25, 0, 1, 30, -45);
             UI.MoveTransform(avatarCheck.Item1, 160, 16, 0, 1, 120, -40);
 
             var reloadButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Reload", "Reload", () =>
             {
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(reloadButton.transform, 40, 20, 1, 1, -80, -40);
 
@@ -91,7 +77,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.avatarScale = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(scaleInput.Item1, 60, 16, 0, 1, 30, -85);
@@ -103,7 +89,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.avatarYoffset = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(yOffsetInput.Item1, 60, 16, 0, 1, 140, -85);
@@ -112,7 +98,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var blinkerCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "VRM Blinker", "VRM Blinker", Options.Instance.avatarBlinker, (check) =>
             {
                 Options.Instance.avatarBlinker = check;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(blinkerCheck.Item3.transform, 30, 16, 0, 1, 250, -85);
             UI.MoveTransform(blinkerCheck.Item1, 50, 16, 0, 1, 280, -85);
@@ -120,7 +106,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var lookAtCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "VRM LookAt", "VRM LookAt", Options.Instance.avatarLookAt, (check) =>
             {
                 Options.Instance.avatarLookAt = check;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(lookAtCheck.Item3.transform, 30, 16, 0, 1, 330, -85);
             UI.MoveTransform(lookAtCheck.Item1, 70, 16, 0, 1, 370, -85);
@@ -128,7 +114,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var simpleAvatarCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Simple Avatar", "Simple Avatar", Options.Instance.simpleAvatar, (check) =>
             {
                 Options.Instance.simpleAvatar = check;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(simpleAvatarCheck.Item3.transform, 30, 16, 0, 1, 30, -110);
             UI.MoveTransform(simpleAvatarCheck.Item1, 70, 16, 0, 1, 70, -110);
@@ -139,7 +125,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.avatarHeadHight = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(headHightInput.Item1, 60, 16, 0, 1, 130, -110);
@@ -151,7 +137,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.avatarHeadSize = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(headSizeInput.Item1, 60, 16, 0, 1, 230, -110);
@@ -163,7 +149,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.avatarArmSize = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(armSizeInput.Item1, 60, 16, 0, 1, 320, -110);
@@ -175,7 +161,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.bookmarkWidth = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(bookmarkWidthInput.Item1, 60, 16, 0, 1, 30, -135);
@@ -187,7 +173,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.bookmarkInsertOffset = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(bookmarkAreaInput.Item1, 50, 16, 0, 1, 130, -135);
@@ -204,7 +190,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var settingMenuBookmarkExportButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Bookmark Export", "Bookmark Export", () =>
             {
-                movementController._bookmarkController.BookmarkExport();
+                Plugin.movement._bookmarkController.BookmarkExport();
             });
             UI.MoveTransform(settingMenuBookmarkExportButton.transform, 70, 25, 0, 1, 360, -135);
 
@@ -218,13 +204,13 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var rectXInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect X", "Sub X", Options.Instance.subCameraRectX.ToString(), (value) =>
             {
-                if (movementController.SubCameraRectEnableGet())
+                if (Plugin.movement.SubCameraRectEnableGet())
                     return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.subCameraRectX = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(rectXInput.Item1, 60, 16, 0, 1, 30, -160);
@@ -233,13 +219,13 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var rectYInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect Y", "Sub Y", Options.Instance.subCameraRectY.ToString(), (value) =>
             {
-                if (movementController.SubCameraRectEnableGet())
+                if (Plugin.movement.SubCameraRectEnableGet())
                     return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.subCameraRectY = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(rectYInput.Item1, 60, 16, 0, 1, 110, -160);
@@ -248,19 +234,19 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var subMoveButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Move", "Cursor Key Move", () =>
             {
-                movementController.SubCameraRectEnable(true);
+                Plugin.movement.SubCameraRectEnable(true);
             });
             UI.MoveTransform(subMoveButton.transform, 50, 25, 0, 1, 220, -160);
 
             var rectWInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect W", "Sub W", Options.Instance.subCameraRectW.ToString(), (value) =>
             {
-                if (movementController.SubCameraRectEnableGet())
+                if (Plugin.movement.SubCameraRectEnableGet())
                     return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.subCameraRectW = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(rectWInput.Item1, 60, 16, 0, 1, 250, -160);
@@ -269,13 +255,13 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var rectHInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Sub Rect H", "Sub H", Options.Instance.subCameraRectH.ToString(), (value) =>
             {
-                if (movementController.SubCameraRectEnableGet())
+                if (Plugin.movement.SubCameraRectEnableGet())
                     return;
                 float res;
                 if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.subCameraRectH = res;
-                    movementController.Reload();
+                    Plugin.movement.Reload();
                 }
             });
             UI.MoveTransform(rectHInput.Item1, 60, 16, 0, 1, 330, -160);
@@ -284,7 +270,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var subSizeButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Move", "Cursor Key Size", () =>
             {
-                movementController.SubCameraRectEnable(false);
+                Plugin.movement.SubCameraRectEnable(false);
             });
             UI.MoveTransform(subSizeButton.transform, 50, 25, 0, 1, 440, -160);
 
@@ -321,7 +307,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 _cameraMovementSettingMenu.SetActive(false);
                 UI.KeyDisableCheck();
-                movementController.SubCameraRectDisable();
+                Plugin.movement.SubCameraRectDisable();
             });
             UI.MoveTransform(closeButton.transform, 50, 25, 0, 1, 440, -190);
 

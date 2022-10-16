@@ -11,7 +11,6 @@ namespace ChroMapper_CameraMovement.UserInterface
     public class MainMenuUI
     {
         public GameObject _cameraMovementMainMenu;
-        public static CameraMovementController movementController;
         public static GameObject cm_MapEditorCamera;
 
         public void AnchoredPosSave()
@@ -20,23 +19,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             Options.Instance.mainMenuUIAnchoredPosY = _cameraMovementMainMenu.GetComponent<RectTransform>().anchoredPosition.y;
         }
 
-        public void AddMenu(MapEditorUI mapEditorUI)
+        public void AddMenu(CanvasGroup topBarCanvas)
         {
-            movementController = Plugin.movement;
-            var parent = mapEditorUI.MainUIGroup[5];
-            _cameraMovementMainMenu = new GameObject("CameraMovement Menu");
-            _cameraMovementMainMenu.transform.parent = parent.transform;
-            _cameraMovementMainMenu.AddComponent<DragWindowController>();
-            _cameraMovementMainMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
-            _cameraMovementMainMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
-
             //Main Menu
-            UI.AttachTransform(_cameraMovementMainMenu, 170, 270, 1, 1, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY, 1, 1);
-
-            Image imageMain = _cameraMovementMainMenu.AddComponent<Image>();
-            imageMain.sprite = PersistentUI.Instance.Sprites.Background;
-            imageMain.type = Image.Type.Sliced;
-            imageMain.color = new Color(0.24f, 0.24f, 0.24f);
+            _cameraMovementMainMenu = UI.SetMenu(new GameObject("CameraMovement Menu"), topBarCanvas, AnchoredPosSave, 170, 270, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY);
 
             var cameraMovementTitle = UI.AddCheckbox(_cameraMovementMainMenu.transform, "CameraMovement", "CameraMovement", new Vector2(-17, -19), Options.Instance.cameraMovementEnable, (check) =>
             {
@@ -55,8 +41,8 @@ namespace ChroMapper_CameraMovement.UserInterface
                     UI._multiDisplayUI._cameraMovementMultiDisplay.SetActive(false);
                     Plugin.movement.KeyDisable();
                 }
-                movementController._bookmarkController?.BookMarkChangeUpdate();
-                movementController.Reload();
+                Plugin.movement._bookmarkController?.BookMarkChangeUpdate();
+                Plugin.movement.Reload();
                 UI.KeyDisableCheck();
             });
             cameraMovementTitle.Item2.fontSize = 16;
@@ -66,14 +52,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 Options.Instance.movement = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                movementController.Reload();
+                Plugin.movement.Reload();
                 UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "UI Hidden", "UI Hidden", new Vector2(0, -55), Options.Instance.uIhidden, (check) =>
             {
                 Options.Instance.uIhidden = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                movementController.UiHidden();
+                Plugin.movement.UiHidden();
                 UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "NJS Editor Scale", "NJS Editor Scale", new Vector2(0, -70), Settings.Instance.NoteJumpSpeedForEditorScale, (check) =>
@@ -85,26 +71,26 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 Options.Instance.turnToHead = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Avatar", "Avatar", new Vector2(0, -100), Options.Instance.avatar, (check) =>
             {
                 Options.Instance.avatar = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Bookmark Lines", "Bookmark Lines", new Vector2(0, -115), Options.Instance.bookmarkLines, (check) =>
             {
                 Options.Instance.bookmarkLines = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                movementController.Reload();
+                Plugin.movement.Reload();
                 UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Sub Camera", "Sub Camera", new Vector2(0, -130), Options.Instance.subCamera, (check) =>
             {
                 Options.Instance.subCamera = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                movementController.Reload();
+                Plugin.movement.Reload();
                 UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Bookmark Edit", "Bookmark Edit", new Vector2(0, -145), Options.Instance.bookmarkEdit, (check) =>
@@ -133,7 +119,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var mainMenuReloadButton = UI.AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
-                movementController.Reload();
+                Plugin.movement.Reload();
             });
             UI.MoveTransform(mainMenuReloadButton.transform, 70, 25, 0.72f, 1, 0, -185);
 

@@ -12,7 +12,6 @@ namespace ChroMapper_CameraMovement.UserInterface
         public Toggle _subWindow;
         public Toggle _layoutWindow;
         public TextMeshProUGUI _message;
-        public CameraMovementController movementController;
         public const string deleteDisplayMessage = "Created displays cannot be deleted!";
         public const string noteEnoughDisplayMessage = "Not enough displays!";
         public void AnchoredPosSave()
@@ -20,23 +19,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             Options.Instance.multiDisplayMenuUIAnchoredPosX = _cameraMovementMultiDisplay.GetComponent<RectTransform>().anchoredPosition.x;
             Options.Instance.multiDisplayMenuUIAnchoredPosY = _cameraMovementMultiDisplay.GetComponent<RectTransform>().anchoredPosition.y;
         }
-        public void AddMenu(MapEditorUI mapEditorUI)
+        public void AddMenu(CanvasGroup topBarCanvas)
         {
-            movementController = Plugin.movement;
-            var parent = mapEditorUI.MainUIGroup[5];
-            _cameraMovementMultiDisplay = new GameObject("CameraMovement Multi Display Menu");
-            _cameraMovementMultiDisplay.transform.parent = parent.transform;
-            _cameraMovementMultiDisplay.AddComponent<DragWindowController>();
-            _cameraMovementMultiDisplay.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
-            _cameraMovementMultiDisplay.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
-
             //Multi Display Menu
-            UI.AttachTransform(_cameraMovementMultiDisplay, 300, 200, 1, 1, Options.Instance.multiDisplayMenuUIAnchoredPosX, Options.Instance.multiDisplayMenuUIAnchoredPosY, 1, 1);
-
-            Image imageSetting = _cameraMovementMultiDisplay.AddComponent<Image>();
-            imageSetting.sprite = PersistentUI.Instance.Sprites.Background;
-            imageSetting.type = Image.Type.Sliced;
-            imageSetting.color = new Color(0.24f, 0.24f, 0.24f);
+            _cameraMovementMultiDisplay = UI.SetMenu(new GameObject("CameraMovement Multi Display Menu"), topBarCanvas, AnchoredPosSave, 300, 200, Options.Instance.multiDisplayMenuUIAnchoredPosX, Options.Instance.multiDisplayMenuUIAnchoredPosY);
 
             UI.AddLabel(_cameraMovementMultiDisplay.transform, "Multi Display Window", "Multi Display Window", new Vector2(0, -15), 200);
 

@@ -26,7 +26,6 @@ namespace ChroMapper_CameraMovement.Component
         public static AudioTimeSyncController atsc;
         public static AutoSaveController autoSave;
         public static SpectrogramSideSwapper spectrogramSideSwapper;
-        public static EventsContainer eventContainer;
         public static BookmarkLinesController bookmarkLinesController;
         public static VRMAvatarController vrmAvatarController;
         public static MultiDisplayController multiDisplayController;
@@ -86,7 +85,6 @@ namespace ChroMapper_CameraMovement.Component
         public float beforeFOV = Settings.Instance.CameraFOV;
         public bool waveFormIsNoteSide;
         public bool beforeWaveFormIsNoteSide;
-        public EventsContainer.PropMode profMode;
         public GridChild eventGridChild;
         public GridChild eventLabelChild;
         public GridChild bpmChangesChild;
@@ -317,8 +315,6 @@ namespace ChroMapper_CameraMovement.Component
                     cm_EventFrontBase.SetActive(false);
                     cm_EventBackBase.SetActive(false);
                     cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = false;
-                    profMode = eventContainer.PropagationEditing;
-                    eventContainer.PropagationEditing = EventsContainer.PropMode.Prop;
                 }
                 if (Settings.Instance.Load_Others)
                 {
@@ -354,7 +350,6 @@ namespace ChroMapper_CameraMovement.Component
                     cm_EventFrontBase.SetActive(true);
                     cm_EventBackBase.SetActive(true);
                     cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = true;
-                    eventContainer.PropagationEditing = profMode;
                 }
                 if (Settings.Instance.Load_Others)
                 {
@@ -655,7 +650,6 @@ namespace ChroMapper_CameraMovement.Component
             }
             if (Settings.Instance.Load_Events)
             {
-                eventContainer = FindObjectOfType<EventsContainer>();
                 cm_EventFrontBase = GameObject.Find("Event Grid Front Scaling Offset/Base");
                 cm_EventBackBase = GameObject.Find("Event Grid Back Scaling Offset/Base");
                 cm_eventLabel = GameObject.Find("Event Label");

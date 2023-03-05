@@ -883,6 +883,34 @@ namespace ChroMapper_CameraMovement.Component
                 beforeRotation = targetCamera.transform.rotation;
                 beforeFOV = targetFOV;
             }
+            if (!Options.Instance.cameraDirectionScrollReversal) return;
+            if (Options.Instance.cameraControlSub)
+            {
+                if (subCamera.transform.rotation.eulerAngles.y > 90 && subCamera.transform.rotation.eulerAngles.y < 270)
+                    PrecisionScrollSet(!Options.Instance.defaultInvertScrollTime);
+                else
+                    PrecisionScrollSet(Options.Instance.defaultInvertScrollTime);
+            }
+            else if (Options.Instance.cameraControlLay)
+            {
+                if (layoutCamera.transform.rotation.eulerAngles.y > 90 && layoutCamera.transform.rotation.eulerAngles.y < 270)
+                    PrecisionScrollSet(!Options.Instance.defaultInvertScrollTime);
+                else
+                    PrecisionScrollSet(Options.Instance.defaultInvertScrollTime);
+            }
+            else
+            {
+                if (cm_MapEditorCamera.transform.rotation.eulerAngles.y > 90 && cm_MapEditorCamera.transform.rotation.eulerAngles.y < 270)
+                    PrecisionScrollSet(!Options.Instance.defaultInvertScrollTime);
+                else
+                    PrecisionScrollSet(Options.Instance.defaultInvertScrollTime);
+            }
+        }
+
+        private void PrecisionScrollSet(bool value)
+        {
+            if (Settings.Instance.InvertScrollTime == value) return;
+            Settings.Instance.InvertScrollTime = value;
         }
 
         private void OnDestroy()

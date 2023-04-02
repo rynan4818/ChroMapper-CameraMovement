@@ -177,13 +177,6 @@ namespace ChroMapper_CameraMovement.Component
         {
             return new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset);
         }
-        public static bool SavingThread()
-        {
-            Type type = autoSave.GetType();
-            FieldInfo field = type.GetField("savingThread", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-            Thread savingThread = (Thread)(field.GetValue(autoSave));
-            return savingThread != null && savingThread.IsAlive;
-        }
         public void UiHidden()
         {
             if (Options.Instance.uIhidden)

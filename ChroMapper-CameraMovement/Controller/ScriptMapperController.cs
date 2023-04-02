@@ -18,7 +18,7 @@ namespace ChroMapper_CameraMovement.Controller
                 return;
             scriptMapperAlive = true;
             CameraMovementController.autoSave.Save();
-            while (CameraMovementController.SavingThread())
+            while (CameraMovementController.autoSave.IsSaving)
                 await Task.Delay(100);
             var path = CameraMovementController.MapGet();
             var scriptmapper = Path.Combine(Environment.CurrentDirectory, Options.Instance.scriptMapperExe);

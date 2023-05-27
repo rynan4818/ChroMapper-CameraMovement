@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
-using System.Threading;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -21,6 +20,7 @@ namespace ChroMapper_CameraMovement.Component
         public const int mappingLayer = 11;
         public const int avatarLayer = 25;
         public const int bookmarkLinesLayer = 26;
+        public const int subCameraArrowSphereLayer = 27;
         public CameraMovement _cameraMovement { get; set; }
         public BookmarkController _bookmarkController { get; set; }
         public static AudioTimeSyncController atsc;
@@ -33,23 +33,6 @@ namespace ChroMapper_CameraMovement.Component
         public static PlusCameraController plusCamera;
         public static DefaultCameraController defaultCamera;
         public static GameObject cm_MapEditorCamera;
-        public static GameObject cm_GridX;
-        public static GameObject cm_interface;
-        public static GameObject cm_Grid;
-        public static GameObject cm_measureGrid16_1;
-        public static GameObject cm_measureGrid8_1;
-        public static GameObject cm_measureGrid4_1;
-        public static GameObject cm_measureGrid1;
-        public static GameObject cm_NoteFrontBase;
-        public static GameObject cm_NoteBackBase;
-        public static GameObject cm_EventFrontBase;
-        public static GameObject cm_EventBackBase;
-        public static GameObject cm_baseTransparent;
-        public static GameObject cm_eventLabel;
-        public static GameObject cm_BPMchangeFrontBase;
-        public static GameObject cm_BPMchangeBackBase;
-        public static GameObject cm_BPMChangeLable;
-        public static GameObject cm_MeasureLinesCanvas;
         public static GameObject cm_UIMode;
         public static GameObject avatarHead;
         public static GameObject avatarArm;
@@ -70,16 +53,6 @@ namespace ChroMapper_CameraMovement.Component
 
         public bool _reload = false;
         public float beforeSeconds;
-        public float gridXBaseAlpha = 0.05f;
-        public float gridXGridAlpha = 0.5f;
-        public float interfaceOpacity = 0.2f;
-        public float gridGridAlpha = 0.5f;
-        public Color measureGridColor16_1;
-        public Color measureGridColor8_1;
-        public Color measureGridColor4_1;
-        public Color measureGridColor1;
-        public Color baseTransparentColor;
-        public Color interfaceColor;
         public Vector3 beforePositon = Vector3.zero;
         public Quaternion beforeRotation = Quaternion.Euler(0, 0, 0);
         public float beforeFOV = Settings.Instance.CameraFOV;
@@ -281,75 +254,20 @@ namespace ChroMapper_CameraMovement.Component
             }
             if (Options.Instance.uIhidden && Options.Instance.cameraMovementEnable)
             {
-                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", 0);
-                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
-                cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", 0);
-                cm_measureGrid16_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
-                cm_measureGrid8_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
-                cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
-                cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", new Color(0, 0, 0, 0));
-                cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
-
-                if (cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.shader.name == "Unlit/Transparent Colored")
-                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", new Color(0, 0, 0, 0));
-                else
-                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", 0);
-                cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = false;
                 spectrogramSideSwapper.IsNoteSide = true;
                 spectrogramSideSwapper.SwapSides();
                 EventBpmOffset(200f);
-                if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
-                {
-                    cm_NoteFrontBase.SetActive(false);
-                    cm_NoteBackBase.SetActive(false);
-                }
-                if (Settings.Instance.Load_Events)
-                {
-                    cm_EventFrontBase.SetActive(false);
-                    cm_EventBackBase.SetActive(false);
-                    cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = false;
-                }
-                if (Settings.Instance.Load_Others)
-                {
-                    cm_BPMchangeFrontBase.SetActive(false);
-                    cm_BPMchangeBackBase.SetActive(false);
-                    cm_BPMChangeLable.gameObject.GetComponent<Canvas>().enabled = false;
-                }
+                var main_camera = cm_MapEditorCamera.GetComponent<Camera>();
+                main_camera.cullingMask &= ~(1 << mappingLayer);
+                main_camera.cullingMask &= ~(1 << bookmarkLinesLayer);
             }
             else
             {
-                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_BaseAlpha", gridXBaseAlpha);
-                cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", gridXGridAlpha);
-                cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_GridAlpha", gridGridAlpha);
-                cm_measureGrid16_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor16_1);
-                cm_measureGrid8_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor8_1);
-                cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor4_1);
-                cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_GridColour", measureGridColor1);
-                cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", baseTransparentColor);
-                if (cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.shader.name == "Unlit/Transparent Colored")
-                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", interfaceColor);
-                else
-                    cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.SetFloat("_OPACITY", interfaceOpacity);
-                cm_MeasureLinesCanvas.gameObject.GetComponent<Canvas>().enabled = true;
                 spectrogramSideSwapper.IsNoteSide = !beforeWaveFormIsNoteSide;
                 spectrogramSideSwapper.SwapSides();
-                if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
-                {
-                    cm_NoteFrontBase.SetActive(true);
-                    cm_NoteBackBase.SetActive(true);
-                }
-                if (Settings.Instance.Load_Events)
-                {
-                    cm_EventFrontBase.SetActive(true);
-                    cm_EventBackBase.SetActive(true);
-                    cm_eventLabel.gameObject.GetComponent<Canvas>().enabled = true;
-                }
-                if (Settings.Instance.Load_Others)
-                {
-                    cm_BPMchangeFrontBase.SetActive(true);
-                    cm_BPMchangeBackBase.SetActive(true);
-                    cm_BPMChangeLable.gameObject.GetComponent<Canvas>().enabled = true;
-                }
+                var main_camera = cm_MapEditorCamera.GetComponent<Camera>();
+                main_camera.cullingMask |= 1 << mappingLayer;
+                main_camera.cullingMask |= 1 << bookmarkLinesLayer;
             }
         }
         public void EventBpmOffset(float offset)
@@ -611,48 +529,10 @@ namespace ChroMapper_CameraMovement.Component
             defaultCamera = this.gameObject.AddComponent<DefaultCameraController>();
 
             cm_MapEditorCamera = GameObject.Find("MapEditor Camera");
-            cm_measureGrid16_1 = GameObject.Find("1/16th Measure Grid");
-            cm_measureGrid8_1 = GameObject.Find("1/8th Measure Grid");
-            cm_measureGrid4_1 = GameObject.Find("1/4th Measure Grid");
-            cm_measureGrid1 = GameObject.Find("One Measure Grid");
-            cm_MeasureLinesCanvas = GameObject.Find("Measure Lines Canvas");
-            cm_interface = GameObject.Find("Interface");
-            cm_GridX = GameObject.Find("Grid X");
-            cm_Grid = GameObject.Find("Grid");
-            cm_baseTransparent = GameObject.Find("Base Transparent");
             cm_UIMode = GameObject.Find("UI Mode");
 
             VRMAvatarController.cm_MapEditorCamera = cm_MapEditorCamera;
 
-            measureGridColor16_1 = cm_measureGrid16_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
-            measureGridColor8_1 = cm_measureGrid8_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
-            measureGridColor4_1 = cm_measureGrid4_1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
-            measureGridColor1 = cm_measureGrid1.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_GridColour");
-            baseTransparentColor = cm_baseTransparent.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
-            if (cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.shader.name == "Unlit/Transparent Colored")
-                interfaceColor = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetColor("_Color");
-            else
-                interfaceOpacity = cm_interface.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_OPACITY");
-            gridXBaseAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_BaseAlpha");
-            gridXGridAlpha = cm_GridX.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
-            gridGridAlpha = cm_Grid.gameObject.GetComponent<Renderer>().sharedMaterial.GetFloat("_GridAlpha");
-            if (Settings.Instance.Load_Notes || Settings.Instance.Load_Obstacles)
-            {
-                cm_NoteFrontBase = GameObject.Find("Note Grid Front Scaling Offset/Base");
-                cm_NoteBackBase = GameObject.Find("Note Grid Back Scaling Offset/Base");
-            }
-            if (Settings.Instance.Load_Events)
-            {
-                cm_EventFrontBase = GameObject.Find("Event Grid Front Scaling Offset/Base");
-                cm_EventBackBase = GameObject.Find("Event Grid Back Scaling Offset/Base");
-                cm_eventLabel = GameObject.Find("Event Label");
-            }
-            if (Settings.Instance.Load_Others)
-            {
-                cm_BPMchangeFrontBase = GameObject.Find("BPM Changes Grid Front Scaling Offset/Base");
-                cm_BPMchangeBackBase = GameObject.Find("BPM Changes Grid Back Scaling Offset/Base");
-                cm_BPMChangeLable = GameObject.Find("BPM Change Label/");
-            }
             avatarHead = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             avatarArm = GameObject.CreatePrimitive(PrimitiveType.Cube);
             avatarLeg = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -704,8 +584,8 @@ namespace ChroMapper_CameraMovement.Component
             eventGridChild = GameObject.Find("Rotating/Event Grid").GetComponent<GridChild>();
             eventLabelChild = GameObject.Find("Rotating/Event Label").GetComponent<GridChild>();
             eventsGridChild = GameObject.Find("Moveable Grid/Events Grid").GetComponent<GridChild>();
-            bpmChangesChild = GameObject.Find("Rotating/BPM Changes Grid").GetComponent<GridChild>();
-            bpmChangesGridChild = GameObject.Find("Moveable Grid/BPM Changes Grid").GetComponent<GridChild>();
+            bpmChangesChild = GameObject.Find("Rotating/BPM Events Grid").GetComponent<GridChild>();
+            bpmChangesGridChild = GameObject.Find("Moveable Grid/BPM Events Grid").GetComponent<GridChild>();
             spectrogramGridChild = GameObject.Find("Rotating/Spectrogram Grid").GetComponent<GridChild>();
             waveformGridChild = GameObject.Find("Moveable Grid/Waveform Chunks Grid").GetComponent<GridChild>();
             eventGridChildLocalOffset = eventGridChild.LocalOffset;
@@ -721,7 +601,7 @@ namespace ChroMapper_CameraMovement.Component
                 customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
                 customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
                 customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
-                customEventsChildLocalOffset = customEventsChild.LocalOffset; ;
+                customEventsChildLocalOffset = customEventsChild.LocalOffset;
                 customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
                 customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
                 customEventsObject = true;
@@ -739,7 +619,7 @@ namespace ChroMapper_CameraMovement.Component
             subCamera.backgroundColor = new Color(0, 0, 0, 255);
             subCameraArrow = new GameObject("Sub Camera Arrow");
             subCameraArrow.transform.parent = subCamera.transform;
-            subCameraArrow.layer = mappingLayer;
+            subCameraArrow.layer = subCameraArrowSphereLayer;
             subCameraArrowTrail = subCameraArrow.AddComponent<TrailRenderer>();
             subCameraArrowTrail.material = new Material(Shader.Find("Sprites/Default"));
             subCameraArrowTrail.material.SetColor("_Color", Color.HSVToRGB(0.2f, 1f, 1f));
@@ -749,7 +629,7 @@ namespace ChroMapper_CameraMovement.Component
             subCameraArrowTrail.enabled = false;
 
             var subCameraArrowSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            subCameraArrowSphere.layer = mappingLayer;
+            subCameraArrowSphere.layer = subCameraArrowSphereLayer;
             subCameraArrowSphere.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
             subCameraArrowSphere.transform.localPosition = new Vector3(0, 0, -0.2f);
             var subCameraArrowSphereMeshRenderer = subCameraArrowSphere.GetComponent<Renderer>();
@@ -758,7 +638,7 @@ namespace ChroMapper_CameraMovement.Component
             subCameraArrowSphere.transform.parent = subCameraArrow.transform;
 
             var subCameraArrowCube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            subCameraArrowCube.layer = mappingLayer;
+            subCameraArrowCube.layer = subCameraArrowSphereLayer;
             subCameraArrowCube.transform.localScale = new Vector3(0.4f, 0.4f, 0.8f);
             subCameraArrowCube.transform.localPosition = new Vector3(0, 0, -0.6f);
             var subCameraArrowCubeMeshRenderer = subCameraArrowCube.GetComponent<Renderer>();
@@ -767,7 +647,7 @@ namespace ChroMapper_CameraMovement.Component
             subCameraArrowCube.transform.parent = subCameraArrow.transform;
 
             var subCameraArrowCube2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            subCameraArrowCube2.layer = mappingLayer;
+            subCameraArrowCube2.layer = subCameraArrowSphereLayer;
             subCameraArrowCube2.transform.localScale = new Vector3(0.3f, 0.5f, 0.3f);
             subCameraArrowCube2.transform.localPosition = new Vector3(0, -0.4f, -0.6f);
             var subCameraArrowCubeMeshRenderer2 = subCameraArrowCube2.GetComponent<Renderer>();
@@ -779,6 +659,7 @@ namespace ChroMapper_CameraMovement.Component
             {
                 subCamera.cullingMask &= ~(1 << mappingLayer);
                 subCamera.cullingMask &= ~(1 << bookmarkLinesLayer);
+                subCamera.cullingMask &= ~(1 << subCameraArrowSphereLayer);
             }
             subCamera.gameObject.SetActive(false);
             subCameraArrow.SetActive(false);
@@ -790,6 +671,7 @@ namespace ChroMapper_CameraMovement.Component
             {
                 layoutCamera.cullingMask &= ~(1 << mappingLayer);
                 layoutCamera.cullingMask &= ~(1 << bookmarkLinesLayer);
+                layoutCamera.cullingMask &= ~(1 << subCameraArrowSphereLayer);
             }
             layoutCamera.gameObject.SetActive(false);
 

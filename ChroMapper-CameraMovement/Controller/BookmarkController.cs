@@ -52,14 +52,14 @@ namespace ChroMapper_CameraMovement.Controller
         {
             if (bookmarkContainers.Count > 0)
             {
-                var lastBookmark = bookmarkContainers.FindLast(x => x.Data.Time <= atsc.CurrentBeat);
+                var lastBookmark = bookmarkContainers.FindLast(x => x.Data.JsonTime <= atsc.CurrentBeat);
                 if (bookmarkContainers.IndexOf(lastBookmark) == -1)
                 {
                     UI._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);
                 }
                 else
                 {
-                    UI._bookmarkMenuUI.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1, lastBookmark.Data.Time);
+                    UI._bookmarkMenuUI.CurrentBookmarkUpdate(lastBookmark.Data.Name, bookmarkContainers.IndexOf(lastBookmark) + 1, lastBookmark.Data.JsonTime);
                 }
             }
             else
@@ -75,7 +75,7 @@ namespace ChroMapper_CameraMovement.Controller
                 var sb = new StringBuilder();
                 bookmarkContainers.ForEach(container =>
                 {
-                    var row = $"{container.Data.Time},\"{container.Data.Name}\"";
+                    var row = $"{container.Data.JsonTime},\"{container.Data.Name}\"";
                     sb.AppendLine(row);
                 });
                 try

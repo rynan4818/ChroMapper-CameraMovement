@@ -53,7 +53,7 @@ namespace ChroMapper_CameraMovement.Component
                 if (!bookmarkTexts.ContainsKey(bookmark))
                 {
                     var text = Instantiate(bookmarkLinePrefab, parent);
-                    text.transform.localPosition = new Vector3(bookmarkXposition, bookmark.Data.Time * EditorScaleController.EditorScale, 0);
+                    text.transform.localPosition = new Vector3(bookmarkXposition, bookmark.Data.JsonTime * EditorScaleController.EditorScale, 0);
                     bookmarkTexts.Add(bookmark, (text, true));
                 }
                 bookmarkTexts[bookmark].Item1.text = $"<mark=#{ColorUtility.ToHtmlStringRGB(bookmark.Data.Color)}50><size=30%><voffset=0.2><s> <indent=6> </s></voffset></size></mark> <size={Options.Instance.bookmarkLinesFontSize}%>{counter}: {bookmark.Data.Name}</size><color=#00000000>.</color>";
@@ -78,7 +78,7 @@ namespace ChroMapper_CameraMovement.Component
 
             foreach (var kvp in bookmarkContainers)
             {
-                var time = kvp.Data.Time;
+                var time = kvp.Data.JsonTime;
                 var text = bookmarkTexts[kvp].Item1;
                 var enabled = time >= currentBeat - beatsBehind && time <= currentBeat + beatsAhead;
 
@@ -93,7 +93,7 @@ namespace ChroMapper_CameraMovement.Component
         private void RefreshPositions()
         {
             foreach (var kvp in bookmarkContainers)
-                bookmarkTexts[kvp].Item1.transform.localPosition = new Vector3(bookmarkXposition, kvp.Data.Time * EditorScaleController.EditorScale, 0);
+                bookmarkTexts[kvp].Item1.transform.localPosition = new Vector3(bookmarkXposition, kvp.Data.JsonTime * EditorScaleController.EditorScale, 0);
         }
     }
 }

@@ -50,6 +50,13 @@ namespace ChroMapper_CameraMovement.Component
         public static InputAction scriptMapperAction;
         public static InputAction dragWindowsAction;
         public static InputAction subCameraRectAction;
+        public static InputAction inputFocusMoveAction;
+        public static InputAction input1upAction;
+        public static InputAction input1downAction;
+        public static InputAction input10upAction;
+        public static InputAction input10downAction;
+        public static InputAction input100upAction;
+        public static InputAction input100downAction;
 
         public bool _reload = false;
         public float beforeSeconds;
@@ -505,6 +512,16 @@ namespace ChroMapper_CameraMovement.Component
             orbitCamera.orbitActiveAction.Disable();
             plusCamera.plusActiveAction.Disable();
             defaultCamera.defaultActiveAction.Disable();
+            if (Options.Instance.cameraMovementEnable)
+            {
+                inputFocusMoveAction.Enable();
+                input1upAction.Enable();
+                input1downAction.Enable();
+                input10upAction.Enable();
+                input10downAction.Enable();
+                input100upAction.Enable();
+                input100downAction.Enable();
+            }
         }
 
         public void KeyEnable()
@@ -515,6 +532,13 @@ namespace ChroMapper_CameraMovement.Component
             orbitCamera.orbitActiveAction.Enable();
             plusCamera.plusActiveAction.Enable();
             defaultCamera.defaultActiveAction.Enable();
+            inputFocusMoveAction.Disable();
+            input1upAction.Disable();
+            input1downAction.Disable();
+            input10upAction.Disable();
+            input10downAction.Disable();
+            input100upAction.Disable();
+            input100downAction.Disable();
         }
         private IEnumerator Start()
         {
@@ -694,6 +718,34 @@ namespace ChroMapper_CameraMovement.Component
                 .With("Right", "<Keyboard>/rightArrow");
             subCameraRectAction.performed += OnSubCameraRect;
             subCameraRectAction.Disable();
+            inputFocusMoveAction = new InputAction("InputFocusMove", binding: Options.Instance.inputFocusMoveKeyBinding);
+            inputFocusMoveAction.performed += UI.InputFocusMove;
+            inputFocusMoveAction.canceled += UI.InputFocusMove;
+            inputFocusMoveAction.Disable();
+            input1upAction = new InputAction("Input1upAction", binding: Options.Instance.input1upKeyBinding);
+            input1upAction.performed += context => UI.InputRound(context,1);
+            input1upAction.canceled += context => UI.InputRound(context, 1);
+            input1upAction.Disable();
+            input1downAction = new InputAction("Input1downAction", binding: Options.Instance.input1downKeyBinding);
+            input1downAction.performed += context => UI.InputRound(context, -1);
+            input1downAction.canceled += context => UI.InputRound(context, -1);
+            input1downAction.Disable();
+            input10upAction = new InputAction("Input10upAction", binding: Options.Instance.input10upKeyBinding);
+            input10upAction.performed += context => UI.InputRound(context, 10);
+            input10upAction.canceled += context => UI.InputRound(context, 10);
+            input10upAction.Disable();
+            input10downAction = new InputAction("Input10downAction", binding: Options.Instance.input10downKeyBinding);
+            input10downAction.performed += context => UI.InputRound(context, -10);
+            input10downAction.canceled += context => UI.InputRound(context, -10);
+            input10downAction.Disable();
+            input100upAction = new InputAction("Input100upAction", binding: Options.Instance.input100upKeyBinding);
+            input100upAction.performed += context => UI.InputRound(context, 100);
+            input100upAction.canceled += context => UI.InputRound(context, 100);
+            input100upAction.Disable();
+            input100downAction = new InputAction("Input100downAction", binding: Options.Instance.input100downKeyBinding);
+            input100downAction.performed += context => UI.InputRound(context, -100);
+            input100downAction.canceled += context => UI.InputRound(context, -100);
+            input100downAction.Disable();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             _bookmarkController = new BookmarkController();

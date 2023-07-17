@@ -144,7 +144,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     CameraPosRotSet(CameraItem.PosX, res);
                 }
             };
-            var cameraControlMenuPosXinput = UI.AddTextInput(_cameraControlMenu.transform, "Pos X", "Pos X", new Vector2(0, -15), "", posXChange);
+            var cameraControlMenuPosXinput = UI.AddTextInput(_cameraControlMenu.transform, "Pos X", "Pos X", new Vector2(0, -15), "", posXChange, "Pos Y", 2);
             UI.MoveTransform(cameraControlMenuPosXinput.Item1, 30, 16, 0f, 1, 15, -15);
             UI.MoveTransform(cameraControlMenuPosXinput.Item3.transform, 40, 20, 0.1f, 1, 5, -15);
             _cameraPosXinput = cameraControlMenuPosXinput.Item3;
@@ -158,7 +158,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     CameraPosRotSet(CameraItem.PosY, res);
                 }
             };
-            var cameraControlMenuPosYinput = UI.AddTextInput(_cameraControlMenu.transform, "Pos Y", "Pos Y", new Vector2(0, -15), "", posYChange);
+            var cameraControlMenuPosYinput = UI.AddTextInput(_cameraControlMenu.transform, "Pos Y", "Pos Y", new Vector2(0, -15), "", posYChange, "Pos Z", 2);
             UI.MoveTransform(cameraControlMenuPosYinput.Item1, 30, 16, 0f, 1, 85, -15);
             UI.MoveTransform(cameraControlMenuPosYinput.Item3.transform, 40, 20, 0.1f, 1, 75, -15);
             _cameraPosYinput = cameraControlMenuPosYinput.Item3;
@@ -172,7 +172,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     CameraPosRotSet(CameraItem.PosZ, res);
                 }
             };
-            var cameraControlMenuPosZinput = UI.AddTextInput(_cameraControlMenu.transform, "Pos Z", "Pos Z", new Vector2(0, -15), "", posZChange);
+            var cameraControlMenuPosZinput = UI.AddTextInput(_cameraControlMenu.transform, "Pos Z", "Pos Z", new Vector2(0, -15), "", posZChange, "Rot X", 2);
             UI.MoveTransform(cameraControlMenuPosZinput.Item1, 30, 16, 0f, 1, 155, -15);
             UI.MoveTransform(cameraControlMenuPosZinput.Item3.transform, 40, 20, 0.1f, 1, 145, -15);
             _cameraPosZinput = cameraControlMenuPosZinput.Item3;
@@ -186,7 +186,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     CameraPosRotSet(CameraItem.RotX, res);
                 }
             };
-            var cameraControlMenuRotXinput = UI.AddTextInput(_cameraControlMenu.transform, "Rot X", "Rot X", new Vector2(0, -15), "", rotXChange);
+            var cameraControlMenuRotXinput = UI.AddTextInput(_cameraControlMenu.transform, "Rot X", "Rot X", new Vector2(0, -15), "", rotXChange, "Rot Y", 1);
             UI.MoveTransform(cameraControlMenuRotXinput.Item1, 30, 16, 0f, 1, 230, -15);
             UI.MoveTransform(cameraControlMenuRotXinput.Item3.transform, 40, 20, 0.1f, 1, 220, -15);
             _cameraRotXinput = cameraControlMenuRotXinput.Item3;
@@ -200,7 +200,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     CameraPosRotSet(CameraItem.RotY, res);
                 }
             };
-            var cameraControlMenuRotYinput = UI.AddTextInput(_cameraControlMenu.transform, "Rot Y", "Rot Y", new Vector2(0, -15), "", rotYChange);
+            var cameraControlMenuRotYinput = UI.AddTextInput(_cameraControlMenu.transform, "Rot Y", "Rot Y", new Vector2(0, -15), "", rotYChange, "Rot Z", 1);
             UI.MoveTransform(cameraControlMenuRotYinput.Item1, 30, 16, 0f, 1, 300, -15);
             UI.MoveTransform(cameraControlMenuRotYinput.Item3.transform, 40, 20, 0.1f, 1, 290, -15);
             _cameraRotYinput = cameraControlMenuRotYinput.Item3;
@@ -214,7 +214,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     CameraPosRotSet(CameraItem.RotZ, res);
                 }
             };
-            var cameraControlMenuRotZinput = UI.AddTextInput(_cameraControlMenu.transform, "Rot Z", "Rot Z", new Vector2(0, -15), "", rotZChange);
+            var cameraControlMenuRotZinput = UI.AddTextInput(_cameraControlMenu.transform, "Rot Z", "Rot Z", new Vector2(0, -15), "", rotZChange, "FOV", 1);
             UI.MoveTransform(cameraControlMenuRotZinput.Item1, 30, 16, 0f, 1, 370, -15);
             UI.MoveTransform(cameraControlMenuRotZinput.Item3.transform, 40, 20, 0.1f, 1, 360, -15);
             _cameraRotZinput = cameraControlMenuRotZinput.Item3;
@@ -229,7 +229,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     cameraPosRotNoUpdate = true;
                 }
             };
-            var cameraControlMenuFOVinput = UI.AddTextInput(_cameraControlMenu.transform, "FOV", "FOV", new Vector2(0, -15), Settings.Instance.CameraFOV.ToString(), fovChange);
+            var cameraControlMenuFOVinput = UI.AddTextInput(_cameraControlMenu.transform, "FOV", "FOV", new Vector2(0, -15), Settings.Instance.CameraFOV.ToString(), fovChange, "Pos X", 0);
             UI.MoveTransform(cameraControlMenuFOVinput.Item1, 25, 16, 0f, 1, 440, -15);
             UI.MoveTransform(cameraControlMenuFOVinput.Item3.transform, 35, 20, 0.1f, 1, 425, -15);
             _cameraFOVinput = cameraControlMenuFOVinput.Item3;

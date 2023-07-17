@@ -59,6 +59,13 @@ namespace ChroMapper_CameraMovement.Configuration
         public string previewKeyBinding = "<Keyboard>/f4";
         public string scriptMapperKeyBinding = "<Keyboard>/f3";
         public string dragWindowKeyBinding = "<Keyboard>/shift";
+        public string inputFocusMoveKeyBinding = "<Keyboard>/tab";
+        public string input1upKeyBinding = "<Keyboard>/f1";
+        public string input1downKeyBinding = "<Keyboard>/f2";
+        public string input10upKeyBinding = "<Keyboard>/f3";
+        public string input10downKeyBinding = "<Keyboard>/f4";
+        public string input100upKeyBinding = "<Keyboard>/f5";
+        public string input100downKeyBinding = "<Keyboard>/f6";
         public float bookmarkUIAnchoredPosX = 150;
         public float bookmarkUIAnchoredPosY = 40;
         public float cameraControlUIAnchoredPosX = 310;

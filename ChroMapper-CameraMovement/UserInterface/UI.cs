@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using TMPro;
 using ChroMapper_CameraMovement.Configuration;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 using ChroMapper_CameraMovement.HarmonyPatches;
 
 namespace ChroMapper_CameraMovement.UserInterface
@@ -25,6 +26,11 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static List<Type> queuedToEnable = new List<Type>();
         public static bool keyDisable { get; private set; } = false;
         public static Vector2 savedMousePos = Vector2.zero;
+        public static EventSystem eventsystem;
+        public static string currentInputField = null;
+        public static Dictionary<string, (string, UITextInput, int?)> focusMoveList = new Dictionary<string, (string, UITextInput, int?)>();
+        public static bool inputFocusMoveActive = false;
+        public static bool inputRoundActive = false;
 
         private static readonly Type[] editActionMapsDisabled =
         {
@@ -62,6 +68,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public void AddMenu(MapEditorUI mapEditorUI)
         {
+            eventsystem = EventSystem.current;
             _mainMenuUI.AddMenu(mapEditorUI);
             _settingMenuUI.AddMenu(mapEditorUI);
             _bookmarkMenuUI.AddMenu(mapEditorUI);
@@ -134,6 +141,57 @@ namespace ChroMapper_CameraMovement.UserInterface
             }
         }
 
+        public static void InputFocusMove(InputAction.CallbackContext context)
+        {
+            if (!context.ReadValueAsButton())
+            {
+                inputFocusMoveActive = false;
+                return;
+            }
+            if (inputFocusMoveActive)
+                return;
+            inputFocusMoveActive = true;
+            (string, UITextInput, int?) currentInput;
+            if (focusMoveList.TryGetValue(currentInputField, out currentInput))
+            {
+                if (currentInput.Item1 == null)
+                    return;
+                (string, UITextInput, int?) nextInput;
+                if (focusMoveList.TryGetValue(currentInput.Item1, out nextInput))
+                {
+                    nextInput.Item2.InputField.Select();
+                    currentInputField = currentInput.Item1;
+                }
+            }
+        }
+        public static void InputRound(InputAction.CallbackContext context, int up)
+        {
+            if (!context.ReadValueAsButton())
+            {
+                inputRoundActive = false;
+                return;
+            }
+            if (inputRoundActive)
+                return;
+            (string, UITextInput, int?) currentInput;
+            if (focusMoveList.TryGetValue(currentInputField, out currentInput))
+            {
+                if (currentInput.Item3 == null)
+                    return;
+                var roundDigits = (int)currentInput.Item3;
+                double value;
+                if (double.TryParse(currentInput.Item2.InputField.text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out value))
+                {
+                    value += Math.Pow(10, -roundDigits) * up;
+                    var digits = roundDigits - (int)Math.Log10(Math.Abs(up));
+                    value *= Math.Pow(10, digits);
+                    value = Math.Round(value, MidpointRounding.AwayFromZero);
+                    value *= Math.Pow(10, -digits);
+                    currentInput.Item2.InputField.text = value.ToString();
+                }
+            }
+        }
+
         // i ended up copying Top_Cat's CM-JS UI helper, too useful to make my own tho
         // after askin TC if it's one of the only way, he let me use this
         public static UIButton AddButton(Transform parent, string title, string text, Vector2 pos, UnityAction onClick)
@@ -167,7 +225,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             return (rectTransform, textComponent);
         }
 
-        public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, Vector2 pos, string value, UnityAction<string> onChange)
+        public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, Vector2 pos, string value, UnityAction<string> onChange, string focusMove = null, int? roundDigits = null)
         {
             var entryLabel = new GameObject(title + " Label", typeof(TextMeshProUGUI));
             var rectTransform = ((RectTransform)entryLabel.transform);
@@ -185,6 +243,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var textInput = UnityEngine.Object.Instantiate(PersistentUI.Instance.TextInputPrefab, parent);
             MoveTransform(textInput.transform, 75, 20, 0.5f, 1, pos.x + 27.5f, pos.y);
             textInput.GetComponent<Image>().pixelsPerUnitMultiplier = 3;
+            textInput.name = title;
             textInput.InputField.text = value;
             textInput.InputField.onFocusSelectAll = false;
             textInput.InputField.textComponent.alignment = TextAlignmentOptions.Left;
@@ -192,13 +251,20 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             textInput.InputField.onValueChanged.AddListener(onChange);
             textInput.InputField.onEndEdit.AddListener(delegate {
+                if (inputFocusMoveActive)
+                    return;
                 KeyDisableCheck();
                 Plugin.movement.KeyEnable();
+                currentInputField = null;
             });
             textInput.InputField.onSelect.AddListener(delegate {
+                if (inputFocusMoveActive)
+                    return;
                 DisableAction(actionMapsDisabled);
                 Plugin.movement.KeyDisable();
+                currentInputField = eventsystem.currentSelectedGameObject.name;
             });
+            focusMoveList.Add(title, (focusMove, textInput, roundDigits));
             return (rectTransform, textComponent, textInput);
         }
 

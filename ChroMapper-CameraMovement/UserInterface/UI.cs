@@ -24,13 +24,13 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static MultiDisplayUI _multiDisplayUI = new MultiDisplayUI();
         public static List<Type> queuedToDisable = new List<Type>();
         public static List<Type> queuedToEnable = new List<Type>();
-        public static bool keyDisable { get; private set; } = false;
-        public static Vector2 savedMousePos = Vector2.zero;
+        public static bool keyDisable { get; private set; }
+        public static Vector2 savedMousePos;
         public static EventSystem eventsystem;
-        public static string currentInputField = null;
-        public static Dictionary<string, (string, UITextInput, int?)> focusMoveList = new Dictionary<string, (string, UITextInput, int?)>();
-        public static bool inputFocusMoveActive = false;
-        public static bool inputRoundActive = false;
+        public static string currentInputField;
+        public static Dictionary<string, (string, UITextInput, int?)> focusMoveList;
+        public static bool inputFocusMoveActive;
+        public static bool inputRoundActive;
 
         private static readonly Type[] editActionMapsDisabled =
         {
@@ -68,6 +68,11 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public void AddMenu(MapEditorUI mapEditorUI)
         {
+            keyDisable = false;
+            currentInputField = null;
+            focusMoveList = new Dictionary<string, (string, UITextInput, int?)>();
+            inputFocusMoveActive = false;
+            inputRoundActive = false;
             eventsystem = EventSystem.current;
             _mainMenuUI.AddMenu(mapEditorUI);
             _settingMenuUI.AddMenu(mapEditorUI);

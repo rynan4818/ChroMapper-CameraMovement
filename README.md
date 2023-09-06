@@ -29,6 +29,8 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 [CustomSongTimeEvents](https://github.com/rynan4818/CustomSongTimeEvents)を適用したCustom Avatars, Custom Platformsモデルを使用することで、カメラワークとプラットフォームのイベントプレビュー、Custom Avatarsの自動表情制御なども同時に可能になります。
 
+Scriptmapperで作れないような複雑なカメラワークをBlenderで作る[Blender2ScriptMapper](https://github.com/rynan4818/blender2ScriptMapper) も作成しましたので参考にしてください。
+
 ## 機能紹介動画
 
 今までのアップデートで追加してきた機能の紹介動画です。機能が多くて下記説明を読むのも大変だと思いますので、ざっと動画を見てもらえると知らなかった機能とかあるかもしれません。

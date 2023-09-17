@@ -31,6 +31,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static Dictionary<string, (string, UITextInput, int?)> focusMoveList;
         public static bool inputFocusMoveActive;
         public static bool inputRoundActive;
+        public static bool inputEndEdit;
+        public static bool inputSelect;
 
         private static readonly Type[] editActionMapsDisabled =
         {
@@ -121,12 +123,24 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public static void QueuedActionMaps()
         {
+            // ChroMapper 0.8.629辺りからTextInputをマウスで行き来するとキー操作無効になるので対策
+            // 同じフレームで同じActionMapに対してEnable、Disableするとなるっぽい
+            if (inputEndEdit && inputSelect)
+            {
+                inputEndEdit = false;
+                inputSelect = false;
+                queuedToDisable.Clear();
+                queuedToEnable.Clear();
+                return;
+            }
             if (queuedToDisable.Any())
                 CMInputCallbackInstaller.DisableActionMaps(typeof(UI), queuedToDisable.ToArray());
             queuedToDisable.Clear();
             if (queuedToEnable.Any())
                 CMInputCallbackInstaller.ClearDisabledActionMaps(typeof(UI), queuedToEnable.ToArray());
             queuedToEnable.Clear();
+            inputEndEdit = false;
+            inputSelect = false;
         }
 
         public static void SetLockState(bool lockMouse)
@@ -258,16 +272,24 @@ namespace ChroMapper_CameraMovement.UserInterface
             textInput.InputField.onEndEdit.AddListener(delegate {
                 if (inputFocusMoveActive)
                     return;
-                KeyDisableCheck();
+                if (keyDisable)
+                    EnableAction(editActionMapsDisabled);
+                else
+                    EnableAction(actionMapsDisabled);
                 Plugin.movement.KeyEnable();
                 currentInputField = null;
+                inputEndEdit = true;
             });
             textInput.InputField.onSelect.AddListener(delegate {
                 if (inputFocusMoveActive)
                     return;
-                DisableAction(actionMapsDisabled);
+                if (keyDisable)
+                    DisableAction(editActionMapsDisabled);
+                else
+                    DisableAction(actionMapsDisabled);
                 Plugin.movement.KeyDisable();
                 currentInputField = eventsystem.currentSelectedGameObject.name;
+                inputSelect = true;
             });
             focusMoveList.Add(title, (focusMove, textInput, roundDigits));
             return (rectTransform, textComponent, textInput);

@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraPlus\CameraMovement.cs" />
+    <Compile Include="Component\CoroutineStarter.cs" />
     <Compile Include="Component\DefaultCameraController.cs" />
     <Compile Include="Component\MultiDisplayController.cs" />
     <Compile Include="Component\BookmarkLinesController.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="Controller\ScriptMapperController.cs" />
     <Compile Include="Util\SimpleJSON.cs" />
     <Compile Include="Controller\VRMAvatarController.cs" />
+    <Compile Include="Util\TimeoutTimer.cs" />
     <Compile Include="Util\UnityUtility.cs" />
   </ItemGroup>
   <ItemGroup>

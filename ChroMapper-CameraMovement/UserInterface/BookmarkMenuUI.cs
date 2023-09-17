@@ -125,7 +125,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var regexKey = new Regex(@"<\w+>/");
             var scriptMapperRunButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(460, -22), () =>
             {
-                ScriptMapperController.ScriptMapperRun();
+                ScriptMapperController.Instance.ScriptMapperRun();
             });
             scriptMapperRunButton.Text.fontSize = 9;
             UI.MoveTransform(scriptMapperRunButton.transform, 55, 20, 0.1f, 1, 640, -35);

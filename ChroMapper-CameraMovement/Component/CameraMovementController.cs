@@ -703,7 +703,7 @@ namespace ChroMapper_CameraMovement.Component
             previewAction.performed += context => OnPreview();
             previewAction.Enable();
             scriptMapperAction = new InputAction("Script Mapper run", binding: Options.Instance.scriptMapperKeyBinding);
-            scriptMapperAction.performed += context => ScriptMapperController.ScriptMapperRun();
+            scriptMapperAction.performed += context => ScriptMapperController.Instance.ScriptMapperRun();
             scriptMapperAction.Enable();
             dragWindowsAction = new InputAction("Drag Windows", binding: Options.Instance.dragWindowKeyBinding);
             dragWindowsAction.started += OnDragWIndows;

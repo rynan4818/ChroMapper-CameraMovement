@@ -149,7 +149,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(0, -245), () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
-                ScriptMapperController.ScriptMapperRun();
+                ScriptMapperController.Instance.ScriptMapperRun();
             });
             UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -215);
 

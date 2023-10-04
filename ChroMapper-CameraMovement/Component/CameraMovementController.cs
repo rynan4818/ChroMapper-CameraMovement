@@ -57,6 +57,8 @@ namespace ChroMapper_CameraMovement.Component
         public static InputAction input10downAction;
         public static InputAction input100upAction;
         public static InputAction input100downAction;
+        public static InputAction input1000upAction;
+        public static InputAction input1000downAction;
 
         public bool _reload = false;
         public float beforeSeconds;
@@ -521,6 +523,8 @@ namespace ChroMapper_CameraMovement.Component
                 input10downAction.Enable();
                 input100upAction.Enable();
                 input100downAction.Enable();
+                input1000upAction.Enable();
+                input1000downAction.Enable();
             }
         }
 
@@ -539,6 +543,8 @@ namespace ChroMapper_CameraMovement.Component
             input10downAction.Disable();
             input100upAction.Disable();
             input100downAction.Disable();
+            input1000upAction.Disable();
+            input1000downAction.Disable();
         }
         private IEnumerator Start()
         {
@@ -738,14 +744,34 @@ namespace ChroMapper_CameraMovement.Component
             input10downAction.performed += context => UI.InputRound(context, -10);
             input10downAction.canceled += context => UI.InputRound(context, -10);
             input10downAction.Disable();
-            input100upAction = new InputAction("Input100upAction", binding: Options.Instance.input100upKeyBinding);
+            input100upAction = new InputAction("Input100upAction");
+            input100upAction.AddCompositeBinding("ButtonWithOneModifier")
+                .With("Modifier", Options.Instance.input100modifierKeyBinding)
+                .With("Button", Options.Instance.input1upKeyBinding);
             input100upAction.performed += context => UI.InputRound(context, 100);
             input100upAction.canceled += context => UI.InputRound(context, 100);
             input100upAction.Disable();
-            input100downAction = new InputAction("Input100downAction", binding: Options.Instance.input100downKeyBinding);
+            input100downAction = new InputAction("Input100downAction");
+            input100downAction.AddCompositeBinding("ButtonWithOneModifier")
+                .With("Modifier", Options.Instance.input100modifierKeyBinding)
+                .With("Button", Options.Instance.input1downKeyBinding);
             input100downAction.performed += context => UI.InputRound(context, -100);
             input100downAction.canceled += context => UI.InputRound(context, -100);
             input100downAction.Disable();
+            input1000upAction = new InputAction("Input1000upAction");
+            input1000upAction.AddCompositeBinding("ButtonWithOneModifier")
+                .With("Modifier", Options.Instance.input100modifierKeyBinding)
+                .With("Button", Options.Instance.input10upKeyBinding);
+            input1000upAction.performed += context => UI.InputRound(context, 1000);
+            input1000upAction.canceled += context => UI.InputRound(context, 1000);
+            input1000upAction.Disable();
+            input1000downAction = new InputAction("Input1000downAction");
+            input1000downAction.AddCompositeBinding("ButtonWithOneModifier")
+                .With("Modifier", Options.Instance.input100modifierKeyBinding)
+                .With("Button", Options.Instance.input10downKeyBinding);
+            input1000downAction.performed += context => UI.InputRound(context, -1000);
+            input1000downAction.canceled += context => UI.InputRound(context, -1000);
+            input1000downAction.Disable();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             _bookmarkController = new BookmarkController();

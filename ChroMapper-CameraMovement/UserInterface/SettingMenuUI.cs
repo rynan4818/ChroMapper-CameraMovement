@@ -34,7 +34,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             movementController = Plugin.movement;
             //More Settings Menu
-            _cameraMovementSettingMenu = UI.SetMenu(new GameObject("CameraMovement Setting Menu"), topBarCanvas, AnchoredPosSave, 500, 210, Options.Instance.settingMenuUIAnchoredPosX, Options.Instance.settingMenuUIAnchoredPosY);
+            _cameraMovementSettingMenu = UI.SetMenu(new GameObject("CameraMovement Setting Menu"), topBarCanvas, AnchoredPosSave, 500, 240, Options.Instance.settingMenuUIAnchoredPosX, Options.Instance.settingMenuUIAnchoredPosY);
 
             UI.AddLabel(_cameraMovementSettingMenu.transform, "More Settings", "More Settings", new Vector2(0, -15));
 
@@ -298,19 +298,35 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(mappingDisableCheck.Item3.transform, 30, 16, 0, 1, 170, -185);
             UI.MoveTransform(mappingDisableCheck.Item1, 70, 16, 0, 1, 210, -185);
 
-            var bookmarkLinesTopCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "bookmark Lines Top", "bookmark Lines Top", Options.Instance.bookmarkLinesShowOnTop, (check) =>
+            var bookmarkLinesTopCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Bookmark Lines Top", "Bookmark Lines Top", Options.Instance.bookmarkLinesShowOnTop, (check) =>
             {
                 Options.Instance.bookmarkLinesShowOnTop = check;
                 CameraMovementController.bookmarkLinesCanvas.GetComponent<BookmarkLinesRenderingOrderController>().BookmakLinesCameraINIT(Options.Instance.bookmarkLinesShowOnTop);
             });
             UI.MoveTransform(bookmarkLinesTopCheck.Item3.transform, 30, 16, 0, 1, 260, -185);
-            UI.MoveTransform(bookmarkLinesTopCheck.Item1, 70, 16, 0, 1, 300, -185);
+            UI.MoveTransform(bookmarkLinesTopCheck.Item1, 50, 16, 0, 1, 290, -185);
+
+            var cameraDirectionScrollReversalCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Camera Direction Scroll Reversal", "Camera Direction Scroll Reversal", Options.Instance.cameraDirectionScrollReversal, (check) =>
+            {
+                Options.Instance.cameraDirectionScrollReversal = check;
+                UI.KeyDisableCheck();
+            });
+            UI.MoveTransform(cameraDirectionScrollReversalCheck.Item3.transform, 30, 16, 0, 1, 330, -185);
+            UI.MoveTransform(cameraDirectionScrollReversalCheck.Item1, 70, 16, 0, 1, 370, -185);
+
+            var defaultInvertScrollTimeCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Default Invert Scroll Time", "Default Invert Scroll Time", Options.Instance.defaultInvertScrollTime, (check) =>
+            {
+                Options.Instance.defaultInvertScrollTime = check;
+                UI.KeyDisableCheck();
+            });
+            UI.MoveTransform(defaultInvertScrollTimeCheck.Item3.transform, 30, 16, 0, 1, 420, -185);
+            UI.MoveTransform(defaultInvertScrollTimeCheck.Item1, 70, 16, 0, 1, 460, -185);
 
             var saveButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", () =>
             {
                 Options.Instance.SettingSave();
             });
-            UI.MoveTransform(saveButton.transform, 60, 25, 0, 1, 380, -190);
+            UI.MoveTransform(saveButton.transform, 60, 25, 0, 1, 380, -220);
 
             var closeButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", () =>
             {
@@ -318,7 +334,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI.KeyDisableCheck();
                 movementController.SubCameraRectDisable();
             });
-            UI.MoveTransform(closeButton.transform, 50, 25, 0, 1, 440, -190);
+            UI.MoveTransform(closeButton.transform, 50, 25, 0, 1, 440, -220);
 
             _cameraMovementSettingMenu.SetActive(false);
         }

@@ -64,8 +64,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public string input1downKeyBinding = "<Keyboard>/f2";
         public string input10upKeyBinding = "<Keyboard>/f3";
         public string input10downKeyBinding = "<Keyboard>/f4";
-        public string input100upKeyBinding = "<Keyboard>/f5";
-        public string input100downKeyBinding = "<Keyboard>/f6";
+        public string input100modifierKeyBinding = "<Keyboard>/shift";
         public float bookmarkUIAnchoredPosX = 150;
         public float bookmarkUIAnchoredPosY = 40;
         public float cameraControlUIAnchoredPosX = 310;
@@ -132,7 +131,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public int bookmarkLinesFontSize = 100;
         public bool subCameraModel = false;
         public float subCameraModelTrailTime = 4f;
-        public bool cameraDirectionScrollReversal = true;
+        public bool cameraDirectionScrollReversal = false;
         public bool defaultInvertScrollTime = false;
 
         public static Options Instance {

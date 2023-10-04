@@ -45,31 +45,17 @@ namespace ChroMapper_CameraMovement.UserInterface
             Options.Instance.bookmarkUIAnchoredPosY = _cameraMovementBookmarkMenu.GetComponent<RectTransform>().anchoredPosition.y;
         }
 
-        public void AddMenu(MapEditorUI mapEditorUI)
+        public void AddMenu(CanvasGroup topBarCanvas)
         {
             movementController = Plugin.movement;
-            var parent = mapEditorUI.MainUIGroup[5];
-            _cameraMovementBookmarkMenu = new GameObject("CameraMovement Bookmark");
-            _cameraMovementBookmarkMenu.transform.parent = parent.transform;
-            _cameraMovementBookmarkMenu.AddComponent<DragWindowController>();
-            _cameraMovementBookmarkMenu.GetComponent<DragWindowController>().canvas = parent.GetComponent<Canvas>();
-            _cameraMovementBookmarkMenu.GetComponent<DragWindowController>().OnDragWindow += AnchoredPosSave;
-
             //Bookmark
-            UI.AttachTransform(_cameraMovementBookmarkMenu, 750, 55, 0.7f, 0.09f, Options.Instance.bookmarkUIAnchoredPosX, Options.Instance.bookmarkUIAnchoredPosY, 1, 1);
+            _cameraMovementBookmarkMenu = UI.SetMenu(new GameObject("CameraMovement Bookmark"), topBarCanvas, AnchoredPosSave, 750, 55, Options.Instance.bookmarkUIAnchoredPosX, Options.Instance.bookmarkUIAnchoredPosY, 0.7f, 0.09f);
 
-            Image imageBookmark = _cameraMovementBookmarkMenu.AddComponent<Image>();
-            imageBookmark.sprite = PersistentUI.Instance.Sprites.Background;
-            imageBookmark.type = Image.Type.Sliced;
-            imageBookmark.color = new Color(0.24f, 0.24f, 0.24f);
-
-            var currentBookmarkLabel = UI.AddLabel(_cameraMovementBookmarkMenu.transform, "", "", new Vector2(0, -15));
+            var currentBookmarkLabel = UI.AddLabel(_cameraMovementBookmarkMenu.transform, "", "", TextAlignmentOptions.Left, 12);
             UI.MoveTransform(currentBookmarkLabel.Item1, 400, 20, 0.1f, 1, 210, -15);
-            currentBookmarkLabel.Item2.fontSize = 12;
-            currentBookmarkLabel.Item2.alignment = TextAlignmentOptions.Left;
             currentBookmarkLabelText = currentBookmarkLabel.Item2;
 
-            var bookmarkSetCheckbox = UI.AddCheckbox(_cameraMovementBookmarkMenu.transform, "Set", "Set", new Vector2(0, -40), false, (check) =>
+            var bookmarkSetCheckbox = UI.AddCheckbox(_cameraMovementBookmarkMenu.transform, "Set", "Set", false, (check) =>
             {
                 commandSet = check;
             });
@@ -77,7 +63,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(bookmarkSetCheckbox.Item3.transform, 30, 16, 0.1f, 1, -35, -37);
             bookmarkSetCheckboxToggle = bookmarkSetCheckbox.Item3;
 
-            var bookmarkMenuInput = UI.AddTextInput(_cameraMovementBookmarkMenu.transform, "No.-", "No.-", new Vector2(0, -22), "", (value) =>
+            var bookmarkMenuInput = UI.AddTextInput(_cameraMovementBookmarkMenu.transform, "No.-", "No.-", "", (value) =>
             {
             });
             UI.MoveTransform(bookmarkMenuInput.Item1, 150, 16, 0.1f, 1, 10, -15);
@@ -87,35 +73,35 @@ namespace ChroMapper_CameraMovement.UserInterface
             bookmarkMenuInputText = bookmarkMenuInput.Item3;
             bookmarkMenuInputText.InputField.textComponent.fontSize = 14;
 
-            var bookmarkMenuCopyButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Copy to Edit", "Copy to Edit", new Vector2(460, -22), () =>
+            var bookmarkMenuCopyButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Copy to Edit", "Copy to Edit", () =>
             {
                 bookmarkMenuInputText.InputField.text = currentBookmarkLabelText.text;
             });
             bookmarkMenuCopyButton.Text.fontSize = 9;
             UI.MoveTransform(bookmarkMenuCopyButton.transform, 35, 20, 0.1f, 1, -10, -35);
 
-            var bookmarkMenuClearButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Clear", "Clear", new Vector2(460, -22), () =>
+            var bookmarkMenuClearButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Clear", "Clear", () =>
             {
                 bookmarkMenuInputText.InputField.text = "";
             });
             bookmarkMenuClearButton.Text.fontSize = 10;
             UI.MoveTransform(bookmarkMenuClearButton.transform, 30, 20, 0.1f, 1, 25, -35);
 
-            var bookmarkMenuNewButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "New", "New", new Vector2(460, -22), () =>
+            var bookmarkMenuNewButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "New", "New", () =>
             {
                 if (bookmarkMenuInputText.InputField.text.Trim() != "")
                     movementController._bookmarkController.BookmarkNew(bookmarkMenuInputText.InputField.text);
             });
             UI.MoveTransform(bookmarkMenuNewButton.transform, 30, 20, 0.1f, 1, 515, -35);
 
-            var bookmarkMenuChangeButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Change", "Change", new Vector2(460, -22), () =>
+            var bookmarkMenuChangeButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Change", "Change", () =>
             {
                 if (currentBookmarkNo > 0)
                     movementController._bookmarkController.BookmarkChange(currentBookmarkNo);
             });
             UI.MoveTransform(bookmarkMenuChangeButton.transform, 40, 20, 0.1f, 1, 550, -35);
 
-            var bookmarkMenuDeleteButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Delete", "Delete", new Vector2(460, -22), () =>
+            var bookmarkMenuDeleteButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Delete", "Delete", () =>
             {
                 if (currentBookmarkNo > 0)
                     movementController._bookmarkController.BookmarkDelete(currentBookmarkNo);
@@ -123,14 +109,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(bookmarkMenuDeleteButton.transform, 40, 20, 0.1f, 1, 590, -35);
 
             var regexKey = new Regex(@"<\w+>/");
-            var scriptMapperRunButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", new Vector2(460, -22), () =>
+            var scriptMapperRunButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", () =>
             {
                 ScriptMapperController.Instance.ScriptMapperRun();
             });
             scriptMapperRunButton.Text.fontSize = 9;
             UI.MoveTransform(scriptMapperRunButton.transform, 55, 20, 0.1f, 1, 640, -35);
 
-            quickCommand1Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command1", Options.Instance.quickCommand1, new Vector2(460, -22), () =>
+            quickCommand1Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command1", Options.Instance.quickCommand1, () =>
             {
                 if (commandSet)
                 {
@@ -149,7 +135,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(quickCommand1Button.transform, 50, 20, 0.1f, 1, 390, -15);
 
-            quickCommand2Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command2", Options.Instance.quickCommand2, new Vector2(460, -22), () =>
+            quickCommand2Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command2", Options.Instance.quickCommand2, () =>
             {
                 if (commandSet)
                 {
@@ -168,7 +154,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(quickCommand2Button.transform, 50, 20, 0.1f, 1, 440, -15);
 
-            quickCommand3Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command3", Options.Instance.quickCommand3, new Vector2(460, -22), () =>
+            quickCommand3Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command3", Options.Instance.quickCommand3, () =>
             {
                 if (commandSet)
                 {
@@ -187,7 +173,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(quickCommand3Button.transform, 50, 20, 0.1f, 1, 490, -15);
 
-            quickCommand4Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command4", Options.Instance.quickCommand4, new Vector2(460, -22), () =>
+            quickCommand4Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command4", Options.Instance.quickCommand4, () =>
             {
                 if (commandSet)
                 {
@@ -206,7 +192,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(quickCommand4Button.transform, 50, 20, 0.1f, 1, 540, -15);
 
-            quickCommand5Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command5", Options.Instance.quickCommand5, new Vector2(460, -22), () =>
+            quickCommand5Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command5", Options.Instance.quickCommand5, () =>
             {
                 if (commandSet)
                 {
@@ -225,7 +211,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(quickCommand5Button.transform, 50, 20, 0.1f, 1, 590, -15);
 
-            quickCommand6Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command6", Options.Instance.quickCommand6, new Vector2(460, -22), () =>
+            quickCommand6Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command6", Options.Instance.quickCommand6, () =>
             {
                 if (commandSet)
                 {

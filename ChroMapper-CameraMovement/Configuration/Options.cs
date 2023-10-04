@@ -132,6 +132,8 @@ namespace ChroMapper_CameraMovement.Configuration
         public int bookmarkLinesFontSize = 100;
         public bool subCameraModel = false;
         public float subCameraModelTrailTime = 4f;
+        public bool cameraDirectionScrollReversal = true;
+        public bool defaultInvertScrollTime = false;
 
         public static Options Instance {
             get {

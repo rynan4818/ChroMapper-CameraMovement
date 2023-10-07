@@ -32,6 +32,7 @@ namespace ChroMapper_CameraMovement.Component
         public static OrbitCameraController orbitCamera;
         public static PlusCameraController plusCamera;
         public static DefaultCameraController defaultCamera;
+        public static MovementPlayerController _movementPlayerController;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_UIMode;
         public static GameObject avatarHead;
@@ -417,6 +418,8 @@ namespace ChroMapper_CameraMovement.Component
                 {
                     avatarModel.SetActive(false);
                 }
+                yield return new WaitUntil(() => _movementPlayerController._init == true);
+                _movementPlayerController.SetMovementData(avatarModel);
             }
 
         }
@@ -553,6 +556,7 @@ namespace ChroMapper_CameraMovement.Component
             autoSave = FindObjectOfType<AutoSaveController>();
             spectrogramSideSwapper = FindObjectOfType<SpectrogramSideSwapper>();
             vrmAvatarController = new VRMAvatarController();
+            _movementPlayerController = new MovementPlayerController();
 
             orbitCamera = this.gameObject.AddComponent<OrbitCameraController>();
             plusCamera = this.gameObject.AddComponent<PlusCameraController>();
@@ -772,6 +776,7 @@ namespace ChroMapper_CameraMovement.Component
             input1000downAction.performed += context => UI.InputRound(context, -1000);
             input1000downAction.canceled += context => UI.InputRound(context, -1000);
             input1000downAction.Disable();
+            _ = _movementPlayerController.InitMovementDataAsync();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             _bookmarkController = new BookmarkController();
@@ -806,11 +811,13 @@ namespace ChroMapper_CameraMovement.Component
                 if (beforeSeconds > atsc.CurrentSeconds)
                 {
                     _cameraMovement.MovementPositionReset();
+                    _movementPlayerController.MovementPositionReset();
                     beforeSeconds = 0;
                 }
                 beforeSeconds = atsc.CurrentSeconds;
                 _bookmarkController?.BookMarkUpdate();
                 _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, subCamera , AvatarPositionGet());
+                _movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
             }
             GameObject targetCamera;
             float targetFOV;

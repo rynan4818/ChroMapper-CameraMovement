@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -93,22 +94,33 @@ namespace ChroMapper_CameraMovement.Controller
             this.eventID = 0;
         }
 
-        public void SetMovementData(GameObject models)
+        public void SetMovementData(GameObject avatarModel, GameObject saberModel)
         {
             if (!this._init || this._records == null)
                 return;
             this._movementData = new List<MovementData>();
             this._movementModels = new List<(Transform, int)>();
-            var modelTree = models.GetComponentsInChildren<Transform>(true);
-            var topNameLength = modelTree[0].name.Length + 1;
-            for (var i = 1; i < modelTree.Length; i++)
+            var avatarModelTree = avatarModel.GetComponentsInChildren<Transform>(true);
+            var topNameLength = avatarModelTree[0].name.Length + 1;
+            for (var i = 1; i < avatarModelTree.Length; i++)
             {
-                var name = modelTree[i].GetFullPathName().Substring(topNameLength);
+                var name = avatarModelTree[i].GetFullPathName().Substring(topNameLength);
                 for (var j = 0; j < this._records.avatarObjectNames.Count; j++)
                 {
                     var objectName = this._records.avatarObjectNames[j];
                     if (objectName.Length - name.Length >= 0 && objectName.Substring(objectName.Length - name.Length) == name)
-                        this._movementModels.Add((modelTree[i], j));
+                        this._movementModels.Add((avatarModelTree[i], j));
+                }
+            }
+            var saberModelTree = saberModel.GetComponentsInChildren<Transform>(true);
+            for (var i = 1; i < saberModelTree.Length; i++)
+            {
+                var name = saberModelTree[i].GetFullPathName().Substring(topNameLength);
+                for (var j = 0; j < this._records.avatarObjectNames.Count; j++)
+                {
+                    var objectName = this._records.avatarObjectNames[j];
+                    if (objectName.Length - name.Length >= 0 && objectName.Substring(objectName.Length - name.Length) == name)
+                        this._movementModels.Add((saberModelTree[i], j));
                 }
             }
             foreach (var record in this._records.record)
@@ -136,7 +148,7 @@ namespace ChroMapper_CameraMovement.Controller
             }
             this.nextSongTime = 0;
             this.eventID = 0;
-            models.transform.localScale = new Vector3(this._records.avatarScale[0], this._records.avatarScale[1], this._records.avatarScale[2]) * Options.Instance.avatarCameraScale;
+            avatarModel.transform.localScale = new Vector3(this._records.avatarScale[0], this._records.avatarScale[1], this._records.avatarScale[2]) * Options.Instance.avatarCameraScale;
         }
 
         public async Task<MovementJson> ReadRecordFileAsync(string path)

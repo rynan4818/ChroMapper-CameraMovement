@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 
 namespace ChroMapper_CameraMovement.Util
 {
@@ -22,10 +24,24 @@ namespace ChroMapper_CameraMovement.Util
                 return transform.name;
             return GetFullPathName(transform.parent) + "/" + transform.name;
         }
+        /// <summary>
+        /// Vector3で線形補間する
+        /// </summary>
+        /// <param name="from">開始値</param>
+        /// <param name="to">終了値</param>
+        /// <param name="percent">線形補間する値(0～1)</param>
+        /// <returns>補間後の値</returns>
         public static Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
         {
             return new Vector3(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent));
         }
+        /// <summary>
+        /// Quaternionで線形補間する
+        /// </summary>
+        /// <param name="from">開始値</param>
+        /// <param name="to">終了値</param>
+        /// <param name="percent">線形補間する値(0～1)</param>
+        /// <returns>補間後の値</returns>
         public static Quaternion LerpQuaternion(Quaternion from, Quaternion to, float percent)
         {
             var value = Quaternion.Dot(from, to);
@@ -33,6 +49,41 @@ namespace ChroMapper_CameraMovement.Util
                 return new Quaternion(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent), Mathf.LerpAngle(from.w, to.w, percent));
             else
                 return new Quaternion(Mathf.LerpAngle(from.x, -to.x, percent), Mathf.LerpAngle(from.y, -to.y, percent), Mathf.LerpAngle(from.z, -to.z, percent), Mathf.LerpAngle(from.w, -to.w, percent));
+        }
+        public static IEnumerator AssetLoadCoroutine(string assetFile, string name, int setLayer, Action<bool, GameObject> result)
+        {
+            var request = AssetBundle.LoadFromFileAsync(assetFile);
+            yield return request;
+            if (request.isDone && request.assetBundle)
+            {
+                var assetBundleRequest = request.assetBundle.LoadAssetWithSubAssetsAsync<GameObject>(name);
+                yield return assetBundleRequest;
+                request.assetBundle.Unload(false);
+                if (assetBundleRequest.isDone && assetBundleRequest.asset != null)
+                {
+                    try
+                    {
+                        var model = (GameObject)UnityEngine.Object.Instantiate(assetBundleRequest.asset);
+                        AllSetLayer(model, setLayer);
+                        result?.Invoke(true, model);
+                    }
+                    catch
+                    {
+                        Debug.LogError("Asset model Instantiate ERR!");
+                        result?.Invoke(false, null);
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Asset Load2 ERR!");
+                    result?.Invoke(false, null);
+                }
+            }
+            else
+            {
+                Debug.LogError("Asset Load1 ERR!");
+                result?.Invoke(false, null);
+            }
         }
     }
 }

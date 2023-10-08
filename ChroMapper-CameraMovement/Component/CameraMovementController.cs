@@ -47,6 +47,7 @@ namespace ChroMapper_CameraMovement.Component
         public static Camera subCamera;
         public static Camera layoutCamera;
         public static GameObject avatarModel;
+        public static GameObject saberModel;
         public static InputAction previewAction;
         public static InputAction scriptMapperAction;
         public static InputAction dragWindowsAction;
@@ -169,7 +170,7 @@ namespace ChroMapper_CameraMovement.Component
 
         public void Reload()
         {
-            StartCoroutine("CustomAvatarLoad");
+            StartCoroutine(this.CustomAvatarLoad());
             VRMAvatarLoad();
             cm_MapEditorCamera.GetComponent<Camera>().cullingMask |= 1 << avatarLayer;
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
@@ -367,42 +368,46 @@ namespace ChroMapper_CameraMovement.Component
                 }
                 if (File.Exists(Options.Instance.avatarFileName))
                 {
-                    var request = AssetBundle.LoadFromFileAsync(Options.Instance.avatarFileName);
-                    yield return request;
-                    if (request.isDone && request.assetBundle)
+                    yield return UnityUtility.AssetLoadCoroutine(Options.Instance.avatarFileName, "_CustomAvatar", avatarLayer,(result, model) =>
                     {
-                        var assetBundleRequest = request.assetBundle.LoadAssetWithSubAssetsAsync<GameObject>("_CustomAvatar");
-                        yield return assetBundleRequest;
-                        if (assetBundleRequest.isDone && assetBundleRequest.asset != null)
+                        if (result)
                         {
-                            request.assetBundle.Unload(false);
-                            try
-                            {
-                                avatarModel = (GameObject)Instantiate(assetBundleRequest.asset);
-                                UnityUtility.AllSetLayer(avatarModel, avatarLayer);
-                                currentAvatarFile = Options.Instance.avatarFileName;
-                            }
-                            catch
-                            {
-                                Debug.LogError("Avatar Instantiate ERR!");
-                            }
+                            currentAvatarFile = Options.Instance.avatarFileName;
+                            avatarModel = model;
                         }
                         else
-                        {
-                            Debug.LogError("Avatar Load2 ERR!");
-                            request.assetBundle.Unload(false);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError("Avatar Load1 ERR!");
-                    }
+                            avatarModel = null;
+                    });
                 }
                 else
                 {
                     Debug.LogError("Avatar File ERR!");
                 }
             }
+            if (saberModel != null)
+            {
+                Destroy(saberModel);
+                Resources.UnloadUnusedAssets();
+            }
+            var saberFile = @"C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\CustomSabers\SnowResort_V1.0.saber";
+            if (File.Exists(saberFile))
+            {
+                yield return UnityUtility.AssetLoadCoroutine(saberFile, "_CustomSaber", avatarLayer, (result, model) =>
+                {
+                    if (result)
+                    {
+                        saberModel = model;
+                    }
+                    else
+                        saberModel = null;
+                });
+            }
+            else
+            {
+                Debug.LogError("Saber File ERR!");
+            }
+
+
             if (avatarModel != null)
             {
                 avatarModel.transform.localScale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
@@ -418,10 +423,12 @@ namespace ChroMapper_CameraMovement.Component
                 {
                     avatarModel.SetActive(false);
                 }
-                yield return new WaitUntil(() => _movementPlayerController._init == true);
-                _movementPlayerController.SetMovementData(avatarModel);
             }
-
+            if (avatarModel != null && saberModel != null)
+            {
+                yield return new WaitUntil(() => _movementPlayerController._init == true);
+                _movementPlayerController.SetMovementData(avatarModel, saberModel);
+            }
         }
 
         public void OnPreview()

@@ -23,6 +23,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static BookmarkMenuUI _bookmarkMenuUI = new BookmarkMenuUI();
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
         public static MultiDisplayUI _multiDisplayUI = new MultiDisplayUI();
+        public static MovementPlayerUI _movementPlayerUI = new MovementPlayerUI();
         public static List<Type> queuedToDisable = new List<Type>();
         public static List<Type> queuedToEnable = new List<Type>();
         public static bool keyDisable { get; private set; }
@@ -83,6 +84,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             _bookmarkMenuUI.AddMenu(topBarCanvas);
             _cameraControlMenuUI.AddMenu(topBarCanvas);
             _multiDisplayUI.AddMenu(topBarCanvas);
+            _movementPlayerUI.AddMenu(topBarCanvas);
             KeyDisableCheck();
         }
 
@@ -109,7 +111,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static void KeyDisableCheck()
         {
             if (Options.Instance.cameraMovementEnable && Options.Instance.mappingDisable && (_settingMenuUI._cameraMovementSettingMenu.activeSelf || _bookmarkMenuUI._cameraMovementBookmarkMenu.activeSelf ||
-                _cameraControlMenuUI._cameraControlMenu.activeSelf || _multiDisplayUI._cameraMovementMultiDisplay.activeSelf || Options.Instance.subCamera ||
+                _cameraControlMenuUI._cameraControlMenu.activeSelf || _multiDisplayUI._cameraMovementMultiDisplay.activeSelf || _movementPlayerUI._movementPlayerMenu.activeSelf || Options.Instance.subCamera ||
                 Options.Instance.movement || Options.Instance.uIhidden || Options.Instance.bookmarkLines))
             {
                 DisableAction(actionMapsDisabled);

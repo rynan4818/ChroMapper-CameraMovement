@@ -23,7 +23,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             movementController = Plugin.movement;
             //Main Menu
-            _cameraMovementMainMenu = UI.SetMenu(new GameObject("CameraMovement Menu"), topBarCanvas, AnchoredPosSave, 170, 270, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY);
+            _cameraMovementMainMenu = UI.SetMenu(new GameObject("CameraMovement Menu"), topBarCanvas, AnchoredPosSave, 170, 315, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY);
             var cameraMovementTitle = UI.AddCheckbox(_cameraMovementMainMenu.transform, "CameraMovement", "CameraMovement", new Vector2(-17, -19), Options.Instance.cameraMovementEnable, (check) =>
             {
                 Options.Instance.cameraMovementEnable = check;
@@ -107,6 +107,12 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI._cameraControlMenuUI._cameraControlMenu.SetActive(check);
                 UI.KeyDisableCheck();
             });
+            UI.AddCheckbox(_cameraMovementMainMenu.transform, "Movement Player", "Movement Player", new Vector2(0, -175), Options.Instance.movementPlayer, (check) =>
+            {
+                Options.Instance.movementPlayer = check;
+                if (!Options.Instance.cameraMovementEnable) return;
+                movementController.Reload();
+            });
 
             var mainMenuMoreSettingsButton = UI.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", () =>
             {
@@ -114,14 +120,14 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI._settingMenuUI._cameraMovementSettingMenu.SetActive(true);
                 UI.KeyDisableCheck();
             });
-            UI.MoveTransform(mainMenuMoreSettingsButton.transform, 70, 25, 0.28f, 1, 0, -185);
+            UI.MoveTransform(mainMenuMoreSettingsButton.transform, 70, 25, 0.28f, 1, 0, -200);
 
             var mainMenuReloadButton = UI.AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
                 movementController.Reload();
             });
-            UI.MoveTransform(mainMenuReloadButton.transform, 70, 25, 0.72f, 1, 0, -185);
+            UI.MoveTransform(mainMenuReloadButton.transform, 70, 25, 0.72f, 1, 0, -200);
 
             var mainMenuMultiDisplayButton = UI.AddButton(_cameraMovementMainMenu.transform, "Multi Display", "Multi Display", () =>
             {
@@ -129,7 +135,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI._multiDisplayUI._cameraMovementMultiDisplay.SetActive(true);
                 UI.KeyDisableCheck();
             });
-            UI.MoveTransform(mainMenuMultiDisplayButton.transform, 70, 25, 0.28f, 1, 0, -215);
+            UI.MoveTransform(mainMenuMultiDisplayButton.transform, 70, 25, 0.28f, 1, 0, -230);
 
             var regexKey = new Regex(@"<\w+>/");
             var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", () =>
@@ -137,19 +143,28 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (!Options.Instance.cameraMovementEnable) return;
                 ScriptMapperController.Instance.ScriptMapperRun();
             });
-            UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -215);
+            UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -230);
 
             var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", () =>
             {
                 Options.Instance.SettingSave();
             });
-            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -245);
+            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -260);
+
+            var movementPlayerButton = UI.AddButton(_cameraMovementMainMenu.transform, "Movement Player", "Movement Player", () =>
+            {
+                if (!Options.Instance.cameraMovementEnable) return;
+                UI._movementPlayerUI.settingBackup();
+                UI._movementPlayerUI._movementPlayerMenu.SetActive(true);
+                UI.KeyDisableCheck();
+            });
+            UI.MoveTransform(movementPlayerButton.transform, 70, 25, 0.72f, 1, 0, -260);
 
             var mainMenuCloseButton = UI.AddButton(_cameraMovementMainMenu.transform, "Close", "Close", () =>
             {
                 _cameraMovementMainMenu.SetActive(false);
             });
-            UI.MoveTransform(mainMenuCloseButton.transform, 70, 25, 0.72f, 1, 0, -245);
+            UI.MoveTransform(mainMenuCloseButton.transform, 70, 25, 0.72f, 1, 0, -290);
 
             _cameraMovementMainMenu.SetActive(false);
             UI._extensionBtn.Click = () =>

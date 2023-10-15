@@ -75,6 +75,8 @@ namespace ChroMapper_CameraMovement.Configuration
         public float settingMenuUIAnchoredPosY = 0;
         public float multiDisplayMenuUIAnchoredPosX = 0;
         public float multiDisplayMenuUIAnchoredPosY = 0;
+        public float movementPlayerUIAnchoredPosX = 0;
+        public float movementPlayerUIAnchoredPosY = -0;
         public float orbitDefaultFOV = 60f;
         public float orbitRotSensitivity = 0.5f;
         public float orbitZoomSensitivity = 0.001f;
@@ -133,6 +135,10 @@ namespace ChroMapper_CameraMovement.Configuration
         public float subCameraModelTrailTime = 4f;
         public bool cameraDirectionScrollReversal = false;
         public bool defaultInvertScrollTime = false;
+        public string deletePattan = @"\(Clone\)";
+        public string movementFileName = "";
+        public string saberFileName = "";
+        public bool movementPlayer = false;
 
         public static Options Instance {
             get {

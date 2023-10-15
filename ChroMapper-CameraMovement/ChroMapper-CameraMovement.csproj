@@ -176,6 +176,7 @@
     <Compile Include="UserInterface\BookmarkMenuUI.cs" />
     <Compile Include="UserInterface\CameraControlMenuUI.cs" />
     <Compile Include="UserInterface\MainMenuUI.cs" />
+    <Compile Include="UserInterface\MovementPlayerUI.cs" />
     <Compile Include="UserInterface\MultiDisplayUI.cs" />
     <Compile Include="UserInterface\SettingMenuUI.cs" />
     <Compile Include="UserInterface\UI.cs" />

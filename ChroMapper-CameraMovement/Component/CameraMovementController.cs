@@ -12,6 +12,7 @@ using ChroMapper_CameraMovement.CameraPlus;
 using ChroMapper_CameraMovement.Controller;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Util;
+using System.Threading.Tasks;
 
 namespace ChroMapper_CameraMovement.Component
 {
@@ -91,10 +92,14 @@ namespace ChroMapper_CameraMovement.Component
         public Vector3 waveformGridChildLocalOffset;
         public bool customEventsObject = false;
         public string currentAvatarFile = "";
+        public string currentSaberFile = "";
         public bool previewMode = false;
         public (bool, bool, bool, bool, bool, bool, Vector3, Quaternion, float) previewEve;
         public bool subCameraRectPos = true;
         public bool dragWindowKeyEnable { set; get; } = false;
+        public int customAvatarLoad = 0;
+        public int vrmAvatarLoad = 0;
+        public int customSaberLoad = 0;
         public static string ScriptGet()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
@@ -170,8 +175,10 @@ namespace ChroMapper_CameraMovement.Component
 
         public void Reload()
         {
+            _ = VRMAvatarLoadAsync();
             StartCoroutine(this.CustomAvatarLoad());
-            VRMAvatarLoad();
+            StartCoroutine(this.CustomrSaberload());
+            StartCoroutine(this.MovementPlayerLoad());
             cm_MapEditorCamera.GetComponent<Camera>().cullingMask |= 1 << avatarLayer;
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
             var avatarHeadPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
@@ -327,10 +334,12 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
-        public void VRMAvatarLoad()
+        public async Task VRMAvatarLoadAsync()
         {
             if (!Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.vrm$", RegexOptions.IgnoreCase))
                 return;
+            vrmAvatarLoad = 1;
+            customAvatarLoad = 0;
             if (avatarModel != null)
             {
                 Destroy(avatarModel);
@@ -341,7 +350,7 @@ namespace ChroMapper_CameraMovement.Component
                 if (currentAvatarFile != Options.Instance.avatarFileName)
                 {
                     currentAvatarFile = Options.Instance.avatarFileName;
-                    vrmAvatarController.LoadModelAsync();
+                    await vrmAvatarController.LoadModelAsync();
                 }
                 else
                 {
@@ -353,12 +362,18 @@ namespace ChroMapper_CameraMovement.Component
             {
                 VRMAvatarController.AvatarDisable();
             }
+            if (VRMAvatarController.avatar == null)
+                vrmAvatarLoad = 0;
+            else
+                vrmAvatarLoad = 2;
         }
 
         public IEnumerator CustomAvatarLoad()
         {
             if (Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.avatar$", RegexOptions.IgnoreCase) && currentAvatarFile != Options.Instance.avatarFileName && Options.Instance.customAvatar && Options.Instance.cameraMovementEnable)
             {
+                customAvatarLoad = 1;
+                vrmAvatarLoad = 0;
                 currentAvatarFile = "";
                 VRMAvatarController.AvatarDisable();
                 if (avatarModel != null)
@@ -384,32 +399,13 @@ namespace ChroMapper_CameraMovement.Component
                     Debug.LogError("Avatar File ERR!");
                 }
             }
-            if (saberModel != null)
+            if (avatarModel == null)
             {
-                Destroy(saberModel);
-                Resources.UnloadUnusedAssets();
-            }
-            var saberFile = @"C:\Program Files (x86)\Steam\steamapps\common\Beat Saber\CustomSabers\SnowResort_V1.0.saber";
-            if (File.Exists(saberFile))
-            {
-                yield return UnityUtility.AssetLoadCoroutine(saberFile, "_CustomSaber", avatarLayer, (result, model) =>
-                {
-                    if (result)
-                    {
-                        saberModel = model;
-                    }
-                    else
-                        saberModel = null;
-                });
+                customAvatarLoad = 0;
             }
             else
             {
-                Debug.LogError("Saber File ERR!");
-            }
-
-
-            if (avatarModel != null)
-            {
+                customAvatarLoad = 2;
                 avatarModel.transform.localScale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
                 var avatarPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset + Options.Instance.avatarYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
                 avatarPosition.y = Options.Instance.originMatchOffsetY;
@@ -424,11 +420,80 @@ namespace ChroMapper_CameraMovement.Component
                     avatarModel.SetActive(false);
                 }
             }
-            if (avatarModel != null && saberModel != null)
+        }
+
+        public IEnumerator CustomrSaberload()
+        {
+            if (Regex.IsMatch(Path.GetExtension(Options.Instance.saberFileName), @"\.saber", RegexOptions.IgnoreCase) && currentSaberFile != Options.Instance.saberFileName && Options.Instance.movementPlayer && Options.Instance.cameraMovementEnable)
             {
-                yield return new WaitUntil(() => _movementPlayerController._init == true);
-                _movementPlayerController.SetMovementData(avatarModel, saberModel);
+                customSaberLoad = 1;
+                if (saberModel != null)
+                {
+                    Destroy(saberModel);
+                    Resources.UnloadUnusedAssets();
+                }
+                var saberFile = Options.Instance.saberFileName;
+                if (File.Exists(saberFile))
+                {
+                    yield return UnityUtility.AssetLoadCoroutine(saberFile, "_CustomSaber", avatarLayer, (result, model) =>
+                    {
+                        if (result)
+                        {
+                            saberModel = model;
+                        }
+                        else
+                        {
+                            saberModel = null;
+                        }
+                    });
+                }
+                else
+                {
+                    Debug.LogError("Saber File ERR!");
+                }
             }
+            if (saberModel == null)
+            {
+                customSaberLoad = 0;
+            }
+            else
+            {
+                customSaberLoad = 2;
+                saberModel.transform.localScale = Vector3.one * Options.Instance.avatarCameraScale;
+                var saberPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset + Options.Instance.avatarYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
+                saberPosition.y = Options.Instance.originMatchOffsetY;
+                saberPosition.z = Options.Instance.originMatchOffsetZ;
+                saberModel.transform.localPosition = saberPosition;
+                if (Options.Instance.movementPlayer && Options.Instance.cameraMovementEnable)
+                {
+                    saberModel.SetActive(true);
+                }
+                else
+                {
+                    saberModel.SetActive(false);
+                }
+            }
+        }
+        public IEnumerator MovementPlayerLoad()
+        {
+            if (!Options.Instance.movementPlayer || !Options.Instance.cameraMovementEnable)
+                yield break;
+            yield return new WaitForSeconds(0.5f);
+            if (vrmAvatarLoad == 1)
+                yield return new WaitUntil(() => vrmAvatarLoad != 1);
+            if (customAvatarLoad == 1)
+                yield return new WaitUntil(() => customAvatarLoad != 1);
+            if (customSaberLoad == 1)
+                yield return new WaitUntil(() => customSaberLoad != 1);
+            GameObject avatar = null;
+            if (customAvatarLoad == 2 && avatarModel != null)
+                avatar = avatarModel;
+            else if (vrmAvatarLoad == 2 && VRMAvatarController.avatar != null)
+                avatar = VRMAvatarController.avatar.Root;
+            GameObject saber = null;
+            if (customSaberLoad == 2 && saberModel != null)
+                saber = saberModel;
+            yield return _movementPlayerController.SetMovementData(avatar, saber);
         }
 
         public void OnPreview()
@@ -783,7 +848,6 @@ namespace ChroMapper_CameraMovement.Component
             input1000downAction.performed += context => UI.InputRound(context, -1000);
             input1000downAction.canceled += context => UI.InputRound(context, -1000);
             input1000downAction.Disable();
-            _ = _movementPlayerController.InitMovementDataAsync();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             _bookmarkController = new BookmarkController();

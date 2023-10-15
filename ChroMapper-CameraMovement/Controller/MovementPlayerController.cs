@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,9 +13,13 @@ namespace ChroMapper_CameraMovement.Controller
 {
     public class MovementJson
     {
-        public List<Record> record { get; set; }
-        public List<string> avatarObjectNames { get; set; }
-        public List<float> avatarScale { get; set; }
+        public int recordFrameRate { get; set; }
+        public List<string> motionCaptures { get; set; }
+        public List<string> topObjectStrings { get; set; }
+        public List<string> rescaleStrings { get; set; }
+        public List<string> objectNames { get; set; }
+        public List<Scale> objectScales { get; set; }
+        public List<Record> records { get; set; }
     }
     public class Record
     {
@@ -27,6 +31,12 @@ namespace ChroMapper_CameraMovement.Controller
         public List<float> rotY { get; set; }
         public List<float> rotZ { get; set; }
         public List<float> rotW { get; set; }
+    }
+    public class Scale
+    {
+        public float x { get; set; }
+        public float y { get; set; }
+        public float z { get; set; }
     }
     public class MovementData
     {
@@ -43,15 +53,6 @@ namespace ChroMapper_CameraMovement.Controller
         public List<(Transform, int)> _movementModels;
         public float nextSongTime;
         public int eventID;
-
-        public async Task InitMovementDataAsync()
-        {
-            _init = false;
-            var path = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, "Test_Movement.json").Replace("/", "\\");
-            this._records = await this.ReadRecordFileAsync(path);
-            Debug.Log("Load Movment Data");
-            _init = true;
-        }
 
         public void MovementUpdate(float currentSeconds)
         {
@@ -94,36 +95,92 @@ namespace ChroMapper_CameraMovement.Controller
             this.eventID = 0;
         }
 
-        public void SetMovementData(GameObject avatarModel, GameObject saberModel)
+        public async Task SetMovementData(GameObject avatarModel, GameObject saberModel)
         {
-            if (!this._init || this._records == null)
+            _init = false;
+            this._records = await this.ReadRecordFileAsync(Options.Instance.movementFileName);
+            if (this._records == null)
+            {
+                Debug.Log("Load Movment Data Error");
                 return;
+            }
+            Debug.Log("Load Movment Data");
             this._movementData = new List<MovementData>();
             this._movementModels = new List<(Transform, int)>();
-            var avatarModelTree = avatarModel.GetComponentsInChildren<Transform>(true);
-            var topNameLength = avatarModelTree[0].name.Length + 1;
-            for (var i = 1; i < avatarModelTree.Length; i++)
+            var deletePattan = new Regex(Options.Instance.deletePattan, RegexOptions.Compiled | RegexOptions.CultureInvariant);
+            var topObjectPattans = new List<Regex>();
+            foreach (var topObjectString in this._records.topObjectStrings)
+                topObjectPattans.Add(new Regex(topObjectString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+            var rescalePattans = new List<Regex>();
+            foreach (var rescaleString in this._records.rescaleStrings)
+                rescalePattans.Add(new Regex(rescaleString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+            if (avatarModel != null)
             {
-                var name = avatarModelTree[i].GetFullPathName().Substring(topNameLength);
-                for (var j = 0; j < this._records.avatarObjectNames.Count; j++)
+                var avatarModelTree = avatarModel.GetComponentsInChildren<Transform>(true);
+                var topNameLength = avatarModelTree[0].name.Length + 1;
+                for (var i = 1; i < avatarModelTree.Length; i++)
                 {
-                    var objectName = this._records.avatarObjectNames[j];
-                    if (objectName.Length - name.Length >= 0 && objectName.Substring(objectName.Length - name.Length) == name)
-                        this._movementModels.Add((avatarModelTree[i], j));
+                    var name = avatarModelTree[i].GetFullPathName().Substring(topNameLength);
+                    for (var j = 0; j < this._records.objectNames.Count; j++)
+                    {
+                        var rescale = false;
+                        var objectName = this._records.objectNames[j];
+                        foreach (var rescalePattan in rescalePattans)
+                        {
+                            if (rescalePattan.IsMatch(objectName))
+                            {
+                                rescale = true;
+                                break;
+                            }
+                        }
+                        foreach (var topObjectPattan in topObjectPattans)
+                            objectName = topObjectPattan.Replace(objectName, string.Empty);
+                        objectName = deletePattan.Replace(objectName, string.Empty);
+                        if (objectName == name)
+                        {
+                            this._movementModels.Add((avatarModelTree[i], j));
+                            if (rescale)
+                                avatarModelTree[i].localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z);
+                            Debug.Log(objectName);
+                            break;
+                        }
+                    }
                 }
             }
-            var saberModelTree = saberModel.GetComponentsInChildren<Transform>(true);
-            for (var i = 1; i < saberModelTree.Length; i++)
+            if (saberModel != null)
             {
-                var name = saberModelTree[i].GetFullPathName().Substring(topNameLength);
-                for (var j = 0; j < this._records.avatarObjectNames.Count; j++)
+                var saberModelTree = saberModel.GetComponentsInChildren<Transform>(true);
+                var topNameLength = saberModelTree[0].name.Length + 1;
+                for (var i = 1; i < saberModelTree.Length; i++)
                 {
-                    var objectName = this._records.avatarObjectNames[j];
-                    if (objectName.Length - name.Length >= 0 && objectName.Substring(objectName.Length - name.Length) == name)
-                        this._movementModels.Add((saberModelTree[i], j));
+                    var name = saberModelTree[i].GetFullPathName().Substring(topNameLength);
+                    for (var j = 0; j < this._records.objectNames.Count; j++)
+                    {
+                        var rescale = false;
+                        var objectName = this._records.objectNames[j];
+                        foreach (var rescalePattan in rescalePattans)
+                        {
+                            if (rescalePattan.IsMatch(objectName))
+                            {
+                                rescale = true;
+                                break;
+                            }
+                        }
+                        foreach (var topObjectPattan in topObjectPattans)
+                            objectName = topObjectPattan.Replace(objectName, string.Empty);
+                        objectName = deletePattan.Replace(objectName, string.Empty);
+                        if (objectName == name)
+                        {
+                            this._movementModels.Add((saberModelTree[i], j));
+                            if (rescale)
+                                saberModelTree[i].localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z);
+                            Debug.Log(objectName);
+                            break;
+                        }
+                    }
                 }
             }
-            foreach (var record in this._records.record)
+            foreach (var record in this._records.records)
             {
                 var movementData = new MovementData();
                 movementData.position = new List<Vector3>();
@@ -148,7 +205,7 @@ namespace ChroMapper_CameraMovement.Controller
             }
             this.nextSongTime = 0;
             this.eventID = 0;
-            avatarModel.transform.localScale = new Vector3(this._records.avatarScale[0], this._records.avatarScale[1], this._records.avatarScale[2]) * Options.Instance.avatarCameraScale;
+            _init = true;
         }
 
         public async Task<MovementJson> ReadRecordFileAsync(string path)

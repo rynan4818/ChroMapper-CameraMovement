@@ -6,6 +6,7 @@ using UniGLTF;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Util;
+using System.Threading.Tasks;
 
 namespace ChroMapper_CameraMovement.Controller
 {
@@ -19,7 +20,7 @@ namespace ChroMapper_CameraMovement.Controller
         public static Animation animation { set; get; }
         public static bool loadActive { set; get; } = false;
 
-        public async void LoadModelAsync()
+        public async Task LoadModelAsync()
         {
             if (!File.Exists(Options.Instance.avatarFileName))
             {

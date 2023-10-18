@@ -13,13 +13,20 @@ namespace ChroMapper_CameraMovement.Controller
 {
     public class MovementJson
     {
+        public List<Setting> Settings { get; set; }
         public int recordFrameRate { get; set; }
-        public List<string> motionCaptures { get; set; }
-        public List<string> topObjectStrings { get; set; }
-        public List<string> rescaleStrings { get; set; }
         public List<string> objectNames { get; set; }
         public List<Scale> objectScales { get; set; }
         public List<Record> records { get; set; }
+    }
+    public class Setting
+    {
+        public virtual string name { get; set; }
+        public virtual string type { get; set; }
+        public virtual List<string> topObjectStrings { get; set; }
+        public virtual string rescaleString { get; set; }
+        public virtual List<string> searchStirngs { get; set; }
+        public virtual List<string> exclusionStrings { get; set; }
     }
     public class Record
     {
@@ -104,18 +111,24 @@ namespace ChroMapper_CameraMovement.Controller
                 Debug.Log("Load Movment Data Error");
                 return;
             }
-            Debug.Log("Load Movment Data");
             this._movementData = new List<MovementData>();
             this._movementModels = new List<(Transform, int)>();
             var deletePattan = new Regex(Options.Instance.deletePattan, RegexOptions.Compiled | RegexOptions.CultureInvariant);
-            var topObjectPattans = new List<Regex>();
-            foreach (var topObjectString in this._records.topObjectStrings)
-                topObjectPattans.Add(new Regex(topObjectString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
-            var rescalePattans = new List<Regex>();
-            foreach (var rescaleString in this._records.rescaleStrings)
-                rescalePattans.Add(new Regex(rescaleString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
             if (avatarModel != null)
             {
+                Debug.Log("Load Movment Data:Avatar");
+                var topObjectPattans = new List<Regex>();
+                var rescalePattans = new List<Regex>();
+                foreach (var setting in this._records.Settings)
+                {
+                    if (setting.type == "Avatar")
+                    {
+                        foreach (var topObjectString in setting.topObjectStrings)
+                            topObjectPattans.Add(new Regex(topObjectString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+                        if (setting.rescaleString != null)
+                            rescalePattans.Add(new Regex(setting.rescaleString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+                    }
+                }
                 var avatarModelTree = avatarModel.GetComponentsInChildren<Transform>(true);
                 var topNameLength = avatarModelTree[0].name.Length + 1;
                 for (var i = 1; i < avatarModelTree.Length; i++)
@@ -123,13 +136,12 @@ namespace ChroMapper_CameraMovement.Controller
                     var name = avatarModelTree[i].GetFullPathName().Substring(topNameLength);
                     for (var j = 0; j < this._records.objectNames.Count; j++)
                     {
-                        var rescale = false;
                         var objectName = this._records.objectNames[j];
                         foreach (var rescalePattan in rescalePattans)
                         {
                             if (rescalePattan.IsMatch(objectName))
                             {
-                                rescale = true;
+                                avatarModel.transform.localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
                                 break;
                             }
                         }
@@ -139,9 +151,7 @@ namespace ChroMapper_CameraMovement.Controller
                         if (objectName == name)
                         {
                             this._movementModels.Add((avatarModelTree[i], j));
-                            if (rescale)
-                                avatarModelTree[i].localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z);
-                            Debug.Log(objectName);
+                            Debug.Log(name);
                             break;
                         }
                     }
@@ -149,6 +159,19 @@ namespace ChroMapper_CameraMovement.Controller
             }
             if (saberModel != null)
             {
+                Debug.Log("Load Movment Data:Saber");
+                var topObjectPattans = new List<Regex>();
+                var rescalePattans = new List<Regex>();
+                foreach (var setting in this._records.Settings)
+                {
+                    if (setting.type == "Saber")
+                    {
+                        foreach (var topObjectString in setting.topObjectStrings)
+                            topObjectPattans.Add(new Regex(topObjectString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+                        if (setting.rescaleString != null)
+                            rescalePattans.Add(new Regex(setting.rescaleString, RegexOptions.Compiled | RegexOptions.CultureInvariant));
+                    }
+                }
                 var saberModelTree = saberModel.GetComponentsInChildren<Transform>(true);
                 var topNameLength = saberModelTree[0].name.Length + 1;
                 for (var i = 1; i < saberModelTree.Length; i++)
@@ -156,13 +179,12 @@ namespace ChroMapper_CameraMovement.Controller
                     var name = saberModelTree[i].GetFullPathName().Substring(topNameLength);
                     for (var j = 0; j < this._records.objectNames.Count; j++)
                     {
-                        var rescale = false;
                         var objectName = this._records.objectNames[j];
                         foreach (var rescalePattan in rescalePattans)
                         {
                             if (rescalePattan.IsMatch(objectName))
                             {
-                                rescale = true;
+                                saberModel.transform.localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
                                 break;
                             }
                         }
@@ -172,9 +194,7 @@ namespace ChroMapper_CameraMovement.Controller
                         if (objectName == name)
                         {
                             this._movementModels.Add((saberModelTree[i], j));
-                            if (rescale)
-                                saberModelTree[i].localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z);
-                            Debug.Log(objectName);
+                            Debug.Log(name);
                             break;
                         }
                     }
@@ -203,6 +223,8 @@ namespace ChroMapper_CameraMovement.Controller
                 }
                 this._movementData.Add(movementData);
             }
+            Debug.Log($"{_records.records.Count}");
+            Debug.Log($"{_movementData.Count}");
             this.nextSongTime = 0;
             this.eventID = 0;
             _init = true;

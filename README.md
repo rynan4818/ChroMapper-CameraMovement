@@ -52,6 +52,8 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
 - F4 でプレビュー表示のON/OFF
 - F3 でScriptMapperの実行
 - 各設定パネルは、Shiftを押しながら左ドラッグで移動
+- デフォルトカメラ移動モード
+    - 右クリック + Zキー Z回転を0度リセット
 - 注視点カメラ移動モード
     - ALT + マウス右ドラッグでアバター中心にカメラ移動
     - ALT + マウス左ドラッグで注視点のオフセット
@@ -68,6 +70,12 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
     - Zキー + 左クリック + 中クリックでZを0度に設定
     - Zキー + 右クリック + マウスホイールでFOVの変更
     - Zキー + 右クリック + 中クリックでFOVのリセット
+- カメラコントロールパネルのPosX,Y,Z,RotX,Y,Z,FOVにカーソルがある時
+    - TABキー フォーカスを順番に移動します
+    - F1,F2キー 最小単位の1倍で値を上下
+    - F3,F4キー 最小単位の10倍で値を上下
+    - Shift + F1,F2キー 最小単位の100倍で値を上下
+    - Shift + F3,F4キー 最小単位の1000倍で値を上下
 
 ※上記キーバインドや感度は[設定ファイル](https://github.com/rynan4818/ChroMapper-CameraMovement#%E8%A8%AD%E5%AE%9A%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)の直接変更で変更可能
 
@@ -122,6 +130,8 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
 * Script File ： 譜面フォルダにある読み込むカメラスクリプトファイル名
 * Mapping Disable ： Camera Movementの機能有効中は譜面作成機能を抑制して、ノーツ等の誤編集を防止します。ただし、OFFにするとカメラ移動機能が制限されます。
 * bookmark Lines Top ： Bookmark Linesを全てのオブジェクトの最前面に表示します。
+* Camera Direction Scroll Reversal : カメラが後ろを向いているときにタイムラインの移動方向が逆になります。(デフォルトは無効)
+* Default Invert Scroll Time : `Camera Direction Scroll Reversal`が有効時のタイムラインの移動方向が逆になります。
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。(メイン設定の同名ボタンと機能は同じ)
 * Close ： More Settingパネルを閉じます。
 

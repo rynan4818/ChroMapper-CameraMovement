@@ -136,9 +136,9 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool cameraDirectionScrollReversal = false;
         public bool defaultInvertScrollTime = false;
         public string deletePattan = @"\(Clone\)";
-        public string movementFileName = "";
         public string saberFileName = "";
         public bool movementPlayer = false;
+        public bool vrmSpringBone = false;
 
         public static Options Instance {
             get {

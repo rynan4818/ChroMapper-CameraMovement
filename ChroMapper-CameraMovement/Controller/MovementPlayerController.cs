@@ -1,4 +1,5 @@
-﻿using ChroMapper_CameraMovement.Configuration;
+﻿using ChroMapper_CameraMovement.Component;
+using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Util;
 using Newtonsoft.Json;
 using System;
@@ -110,9 +111,9 @@ namespace ChroMapper_CameraMovement.Controller
 
         public async Task SetMovementDataAsync(GameObject avatarModel, GameObject saberModel)
         {
-            if (this._initActive || avatarModel == null && saberModel == null)
+            if (this._initActive || avatarModel == null && saberModel == null || !File.Exists(CameraMovementController.movementPlayerOptions.movementFileName))
                 return;
-            if (this._loadMovementFileName == Options.Instance.movementFileName && avatarModel == this._loadAvatarModel && saberModel == this._loadSaberModel)
+            if (this._loadMovementFileName == CameraMovementController.movementPlayerOptions.movementFileName && avatarModel == this._loadAvatarModel && saberModel == this._loadSaberModel)
             {
                 this.nextSongTime = 0;
                 this.eventID = 0;
@@ -127,7 +128,7 @@ namespace ChroMapper_CameraMovement.Controller
             this._initActive = true;
             this._avatarScale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
             this._saberScale = Vector3.one * Options.Instance.avatarCameraScale;
-            this._records = await this.ReadRecordFileAsync(Options.Instance.movementFileName);
+            this._records = await this.ReadRecordFileAsync(CameraMovementController.movementPlayerOptions.movementFileName);
             if (this._records == null)
             {
                 Debug.Log("Load Movment Data Error");
@@ -251,7 +252,7 @@ namespace ChroMapper_CameraMovement.Controller
             this.eventID = 0;
             this._initActive = false;
             this._init = true;
-            this._loadMovementFileName = Options.Instance.movementFileName;
+            this._loadMovementFileName = CameraMovementController.movementPlayerOptions.movementFileName;
             avatarModel.transform.localScale = this._avatarScale;
             saberModel.transform.localScale = this._saberScale;
         }
@@ -277,7 +278,15 @@ namespace ChroMapper_CameraMovement.Controller
         }
         public async Task<string> ReadAllTextAsync(string path)
         {
-            var fileInfo = new FileInfo(path);
+            FileInfo fileInfo;
+            try
+            {
+                fileInfo = new FileInfo(path);
+            }
+            catch
+            {
+                return null;
+            }
             if (!fileInfo.Exists || fileInfo.Length == 0)
                 return null;
             string result;

@@ -3,6 +3,7 @@ using UnityEngine;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
 using SFB;
+using ChroMapper_CameraMovement.Controller;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -15,6 +16,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public UITextInput subRectY;
         public UITextInput subRectW;
         public UITextInput subRectH;
+        public UITextInput avatarScale;
 
         public void AnchoredPosSave()
         {
@@ -83,6 +85,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(scaleInput.Item1, 60, 16, 0, 1, 30, -85);
             UI.MoveTransform(scaleInput.Item3.transform, 40, 20, 0.1f, 1, 35, -85);
+            avatarScale = scaleInput.Item3;
 
             var yOffsetInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Avatar Y offset", "Avatar Y offset", Options.Instance.avatarYoffset.ToString(), (value) =>
             {
@@ -321,6 +324,39 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(defaultInvertScrollTimeCheck.Item3.transform, 30, 16, 0, 1, 420, -185);
             UI.MoveTransform(defaultInvertScrollTimeCheck.Item1, 70, 16, 0, 1, 460, -185);
+
+            var setAvatarScaleButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Set Avatar Scale", "Set current display to Avatar Scale", () =>
+            {
+                var scale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
+                if (CameraMovementController.avatarModel != null)
+                    scale = CameraMovementController.avatarModel.transform.localScale;
+                else if (VRMAvatarController.avatar != null)
+                    scale = VRMAvatarController.avatar.Root.transform.localScale;
+                scale /= Options.Instance.avatarCameraScale;
+                if (scale.x == scale.y && scale.y == scale.z)
+                {
+                    Options.Instance.avatarScale = scale.x;
+                    avatarScale.InputField.text = Options.Instance.avatarScale.ToString();
+                }
+                else
+                {
+                    var dialogBox = PersistentUI.Instance
+                        .CreateNewDialogBox()
+                        .WithTitle($"The scales x, y, z are not identical. x:{scale.x}  y:{scale.y}  z:{scale.z}");
+                    dialogBox.AddFooterButton(() => dialogBox.Close(), "PersistentUI", "ok");
+                    dialogBox.Open();
+                }
+            });
+            UI.MoveTransform(setAvatarScaleButton.transform, 100, 25, 0, 1, 80, -220);
+
+            var vrmSpringBoneCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "VRM Spring Bone", "VRM Spring Bone", Options.Instance.vrmSpringBone, (check) =>
+            {
+                Options.Instance.vrmSpringBone = check;
+                VRMAvatarController.SpringBoneEnable();
+                UI.KeyDisableCheck();
+            });
+            UI.MoveTransform(vrmSpringBoneCheck.Item3.transform, 30, 16, 0, 1, 150, -220);
+            UI.MoveTransform(vrmSpringBoneCheck.Item1, 70, 16, 0, 1, 190, -220);
 
             var saveButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", () =>
             {

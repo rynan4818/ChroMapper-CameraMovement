@@ -4,6 +4,7 @@ using SFB;
 using System;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -13,13 +14,22 @@ namespace ChroMapper_CameraMovement.UserInterface
         public CameraMovementController movementController;
         public UITextInput _movementFileInputText;
         public UITextInput _saberFileInputText;
+        public Toggle _setDefaultSaberCheck;
+        public Toggle _saberEnabledCheck;
         public string _movementFileNameBackup;
         public string _saberFileNameBackup;
+        public bool _setDefaultSaber;
 
         public void settingBackup()
         {
-            _movementFileNameBackup = Options.Instance.movementFileName;
-            _saberFileNameBackup = Options.Instance.saberFileName;
+            _movementFileNameBackup = CameraMovementController.movementPlayerOptions.movementFileName;
+            if (CameraMovementController.movementPlayerOptions.saberFileName == "")
+                _saberFileNameBackup = Options.Instance.saberFileName;
+            else
+               _saberFileNameBackup = CameraMovementController.movementPlayerOptions.saberFileName;
+            _movementFileInputText.InputField.text = _movementFileNameBackup;
+            _saberFileInputText.InputField.text = _saberFileNameBackup;
+            _saberEnabledCheck.isOn = CameraMovementController.movementPlayerOptions.saberEnabled;
         }
         public void AnchoredPosSave()
         {
@@ -33,21 +43,29 @@ namespace ChroMapper_CameraMovement.UserInterface
             _movementPlayerMenu = UI.SetMenu(new GameObject("Movemnet Player Menu"), topBarCanvas, AnchoredPosSave, 500, 160, Options.Instance.movementPlayerUIAnchoredPosX, Options.Instance.movementPlayerUIAnchoredPosY);
             UI.AddLabel(_movementPlayerMenu.transform, "Movemnet Player", "Movemnet Player", new Vector2(0, -19.5f));
 
-            var movementFileInput = UI.AddTextInput(_movementPlayerMenu.transform, "Movement File", "Movement File", Options.Instance.movementFileName, (value) =>
+            var movementFileInput = UI.AddTextInput(_movementPlayerMenu.transform, "Movement File", "Movement File", _movementFileNameBackup, (value) =>
             {
-                Options.Instance.movementFileName = value;
+                CameraMovementController.movementPlayerOptions.movementFileName = value;
             });
             _movementFileInputText = movementFileInput.Item3;
             UI.MoveTransform(movementFileInput.Item1, 60, 16, 0, 1, 63.1f, -28.2f);
             UI.MoveTransform(movementFileInput.Item3.transform, 425, 20, 0.1f, 1, 196, -46.6f);
 
-            var saberFileInput = UI.AddTextInput(_movementPlayerMenu.transform, "Saber File", "Saber File", Options.Instance.saberFileName, (value) =>
+            var saberFileInput = UI.AddTextInput(_movementPlayerMenu.transform, "Saber File", "Saber File", _saberFileNameBackup, (value) =>
             {
-                Options.Instance.saberFileName = value;
+                CameraMovementController.movementPlayerOptions.saberFileName = value;
             });
             _saberFileInputText = saberFileInput.Item3;
-            UI.MoveTransform(saberFileInput.Item1, 60, 16, 0, 1, 63.1f, -73.1f);
+            UI.MoveTransform(saberFileInput.Item1, 40, 16, 0, 1, 53.1f, -73.1f);
             UI.MoveTransform(saberFileInput.Item3.transform, 425, 20, 0.1f, 1, 196, -89.7f);
+
+            var saberEnabled = UI.AddCheckbox(_movementPlayerMenu.transform, "Saber Enabled", "Saber Enabled", false, (check) =>
+            {
+                CameraMovementController.movementPlayerOptions.saberEnabled = check;
+            });
+            UI.MoveTransform(saberEnabled.Item3.transform, 30, 16, 0, 1, 100, -73.1f);
+            UI.MoveTransform(saberEnabled.Item1, 70, 16, 0, 1, 140, -73.1f);
+            _saberEnabledCheck = saberEnabled.Item3;
 
             var movementSelectButton = UI.AddButton(_movementPlayerMenu.transform, "Select", "Select", () =>
             {
@@ -55,7 +73,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 string dir;
                 try
                 {
-                    dir = Path.GetDirectoryName(Options.Instance.movementFileName);
+                    dir = Path.GetDirectoryName(CameraMovementController.movementPlayerOptions.movementFileName);
                 }
                 catch
                 {
@@ -66,7 +84,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 var paths = StandaloneFileBrowser.OpenFilePanel("Movement File", dir, ext, false);
                 if (paths.Length > 0 && File.Exists(paths[0]))
                 {
-                    Options.Instance.movementFileName = paths[0];
+                    CameraMovementController.movementPlayerOptions.movementFileName = paths[0];
                     _movementFileInputText.InputField.text = paths[0];
                 }
             });
@@ -78,7 +96,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 string dir;
                 try
                 {
-                    dir = Path.GetDirectoryName(Options.Instance.saberFileName);
+                    dir = Path.GetDirectoryName(CameraMovementController.movementPlayerOptions.saberFileName);
                 }
                 catch
                 {
@@ -89,16 +107,35 @@ namespace ChroMapper_CameraMovement.UserInterface
                 var paths = StandaloneFileBrowser.OpenFilePanel("Saber File", dir, ext, false);
                 if (paths.Length > 0 && File.Exists(paths[0]))
                 {
-                    Options.Instance.saberFileName = paths[0];
+                    CameraMovementController.movementPlayerOptions.saberFileName = paths[0];
                     _saberFileInputText.InputField.text = paths[0];
                 }
             });
             UI.MoveTransform(saberSelectButton.transform, 40, 20, 0, 1, 440, -69.8f);
 
+            var setDefaultSaber = UI.AddCheckbox(_movementPlayerMenu.transform, "Set Default Saber", "Set Default Saber", false, (check) =>
+            {
+                _setDefaultSaber = check;
+            });
+            UI.MoveTransform(setDefaultSaber.Item3.transform, 30, 16, 0, 1, 50, -115);
+            UI.MoveTransform(setDefaultSaber.Item1, 70, 16, 0, 1, 90, -115);
+            _setDefaultSaberCheck = setDefaultSaber.Item3;
+
+            var saveButton = UI.AddButton(_movementPlayerMenu.transform, "Save", "Save", () =>
+            {
+                CameraMovementController.movementPlayerOptions.SettingSave();
+                Options.Instance.SettingSave();
+            });
+            UI.MoveTransform(saveButton.transform, 70, 25, 0, 1, 250, -134);
+
             var cancelButton = UI.AddButton(_movementPlayerMenu.transform, "Cancel", "Cancel", () =>
             {
-                Options.Instance.movementFileName = _movementFileNameBackup;
-                Options.Instance.saberFileName = _saberFileNameBackup;
+                CameraMovementController.movementPlayerOptions.saberFileName = _movementFileNameBackup;
+                _movementFileInputText.InputField.text = _movementFileNameBackup;
+                CameraMovementController.movementPlayerOptions.saberFileName = _saberFileNameBackup;
+                _saberFileInputText.InputField.text = _saberFileNameBackup;
+                _setDefaultSaberCheck.isOn = false;
+                _setDefaultSaber = false;
                 _movementPlayerMenu.SetActive(false);
                 UI.KeyDisableCheck();
             });
@@ -106,8 +143,15 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var openButton = UI.AddButton(_movementPlayerMenu.transform, "Open", "Open", () =>
             {
+                if (_setDefaultSaber)
+                {
+                    Options.Instance.saberFileName = CameraMovementController.movementPlayerOptions.saberFileName;
+                }
+                _setDefaultSaber = false;
+                _setDefaultSaberCheck.isOn = false;
                 _movementPlayerMenu.SetActive(false);
                 UI.KeyDisableCheck();
+                movementController.Reload();
             });
             UI.MoveTransform(openButton.transform, 70, 25, 0, 1, 424.4f, -134);
 

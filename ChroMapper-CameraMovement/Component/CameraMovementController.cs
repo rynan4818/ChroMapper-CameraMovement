@@ -12,7 +12,6 @@ using ChroMapper_CameraMovement.CameraPlus;
 using ChroMapper_CameraMovement.Controller;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Util;
-using System.Threading.Tasks;
 
 namespace ChroMapper_CameraMovement.Component
 {
@@ -33,7 +32,8 @@ namespace ChroMapper_CameraMovement.Component
         public static OrbitCameraController orbitCamera;
         public static PlusCameraController plusCamera;
         public static DefaultCameraController defaultCamera;
-        public static MovementPlayerController _movementPlayerController;
+        public static MovementPlayerController movementPlayerController;
+        public static MovementPlayerOptions movementPlayerOptions;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_UIMode;
         public static GameObject avatarHead;
@@ -359,6 +359,7 @@ namespace ChroMapper_CameraMovement.Component
                 else
                 {
                     VRMAvatarController.SetDefaultTransform();
+                    VRMAvatarController.AvatarTransformSet();
                     VRMAvatarController.AvatarEnable();
                 }
             }
@@ -432,7 +433,7 @@ namespace ChroMapper_CameraMovement.Component
         {
             if (customSaberLoad == 1)
                 yield break;
-            if (Regex.IsMatch(Path.GetExtension(Options.Instance.saberFileName), @"\.saber", RegexOptions.IgnoreCase) && currentSaberFile != Options.Instance.saberFileName && Options.Instance.movementPlayer && Options.Instance.cameraMovementEnable)
+            if (Regex.IsMatch(Path.GetExtension(movementPlayerOptions.saberFileName), @"\.saber", RegexOptions.IgnoreCase) && currentSaberFile != movementPlayerOptions.saberFileName && Options.Instance.movementPlayer && Options.Instance.cameraMovementEnable)
             {
                 customSaberLoad = 1;
                 if (saberModel != null)
@@ -440,7 +441,7 @@ namespace ChroMapper_CameraMovement.Component
                     Destroy(saberModel);
                     Resources.UnloadUnusedAssets();
                 }
-                var saberFile = Options.Instance.saberFileName;
+                var saberFile = movementPlayerOptions.saberFileName;
                 if (File.Exists(saberFile))
                 {
                     yield return UnityUtility.AssetLoadCoroutine(saberFile, "_CustomSaber", avatarLayer, (result, model) =>
@@ -473,7 +474,7 @@ namespace ChroMapper_CameraMovement.Component
                 saberPosition.y = Options.Instance.originMatchOffsetY;
                 saberPosition.z = Options.Instance.originMatchOffsetZ;
                 saberModel.transform.localPosition = saberPosition;
-                if (Options.Instance.movementPlayer && Options.Instance.cameraMovementEnable)
+                if (Options.Instance.movementPlayer && Options.Instance.cameraMovementEnable && CameraMovementController.movementPlayerOptions.saberEnabled)
                 {
                     saberModel.SetActive(true);
                 }
@@ -502,12 +503,12 @@ namespace ChroMapper_CameraMovement.Component
             GameObject saber = null;
             if (customSaberLoad == 2 && saberModel != null)
                 saber = saberModel;
-            var task = _movementPlayerController.SetMovementDataAsync(avatar, saber);
+            var task = movementPlayerController.SetMovementDataAsync(avatar, saber);
             yield return new WaitUntil(() => task.IsCompleted);
             if (task.IsFaulted && task.Exception != null)
                 throw task.Exception;
             movementPlayerLoadActive = false;
-            _movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
+            movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
         }
 
         public void OnPreview()
@@ -641,7 +642,8 @@ namespace ChroMapper_CameraMovement.Component
             autoSave = FindObjectOfType<AutoSaveController>();
             spectrogramSideSwapper = FindObjectOfType<SpectrogramSideSwapper>();
             vrmAvatarController = new VRMAvatarController();
-            _movementPlayerController = new MovementPlayerController();
+            movementPlayerController = new MovementPlayerController();
+            movementPlayerOptions = MovementPlayerOptions.SettingLoad();
 
             orbitCamera = this.gameObject.AddComponent<OrbitCameraController>();
             plusCamera = this.gameObject.AddComponent<PlusCameraController>();
@@ -895,14 +897,14 @@ namespace ChroMapper_CameraMovement.Component
                 if (beforeSeconds > atsc.CurrentSeconds)
                 {
                     _cameraMovement.MovementPositionReset();
-                    _movementPlayerController.MovementPositionReset();
+                    movementPlayerController.MovementPositionReset();
                     beforeSeconds = 0;
                 }
                 beforeSeconds = atsc.CurrentSeconds;
                 _bookmarkController?.BookMarkUpdate();
                 _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, subCamera , AvatarPositionGet());
                 if (!movementPlayerLoadActive && Options.Instance.movementPlayer)
-                    _movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
+                    movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
             }
             GameObject targetCamera;
             float targetFOV;

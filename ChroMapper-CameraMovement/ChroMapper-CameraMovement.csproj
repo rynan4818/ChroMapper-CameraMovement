@@ -161,6 +161,7 @@
     <Compile Include="Component\DragWindowController.cs" />
     <Compile Include="Component\OrbitCameraController.cs" />
     <Compile Include="Component\PlusCameraController.cs" />
+    <Compile Include="Configuration\MovementPlayerOptions.cs" />
     <Compile Include="Configuration\Options.cs" />
     <Compile Include="Controller\BookmarkController.cs" />
     <Compile Include="Controller\MovementPlayerController.cs" />

@@ -69,11 +69,7 @@ namespace ChroMapper_CameraMovement.Controller
             animation = avatar.GetComponent<Animation>();
             if (animation && animation.clip != null)
                 animation.Play(animation.clip.name);
-            defaultTransform = new List<(Transform, Vector3, Quaternion, Vector3)>();
-            SpringBoneEnable(false);
-            defaultTransform.Add((avatar.Root.transform, avatar.Root.transform.position, avatar.Root.transform.rotation, avatar.Root.transform.localScale));
-            foreach (var tarns in avatar.Root.GetComponentsInChildren<Transform>())
-                defaultTransform.Add((tarns, tarns.position, tarns.rotation, tarns.localScale));
+            SpringBoneEnable();
             loadActive = false;
         }
 
@@ -93,11 +89,17 @@ namespace ChroMapper_CameraMovement.Controller
             }
             if (Options.Instance.avatarAnimation && animation && animation.clip != null)
                 animation.enabled = Options.Instance.avatarAnimation;
+            defaultTransform = new List<(Transform, Vector3, Quaternion, Vector3)>
+            {
+                (avatar.Root.transform, avatar.Root.transform.position, avatar.Root.transform.rotation, avatar.Root.transform.localScale)
+            };
+            foreach (var tarns in avatar.Root.GetComponentsInChildren<Transform>())
+                defaultTransform.Add((tarns, tarns.position, tarns.rotation, tarns.localScale));
         }
-        public static void SpringBoneEnable(bool enable)
+        public static void SpringBoneEnable()
         {
             foreach (var springBone in avatar.Root.GetComponentsInChildren<VRMSpringBone>())
-                springBone.enabled = enable;
+                springBone.enabled = Options.Instance.vrmSpringBone;
         }
 
         public static void SetDefaultTransform()

@@ -13,6 +13,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public string movementFileName = "";
         public string saberFileName = "";
         public bool saberEnabled = true;
+        public float playersPlaceOffset = 0;
         public static string GetSettingFile()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, settingJsonFile);

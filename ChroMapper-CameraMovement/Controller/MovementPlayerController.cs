@@ -99,6 +99,10 @@ namespace ChroMapper_CameraMovement.Controller
                 var StartRot = this._movementData[this.eventID].rotation[i];
                 var EndRot = this._movementData[this.eventID + 1].rotation[i];
                 var rot = UnityUtility.LerpQuaternion(StartRot, EndRot, movePerc);
+                pos.y += Options.Instance.avatarYoffset;
+                pos *= Options.Instance.avatarCameraScale;
+                pos.y += Options.Instance.originMatchOffsetY;
+                pos.z += Options.Instance.originMatchOffsetZ;
                 modle.position = pos;
                 modle.rotation = rot;
             }
@@ -234,9 +238,7 @@ namespace ChroMapper_CameraMovement.Controller
                     var posX = record.posX[movementModel.Item2] + Options.Instance.originXoffset;
                     var posY = record.posY[movementModel.Item2] + Options.Instance.originYoffset;
                     var posZ = record.posZ[movementModel.Item2] + Options.Instance.originZoffset;
-                    var pos = new Vector3(posX, posY, posZ) * Options.Instance.avatarCameraScale;
-                    pos.y += Options.Instance.originMatchOffsetY;
-                    pos.z += Options.Instance.originMatchOffsetZ;
+                    var pos = new Vector3(posX, posY, posZ);
                     movementData.position.Add(pos);
                     var rotX = record.rotX[movementModel.Item2];
                     var rotY = record.rotY[movementModel.Item2];

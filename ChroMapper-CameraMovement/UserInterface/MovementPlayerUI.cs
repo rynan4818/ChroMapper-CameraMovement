@@ -16,9 +16,11 @@ namespace ChroMapper_CameraMovement.UserInterface
         public UITextInput _saberFileInputText;
         public Toggle _setDefaultSaberCheck;
         public Toggle _saberEnabledCheck;
+        public UITextInput _playersPlaceOffsetCheck;
         public string _movementFileNameBackup;
         public string _saberFileNameBackup;
         public bool _setDefaultSaber;
+        public float _playersPlaceBackup;
 
         public void settingBackup()
         {
@@ -30,6 +32,8 @@ namespace ChroMapper_CameraMovement.UserInterface
             _movementFileInputText.InputField.text = _movementFileNameBackup;
             _saberFileInputText.InputField.text = _saberFileNameBackup;
             _saberEnabledCheck.isOn = CameraMovementController.movementPlayerOptions.saberEnabled;
+            _playersPlaceBackup = CameraMovementController.movementPlayerOptions.playersPlaceOffset;
+            _playersPlaceOffsetCheck.InputField.text = _playersPlaceBackup.ToString();
         }
         public void AnchoredPosSave()
         {
@@ -121,6 +125,23 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(setDefaultSaber.Item1, 70, 16, 0, 1, 90, -115);
             _setDefaultSaberCheck = setDefaultSaber.Item3;
 
+            var headSizeInput = UI.AddTextInput(_movementPlayerMenu.transform, "Players Place Offset", "Players Place Offset", "", (value) =>
+            {
+                float res;
+                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                {
+                    CameraMovementController.movementPlayerOptions.playersPlaceOffset = res;
+                    if (CameraMovementController.playersPlace != null)
+                    {
+                        var a = CameraMovementController.playersPlace.transform.position;
+                        CameraMovementController.playersPlace.transform.position = new Vector3(a.x, movementController.playersPlaceDefault + CameraMovementController.movementPlayerOptions.playersPlaceOffset, a.z);
+                    }
+                }
+            });
+            UI.MoveTransform(headSizeInput.Item1, 100, 16, 0, 1, 70, -135);
+            UI.MoveTransform(headSizeInput.Item3.transform, 40, 20, 0.1f, 1, 100, -135);
+            _playersPlaceOffsetCheck = headSizeInput.Item3;
+
             var saveButton = UI.AddButton(_movementPlayerMenu.transform, "Save", "Save", () =>
             {
                 CameraMovementController.movementPlayerOptions.SettingSave();
@@ -134,6 +155,8 @@ namespace ChroMapper_CameraMovement.UserInterface
                 _movementFileInputText.InputField.text = _movementFileNameBackup;
                 CameraMovementController.movementPlayerOptions.saberFileName = _saberFileNameBackup;
                 _saberFileInputText.InputField.text = _saberFileNameBackup;
+                CameraMovementController.movementPlayerOptions.playersPlaceOffset = _playersPlaceBackup;
+                _playersPlaceOffsetCheck.InputField.text = _playersPlaceBackup.ToString();
                 _setDefaultSaberCheck.isOn = false;
                 _setDefaultSaber = false;
                 _movementPlayerMenu.SetActive(false);

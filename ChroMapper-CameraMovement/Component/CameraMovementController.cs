@@ -44,6 +44,7 @@ namespace ChroMapper_CameraMovement.Component
         public static GameObject bookmarkLines;
         public static GameObject bookmarkLinesCanvas;
         public static GameObject subCameraArrow;
+        public static GameObject playersPlace;
         public static TrailRenderer subCameraArrowTrail;
         public static Camera subCamera;
         public static Camera layoutCamera;
@@ -101,6 +102,7 @@ namespace ChroMapper_CameraMovement.Component
         public int vrmAvatarLoad = 0;
         public int customSaberLoad = 0;
         public bool movementPlayerLoadActive;
+        public float playersPlaceDefault = 0;
         public static string ScriptGet()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
@@ -180,6 +182,11 @@ namespace ChroMapper_CameraMovement.Component
             StartCoroutine(this.CustomAvatarLoad());
             StartCoroutine(this.CustomrSaberload());
             StartCoroutine(this.MovementPlayerLoad());
+            if (playersPlace != null)
+            {
+                var a = playersPlace.transform.position;
+                playersPlace.transform.position = new Vector3(a.x, playersPlaceDefault + movementPlayerOptions.playersPlaceOffset, a.z);
+            }
             cm_MapEditorCamera.GetComponent<Camera>().cullingMask |= 1 << avatarLayer;
             //サンプル アリシア・ソリッドを元に 頭の高さ1.43m、大きさ0.25m  腕の長さ1.12mの時
             var avatarHeadPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.avatarHeadHight + Options.Instance.originYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
@@ -865,6 +872,9 @@ namespace ChroMapper_CameraMovement.Component
             input1000downAction.Disable();
 
             yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
+            playersPlace = GameObject.Find("PlayersPlace");
+            if (playersPlace != null)
+                playersPlaceDefault = playersPlace.transform.position.y;
             _bookmarkController = new BookmarkController();
             _bookmarkController.bookmarkLinesController = bookmarkLinesController;
             _bookmarkController.atsc = atsc;

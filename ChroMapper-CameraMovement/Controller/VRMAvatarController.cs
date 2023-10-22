@@ -7,6 +7,7 @@ using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Util;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ChroMapper_CameraMovement.Controller
 {
@@ -19,7 +20,7 @@ namespace ChroMapper_CameraMovement.Controller
         public static Blinker m_blink { set; get; }
         public static Animation animation { set; get; }
         public static bool loadActive { set; get; } = false;
-
+        public static List<(Transform, Vector3, Quaternion, Vector3)> defaultTransform { set; get; }
         public async Task LoadModelAsync()
         {
             if (!File.Exists(Options.Instance.avatarFileName))
@@ -66,6 +67,11 @@ namespace ChroMapper_CameraMovement.Controller
             animation = avatar.GetComponent<Animation>();
             if (animation && animation.clip != null)
                 animation.Play(animation.clip.name);
+            defaultTransform = new List<(Transform, Vector3, Quaternion, Vector3)>();
+            SpringBoneEnable(false);
+            defaultTransform.Add((avatar.Root.transform, avatar.Root.transform.position, avatar.Root.transform.rotation, avatar.Root.transform.localScale));
+            foreach (var tarns in avatar.Root.GetComponentsInChildren<Transform>())
+                defaultTransform.Add((tarns, tarns.position, tarns.rotation, tarns.localScale));
             loadActive = false;
         }
 
@@ -85,6 +91,21 @@ namespace ChroMapper_CameraMovement.Controller
             }
             if (Options.Instance.avatarAnimation && animation && animation.clip != null)
                 animation.enabled = Options.Instance.avatarAnimation;
+        }
+        public static void SpringBoneEnable(bool enable)
+        {
+            foreach (var springBone in avatar.Root.GetComponentsInChildren<VRMSpringBone>())
+                springBone.enabled = enable;
+        }
+
+        public static void SetDefaultTransform()
+        {
+            foreach (var trans in defaultTransform)
+            {
+                trans.Item1.position = trans.Item2;
+                trans.Item1.rotation = trans.Item3;
+                trans.Item1.localScale = trans.Item4;
+            }
         }
 
         public static void AvatarEnable()

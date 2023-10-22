@@ -100,6 +100,7 @@ namespace ChroMapper_CameraMovement.Component
         public int customAvatarLoad = 0;
         public int vrmAvatarLoad = 0;
         public int customSaberLoad = 0;
+        public bool movementPlayerLoadActive;
         public static string ScriptGet()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
@@ -354,8 +355,8 @@ namespace ChroMapper_CameraMovement.Component
                 }
                 else
                 {
+                    VRMAvatarController.SetDefaultTransform();
                     VRMAvatarController.AvatarEnable();
-                    VRMAvatarController.AvatarTransformSet();
                 }
             }
             else
@@ -439,6 +440,7 @@ namespace ChroMapper_CameraMovement.Component
                     {
                         if (result)
                         {
+                            currentSaberFile = saberFile;
                             saberModel = model;
                         }
                         else
@@ -478,7 +480,7 @@ namespace ChroMapper_CameraMovement.Component
         {
             if (!Options.Instance.movementPlayer || !Options.Instance.cameraMovementEnable)
                 yield break;
-            yield return new WaitForSeconds(0.5f);
+            movementPlayerLoadActive = true;
             if (vrmAvatarLoad == 1)
                 yield return new WaitUntil(() => vrmAvatarLoad != 1);
             if (customAvatarLoad == 1)
@@ -494,11 +496,12 @@ namespace ChroMapper_CameraMovement.Component
             if (customSaberLoad == 2 && saberModel != null)
                 saber = saberModel;
             yield return _movementPlayerController.SetMovementData(avatar, saber);
+            movementPlayerLoadActive = false;
+            _movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
         }
 
         public void OnPreview()
         {
-            Debug.Log("PreviewToggle");
             previewMode = !previewMode;
             if (previewMode)
             {
@@ -888,7 +891,8 @@ namespace ChroMapper_CameraMovement.Component
                 beforeSeconds = atsc.CurrentSeconds;
                 _bookmarkController?.BookMarkUpdate();
                 _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, subCamera , AvatarPositionGet());
-                _movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
+                if (!movementPlayerLoadActive && Options.Instance.movementPlayer)
+                    _movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
             }
             GameObject targetCamera;
             float targetFOV;

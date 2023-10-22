@@ -57,9 +57,15 @@ namespace ChroMapper_CameraMovement.Controller
         public MovementJson _records;
         public List<MovementData> _movementData;
         public bool _init;
+        public bool _initActive;
         public List<(Transform, int)> _movementModels;
         public float nextSongTime;
         public int eventID;
+        public Vector3 _avatarScale;
+        public Vector3 _saberScale;
+        public string _loadMovementFileName;
+        public GameObject _loadAvatarModel;
+        public GameObject _loadSaberModel;
 
         public void MovementUpdate(float currentSeconds)
         {
@@ -104,7 +110,23 @@ namespace ChroMapper_CameraMovement.Controller
 
         public async Task SetMovementData(GameObject avatarModel, GameObject saberModel)
         {
-            _init = false;
+            if (this._initActive)
+                return;
+            if (this._loadMovementFileName == Options.Instance.movementFileName && avatarModel == this._loadAvatarModel && saberModel == this._loadSaberModel)
+            {
+                this.nextSongTime = 0;
+                this.eventID = 0;
+                avatarModel.transform.localScale = this._avatarScale;
+                saberModel.transform.localScale = this._saberScale;
+                return;
+            }
+            this._loadAvatarModel = avatarModel;
+            this._loadSaberModel = saberModel;
+            this._loadMovementFileName = null;
+            this._init = false;
+            this._initActive = true;
+            this._avatarScale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
+            this._saberScale = Vector3.one * Options.Instance.avatarCameraScale;
             this._records = await this.ReadRecordFileAsync(Options.Instance.movementFileName);
             if (this._records == null)
             {
@@ -141,7 +163,7 @@ namespace ChroMapper_CameraMovement.Controller
                         {
                             if (rescalePattan.IsMatch(objectName))
                             {
-                                avatarModel.transform.localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
+                                this._avatarScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
                                 break;
                             }
                         }
@@ -184,7 +206,7 @@ namespace ChroMapper_CameraMovement.Controller
                         {
                             if (rescalePattan.IsMatch(objectName))
                             {
-                                saberModel.transform.localScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
+                                this._saberScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
                                 break;
                             }
                         }
@@ -227,7 +249,11 @@ namespace ChroMapper_CameraMovement.Controller
             Debug.Log($"{_movementData.Count}");
             this.nextSongTime = 0;
             this.eventID = 0;
-            _init = true;
+            this._initActive = false;
+            this._init = true;
+            this._loadMovementFileName = Options.Instance.movementFileName;
+            avatarModel.transform.localScale = this._avatarScale;
+            saberModel.transform.localScale = this._saberScale;
         }
 
         public async Task<MovementJson> ReadRecordFileAsync(string path)
@@ -238,7 +264,7 @@ namespace ChroMapper_CameraMovement.Controller
             {
                 if (json == null)
                     throw new JsonReaderException($"Json file error {path}");
-                result = JsonConvert.DeserializeObject<MovementJson>(json);
+                result = await Task.Run(() => JsonConvert.DeserializeObject<MovementJson>(json));
                 if (result == null)
                     throw new JsonReaderException($"Empty json {path}");
             }

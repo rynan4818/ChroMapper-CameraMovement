@@ -176,7 +176,7 @@ namespace ChroMapper_CameraMovement.Component
 
         public void Reload()
         {
-            _ = VRMAvatarLoadAsync();
+            StartCoroutine(this.VRMAvatarLoadAsync());
             StartCoroutine(this.CustomAvatarLoad());
             StartCoroutine(this.CustomrSaberload());
             StartCoroutine(this.MovementPlayerLoad());
@@ -335,10 +335,10 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
-        public async Task VRMAvatarLoadAsync()
+        public IEnumerator VRMAvatarLoadAsync()
         {
-            if (!Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.vrm$", RegexOptions.IgnoreCase))
-                return;
+            if (!Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.vrm$", RegexOptions.IgnoreCase) || vrmAvatarLoad == 1)
+                yield break;
             vrmAvatarLoad = 1;
             customAvatarLoad = 0;
             if (avatarModel != null)
@@ -351,7 +351,10 @@ namespace ChroMapper_CameraMovement.Component
                 if (currentAvatarFile != Options.Instance.avatarFileName)
                 {
                     currentAvatarFile = Options.Instance.avatarFileName;
-                    await vrmAvatarController.LoadModelAsync();
+                    var task = vrmAvatarController.LoadModelAsync();
+                    yield return new WaitUntil(() => task.IsCompleted);
+                    if (task.IsFaulted && task.Exception != null)
+                        throw task.Exception;
                 }
                 else
                 {
@@ -371,6 +374,8 @@ namespace ChroMapper_CameraMovement.Component
 
         public IEnumerator CustomAvatarLoad()
         {
+            if (customAvatarLoad == 1)
+                yield break;
             if (Regex.IsMatch(Path.GetExtension(Options.Instance.avatarFileName), @"\.avatar$", RegexOptions.IgnoreCase) && currentAvatarFile != Options.Instance.avatarFileName && Options.Instance.customAvatar && Options.Instance.cameraMovementEnable)
             {
                 customAvatarLoad = 1;
@@ -425,6 +430,8 @@ namespace ChroMapper_CameraMovement.Component
 
         public IEnumerator CustomrSaberload()
         {
+            if (customSaberLoad == 1)
+                yield break;
             if (Regex.IsMatch(Path.GetExtension(Options.Instance.saberFileName), @"\.saber", RegexOptions.IgnoreCase) && currentSaberFile != Options.Instance.saberFileName && Options.Instance.movementPlayer && Options.Instance.cameraMovementEnable)
             {
                 customSaberLoad = 1;
@@ -495,7 +502,10 @@ namespace ChroMapper_CameraMovement.Component
             GameObject saber = null;
             if (customSaberLoad == 2 && saberModel != null)
                 saber = saberModel;
-            yield return _movementPlayerController.SetMovementData(avatar, saber);
+            var task = _movementPlayerController.SetMovementDataAsync(avatar, saber);
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (task.IsFaulted && task.Exception != null)
+                throw task.Exception;
             movementPlayerLoadActive = false;
             _movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
         }

@@ -108,9 +108,9 @@ namespace ChroMapper_CameraMovement.Controller
             this.eventID = 0;
         }
 
-        public async Task SetMovementData(GameObject avatarModel, GameObject saberModel)
+        public async Task SetMovementDataAsync(GameObject avatarModel, GameObject saberModel)
         {
-            if (this._initActive)
+            if (this._initActive || avatarModel == null && saberModel == null)
                 return;
             if (this._loadMovementFileName == Options.Instance.movementFileName && avatarModel == this._loadAvatarModel && saberModel == this._loadSaberModel)
             {

@@ -23,6 +23,8 @@ namespace ChroMapper_CameraMovement.Controller
         public static List<(Transform, Vector3, Quaternion, Vector3)> defaultTransform { set; get; }
         public async Task LoadModelAsync()
         {
+            if (loadActive)
+                return;
             if (!File.Exists(Options.Instance.avatarFileName))
             {
                 Debug.LogError("Avatar File ERR!");

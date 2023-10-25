@@ -73,7 +73,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var movementSelectButton = UI.AddButton(_movementPlayerMenu.transform, "Select", "Select", () =>
             {
-                var ext = new ExtensionFilter[] { new ExtensionFilter("Movement File", new string[] { "json" }) };
+                var ext = new ExtensionFilter[] { new ExtensionFilter("Movement File", new string[] { "mvrec" }) };
                 string dir;
                 try
                 {

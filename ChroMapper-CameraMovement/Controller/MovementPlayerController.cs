@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,37 +15,37 @@ namespace ChroMapper_CameraMovement.Controller
 {
     public class MovementJson
     {
+        public int objectCount { get; set; }
+        public int recordCount { get; set; }
+        public string levelID { get; set; }
+        public string songName { get; set; }
+        public string serializedName { get; set; }
+        public string difficulty { get; set; }
         public List<Setting> Settings { get; set; }
         public int recordFrameRate { get; set; }
         public List<string> objectNames { get; set; }
         public List<Scale> objectScales { get; set; }
-        public List<Record> records { get; set; }
+        public List<NUllObject> recordNullObjects { get; set; }
     }
     public class Setting
     {
-        public virtual string name { get; set; }
-        public virtual string type { get; set; }
-        public virtual List<string> topObjectStrings { get; set; }
-        public virtual string rescaleString { get; set; }
-        public virtual List<string> searchStirngs { get; set; }
-        public virtual List<string> exclusionStrings { get; set; }
-    }
-    public class Record
-    {
-        public float songTIme { get; set; }
-        public List<float> posX { get; set; }
-        public List<float> posY { get; set; }
-        public List<float> posZ { get; set; }
-        public List<float> rotX { get; set; }
-        public List<float> rotY { get; set; }
-        public List<float> rotZ { get; set; }
-        public List<float> rotW { get; set; }
+        public string name { get; set; }
+        public string type { get; set; }
+        public List<string> topObjectStrings { get; set; }
+        public string rescaleString { get; set; }
+        public List<string> searchStirngs { get; set; }
+        public List<string> exclusionStrings { get; set; }
     }
     public class Scale
     {
         public float x { get; set; }
         public float y { get; set; }
         public float z { get; set; }
+    }
+    public class NUllObject
+    {
+        public float songTime { get; set; }
+        public int objIndex { get; set; }
     }
     public class MovementData
     {
@@ -55,7 +56,7 @@ namespace ChroMapper_CameraMovement.Controller
     public class MovementPlayerController
     {
         public static SemaphoreSlim RecordsSemaphore = new SemaphoreSlim(1, 1);
-        public MovementJson _records;
+        public MovementJson _metaData;
         public List<MovementData> _movementData;
         public bool _init;
         public bool _initActive;
@@ -70,7 +71,7 @@ namespace ChroMapper_CameraMovement.Controller
 
         public void MovementUpdate(float currentSeconds)
         {
-            if (!this._init || this._records == null || this._movementData == null)
+            if (!this._init || this._metaData == null || this._movementData == null)
                 return;
             while (this.nextSongTime <= currentSeconds)
             {
@@ -132,8 +133,8 @@ namespace ChroMapper_CameraMovement.Controller
             this._initActive = true;
             this._avatarScale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
             this._saberScale = Vector3.one * Options.Instance.avatarCameraScale;
-            this._records = await this.ReadRecordFileAsync(CameraMovementController.movementPlayerOptions.movementFileName);
-            if (this._records == null)
+            this._metaData = await this.ReadMetaDataAsync(CameraMovementController.movementPlayerOptions.movementFileName);
+            if (this._metaData == null)
             {
                 Debug.Log("Load Movment Data Error");
                 return;
@@ -146,7 +147,7 @@ namespace ChroMapper_CameraMovement.Controller
                 Debug.Log("Load Movment Data:Avatar");
                 var topObjectPattans = new List<Regex>();
                 var rescalePattans = new List<Regex>();
-                foreach (var setting in this._records.Settings)
+                foreach (var setting in this._metaData.Settings)
                 {
                     if (setting.type == "Avatar")
                     {
@@ -161,14 +162,14 @@ namespace ChroMapper_CameraMovement.Controller
                 for (var i = 1; i < avatarModelTree.Length; i++)
                 {
                     var name = avatarModelTree[i].GetFullPathName().Substring(topNameLength);
-                    for (var j = 0; j < this._records.objectNames.Count; j++)
+                    for (var j = 0; j < this._metaData.objectNames.Count; j++)
                     {
-                        var objectName = this._records.objectNames[j];
+                        var objectName = this._metaData.objectNames[j];
                         foreach (var rescalePattan in rescalePattans)
                         {
                             if (rescalePattan.IsMatch(objectName))
                             {
-                                this._avatarScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
+                                this._avatarScale = new Vector3(this._metaData.objectScales[j].x, this._metaData.objectScales[j].y, this._metaData.objectScales[j].z) * Options.Instance.avatarCameraScale;
                                 break;
                             }
                         }
@@ -189,7 +190,7 @@ namespace ChroMapper_CameraMovement.Controller
                 Debug.Log("Load Movment Data:Saber");
                 var topObjectPattans = new List<Regex>();
                 var rescalePattans = new List<Regex>();
-                foreach (var setting in this._records.Settings)
+                foreach (var setting in this._metaData.Settings)
                 {
                     if (setting.type == "Saber")
                     {
@@ -204,14 +205,14 @@ namespace ChroMapper_CameraMovement.Controller
                 for (var i = 1; i < saberModelTree.Length; i++)
                 {
                     var name = saberModelTree[i].GetFullPathName().Substring(topNameLength);
-                    for (var j = 0; j < this._records.objectNames.Count; j++)
+                    for (var j = 0; j < this._metaData.objectNames.Count; j++)
                     {
-                        var objectName = this._records.objectNames[j];
+                        var objectName = this._metaData.objectNames[j];
                         foreach (var rescalePattan in rescalePattans)
                         {
                             if (rescalePattan.IsMatch(objectName))
                             {
-                                this._saberScale = new Vector3(this._records.objectScales[j].x, this._records.objectScales[j].y, this._records.objectScales[j].z) * Options.Instance.avatarCameraScale;
+                                this._saberScale = new Vector3(this._metaData.objectScales[j].x, this._metaData.objectScales[j].y, this._metaData.objectScales[j].z) * Options.Instance.avatarCameraScale;
                                 break;
                             }
                         }
@@ -227,29 +228,9 @@ namespace ChroMapper_CameraMovement.Controller
                     }
                 }
             }
-            foreach (var record in this._records.records)
-            {
-                var movementData = new MovementData();
-                movementData.position = new List<Vector3>();
-                movementData.rotation = new List<Quaternion>();
-                movementData.songTime = record.songTIme;
-                foreach(var movementModel in this._movementModels)
-                {
-                    var posX = record.posX[movementModel.Item2] + Options.Instance.originXoffset;
-                    var posY = record.posY[movementModel.Item2] + Options.Instance.originYoffset;
-                    var posZ = record.posZ[movementModel.Item2] + Options.Instance.originZoffset;
-                    var pos = new Vector3(posX, posY, posZ);
-                    movementData.position.Add(pos);
-                    var rotX = record.rotX[movementModel.Item2];
-                    var rotY = record.rotY[movementModel.Item2];
-                    var rotZ = record.rotZ[movementModel.Item2];
-                    var rotW = record.rotW[movementModel.Item2];
-                    movementData.rotation.Add(new Quaternion(rotX, rotY, rotZ, rotW));
-                }
-                this._movementData.Add(movementData);
-            }
-            Debug.Log($"{_records.records.Count}");
-            Debug.Log($"{_movementData.Count}");
+            await this.ReadRecordDataAsync(CameraMovementController.movementPlayerOptions.movementFileName);
+            Debug.Log($"{this._metaData.recordCount}");
+            Debug.Log($"{this._movementData.Count}");
             this.nextSongTime = 0;
             this.eventID = 0;
             this._initActive = false;
@@ -259,6 +240,78 @@ namespace ChroMapper_CameraMovement.Controller
             saberModel.transform.localScale = this._saberScale;
         }
 
+        public async Task<MovementJson> ReadMetaDataAsync(string path)
+        {
+            MovementJson result = null;
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (var reader = new BinaryReader(File.OpenRead(path), Encoding.UTF8))
+                    {
+                        string json;
+                        json = reader.ReadString();
+                        if (json == null)
+                            throw new JsonReaderException($"Meta Data Json error {path}");
+                        result = JsonConvert.DeserializeObject<MovementJson>(json);
+                        if (result == null)
+                            throw new JsonReaderException($"Meta Data Empty json {path}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.Log(ex.ToString());
+                result = null;
+            }
+            return result;
+        }
+        public async Task ReadRecordDataAsync(string path)
+        {
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (var reader = new BinaryReader(File.OpenRead(path), Encoding.UTF8))
+                    {
+                        reader.ReadString();
+                        for (var i = 0; i < this._metaData.recordCount; i++)
+                        {
+                            var movementData = new MovementData();
+                            movementData.position = new List<Vector3>();
+                            movementData.rotation = new List<Quaternion>();
+                            movementData.songTime = reader.ReadSingle();
+                            var pos = new Vector3[this._metaData.objectNames.Count];
+                            var rot = new Quaternion[this._metaData.objectNames.Count];
+                            for (int j = 0; j < this._metaData.objectNames.Count; j++)
+                            {
+                                pos[j] = new Vector3(
+                                    reader.ReadSingle() + Options.Instance.originXoffset,
+                                    reader.ReadSingle() + Options.Instance.originYoffset,
+                                    reader.ReadSingle() + Options.Instance.originZoffset
+                                );
+                                rot[j] = new Quaternion(
+                                    reader.ReadSingle(),
+                                    reader.ReadSingle(),
+                                    reader.ReadSingle(),
+                                    reader.ReadSingle()
+                                );
+                            }
+                            foreach (var movementModel in this._movementModels)
+                            {
+                                movementData.position.Add(pos[movementModel.Item2]);
+                                movementData.rotation.Add(rot[movementModel.Item2]);
+                            }
+                            this._movementData.Add(movementData);
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Debug.Log(ex.ToString());
+            }
+        }
         public async Task<MovementJson> ReadRecordFileAsync(string path)
         {
             MovementJson result;

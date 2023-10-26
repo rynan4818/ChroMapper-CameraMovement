@@ -12,6 +12,7 @@ using ChroMapper_CameraMovement.CameraPlus;
 using ChroMapper_CameraMovement.Controller;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Util;
+using System.Collections.Generic;
 
 namespace ChroMapper_CameraMovement.Component
 {
@@ -103,6 +104,9 @@ namespace ChroMapper_CameraMovement.Component
         public int customSaberLoad = 0;
         public bool movementPlayerLoadActive;
         public float playersPlaceDefault = 0;
+        public static List<(Transform, Vector3, Quaternion, Vector3)> avatarDefaultTransform { set; get; }
+        public static List<(Transform, Vector3, Quaternion, Vector3)> saberDefaultTransform { set; get; }
+
         public static string ScriptGet()
         {
             return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
@@ -403,6 +407,12 @@ namespace ChroMapper_CameraMovement.Component
                         {
                             currentAvatarFile = Options.Instance.avatarFileName;
                             avatarModel = model;
+                            avatarDefaultTransform = new List<(Transform, Vector3, Quaternion, Vector3)>
+                            {
+                                (avatarModel.transform, avatarModel.transform.position, avatarModel.transform.rotation, avatarModel.transform.localScale)
+                            };
+                            foreach (var tarns in avatarModel.GetComponentsInChildren<Transform>())
+                                avatarDefaultTransform.Add((tarns, tarns.position, tarns.rotation, tarns.localScale));
                         }
                         else
                             avatarModel = null;
@@ -420,6 +430,12 @@ namespace ChroMapper_CameraMovement.Component
             else
             {
                 customAvatarLoad = 2;
+                foreach (var trans in avatarDefaultTransform)
+                {
+                    trans.Item1.position = trans.Item2;
+                    trans.Item1.rotation = trans.Item3;
+                    trans.Item1.localScale = trans.Item4;
+                }
                 avatarModel.transform.localScale = new Vector3(Options.Instance.avatarScale, Options.Instance.avatarScale, Options.Instance.avatarScale) * Options.Instance.avatarCameraScale;
                 var avatarPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset + Options.Instance.avatarYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
                 avatarPosition.y = Options.Instance.originMatchOffsetY;
@@ -457,6 +473,12 @@ namespace ChroMapper_CameraMovement.Component
                         {
                             currentSaberFile = saberFile;
                             saberModel = model;
+                            saberDefaultTransform = new List<(Transform, Vector3, Quaternion, Vector3)>
+                            {
+                                (saberModel.transform, saberModel.transform.position, saberModel.transform.rotation, saberModel.transform.localScale)
+                            };
+                            foreach (var tarns in saberModel.GetComponentsInChildren<Transform>())
+                                saberDefaultTransform.Add((tarns, tarns.position, tarns.rotation, tarns.localScale));
                         }
                         else
                         {
@@ -476,6 +498,12 @@ namespace ChroMapper_CameraMovement.Component
             else
             {
                 customSaberLoad = 2;
+                foreach (var trans in saberDefaultTransform)
+                {
+                    trans.Item1.position = trans.Item2;
+                    trans.Item1.rotation = trans.Item3;
+                    trans.Item1.localScale = trans.Item4;
+                }
                 saberModel.transform.localScale = Vector3.one * Options.Instance.avatarCameraScale;
                 var saberPosition = new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset + Options.Instance.avatarYoffset, Options.Instance.originZoffset) * Options.Instance.avatarCameraScale;
                 saberPosition.y = Options.Instance.originMatchOffsetY;

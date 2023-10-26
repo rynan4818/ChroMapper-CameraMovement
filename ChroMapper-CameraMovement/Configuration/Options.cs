@@ -139,6 +139,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public string saberFileName = "";
         public bool movementPlayer = false;
         public bool vrmSpringBone = false;
+        public bool orbitTargetObject = true;
 
         public static Options Instance {
             get {

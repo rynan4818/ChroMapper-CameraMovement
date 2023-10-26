@@ -161,7 +161,8 @@ namespace ChroMapper_CameraMovement.Component
                 rotActiveAction.Enable();
                 zoomActiveAction.Enable();
                 mouseMoveAction.Enable();
-                targetPosObject.SetActive(true);
+                if (Options.Instance.orbitTargetObject)
+                    targetPosObject.SetActive(true);
                 if (MultiDisplayController.activeWindowNumber == 0)
                     UI.SetLockState(true);
             }

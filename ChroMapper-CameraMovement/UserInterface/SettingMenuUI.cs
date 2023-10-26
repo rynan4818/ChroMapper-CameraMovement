@@ -358,6 +358,14 @@ namespace ChroMapper_CameraMovement.UserInterface
             UI.MoveTransform(vrmSpringBoneCheck.Item3.transform, 30, 16, 0, 1, 150, -220);
             UI.MoveTransform(vrmSpringBoneCheck.Item1, 70, 16, 0, 1, 190, -220);
 
+            var orbitTargetCheck = UI.AddCheckbox(_cameraMovementSettingMenu.transform, "Orbit Camera Target", "Orbit Camera Target", Options.Instance.orbitTargetObject, (check) =>
+            {
+                Options.Instance.orbitTargetObject = check;
+                UI.KeyDisableCheck();
+            });
+            UI.MoveTransform(orbitTargetCheck.Item3.transform, 30, 16, 0, 1, 250, -220);
+            UI.MoveTransform(orbitTargetCheck.Item1, 70, 16, 0, 1, 290, -220);
+
             var saveButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Setting Save", "Setting Save", () =>
             {
                 Options.Instance.SettingSave();

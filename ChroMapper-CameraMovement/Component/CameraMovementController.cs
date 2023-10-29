@@ -35,6 +35,7 @@ namespace ChroMapper_CameraMovement.Component
         public static DefaultCameraController defaultCamera;
         public static MovementPlayerController movementPlayerController;
         public static MovementPlayerOptions movementPlayerOptions;
+        public static NalulunaAvatarsEventController nalulunaAvatarsEventController;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_UIMode;
         public static GameObject avatarHead;
@@ -285,6 +286,10 @@ namespace ChroMapper_CameraMovement.Component
             if (Options.Instance.uIhidden && Options.Instance.cameraMovementEnable)
             {
                 spectrogramSideSwapper.IsNoteSide = true;
+                //Grid   Spectrogram  Note  Rotation  Event  BPM Change  CustomEvent
+                //Order  -1  , 3      0     1         2      4           5
+                //offset 3.5 , 2.5    0     0         0.5    0.5         1.5
+                //SwapSides()は Spectrogram Grid のorder を -1 と 3、offset を 3.5f　と 2.5fで切り替える
                 spectrogramSideSwapper.SwapSides();
                 EventBpmOffset(200f);
                 var main_camera = cm_MapEditorCamera.GetComponent<Camera>();
@@ -752,22 +757,6 @@ namespace ChroMapper_CameraMovement.Component
             spectrogramGridChildLocalOffset = spectrogramGridChild.LocalOffset;
             waveformGridChildLocalOffset = waveformGridChild.LocalOffset;
 
-            try
-            {
-                customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
-                customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
-                customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
-                customEventsChildLocalOffset = customEventsChild.LocalOffset;
-                customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
-                customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
-                customEventsObject = true;
-            }
-            catch
-            {
-                Debug.LogWarning("CameraMovement:customEvents object err");
-                customEventsObject = false;
-            }
-
             beforeWaveFormIsNoteSide = spectrogramSideSwapper.IsNoteSide;
 
             subCamera = new GameObject("Preview Camera").AddComponent<Camera>();
@@ -899,10 +888,31 @@ namespace ChroMapper_CameraMovement.Component
             input1000downAction.canceled += context => UI.InputRound(context, -1000);
             input1000downAction.Disable();
 
-            yield return new WaitForSeconds(0.5f); //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
+            yield return new WaitForSeconds(0.5f); //待機しないとエラーになる物用
+
+            //待機後でないとカスタムイベントオブジェクトが見つからないので、ここに置く。
+            try
+            {
+                customEventsChild = GameObject.Find("Rotating/Custom Events Grid").GetComponent<GridChild>();
+                customEventsLabelsChild = GameObject.Find("Rotating/Custom Events Grid Labels").GetComponent<GridChild>();
+                customEventsGridChild = GameObject.Find("Moveable Grid/Custom Events Grid").GetComponent<GridChild>();
+                customEventsChildLocalOffset = customEventsChild.LocalOffset;
+                customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
+                customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
+                customEventsObject = true;
+            }
+            catch
+            {
+                Debug.LogWarning("CameraMovement:customEvents object err");
+                customEventsObject = false;
+            }
+            nalulunaAvatarsEventController = this.gameObject.AddComponent<NalulunaAvatarsEventController>();
+            nalulunaAvatarsEventController._atsc = atsc;
+
             playersPlace = GameObject.Find("PlayersPlace");
             if (playersPlace != null)
                 playersPlaceDefault = playersPlace.transform.position.y;
+            //BookmarkManagerのStart()が0.1秒待つので0.5秒待つことにする。
             _bookmarkController = new BookmarkController();
             _bookmarkController.bookmarkLinesController = bookmarkLinesController;
             _bookmarkController.atsc = atsc;

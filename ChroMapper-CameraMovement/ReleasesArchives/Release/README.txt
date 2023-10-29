@@ -56,8 +56,13 @@ http://iconion.com/ja/
 
 ○ソースコードの参考、コピー
 
-カメラスクリプトの処理はCameraPlusを流用しています、著作権表記・ライセンスは以下の通りです。
+カメラスクリプトの処理は、すのーさんのCameraPlusを流用しています、著作権表記・ライセンスは以下の通りです。
 https://github.com/Snow1226/CameraPlus/blob/master/LICENSE
 
 UIの参考としてLolighterを流用しています、著作権表記・ライセンスは以下の通りです。
+ChroMapper-Lolighter: Copyright (c) 2021 Kival Evan
 https://github.com/KivalEvan/ChroMapper-Lolighter/blob/main/LICENSE
+
+BlendShapeの参考としてVirtualMotionCaptureを流用しています、著作権表記・ライセンスは以下の通りです。
+VirtualMotionCapture: Copyright (c) 2018 sh-akira
+https://github.com/sh-akira/VirtualMotionCapture/blob/master/LICENSE

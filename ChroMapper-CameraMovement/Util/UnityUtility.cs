@@ -33,7 +33,7 @@ namespace ChroMapper_CameraMovement.Util
         /// <returns>補間後の値</returns>
         public static Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
         {
-            return new Vector3(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent));
+            return new Vector3(Mathf.Lerp(from.x, to.x, percent), Mathf.Lerp(from.y, to.y, percent), Mathf.Lerp(from.z, to.z, percent));
         }
         /// <summary>
         /// Quaternionで線形補間する
@@ -46,9 +46,9 @@ namespace ChroMapper_CameraMovement.Util
         {
             var value = Quaternion.Dot(from, to);
             if (value > 0.0)
-                return new Quaternion(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent), Mathf.LerpAngle(from.w, to.w, percent));
+                return new Quaternion(Mathf.Lerp(from.x, to.x, percent), Mathf.Lerp(from.y, to.y, percent), Mathf.Lerp(from.z, to.z, percent), Mathf.Lerp(from.w, to.w, percent));
             else
-                return new Quaternion(Mathf.LerpAngle(from.x, -to.x, percent), Mathf.LerpAngle(from.y, -to.y, percent), Mathf.LerpAngle(from.z, -to.z, percent), Mathf.LerpAngle(from.w, -to.w, percent));
+                return new Quaternion(Mathf.Lerp(from.x, -to.x, percent), Mathf.Lerp(from.y, -to.y, percent), Mathf.Lerp(from.z, -to.z, percent), Mathf.Lerp(from.w, -to.w, percent));
         }
         public static IEnumerator AssetLoadCoroutine(string assetFile, string name, int setLayer, Action<bool, GameObject> result)
         {

@@ -209,7 +209,7 @@ namespace ChroMapper_CameraMovement.CameraPlus
                 movePerc = Mathf.Clamp(current / difference, 0, 1);
 
             Vector3 cameraPos = LerpVector3(StartPos, EndPos, Ease(movePerc));
-            Vector3 cameraRot = LerpVector3(StartRot, EndRot, Ease(movePerc));
+            Vector3 cameraRot = LerpAngleVector3(StartRot, EndRot, Ease(movePerc));
             cameraPos.x += Options.Instance.originXoffset;
             cameraPos.y += Options.Instance.originYoffset;
             cameraPos.z += Options.Instance.originZoffset;
@@ -262,6 +262,11 @@ namespace ChroMapper_CameraMovement.CameraPlus
         }
 
         protected Vector3 LerpVector3(Vector3 from, Vector3 to, float percent)
+        {
+            return new Vector3(Mathf.Lerp(from.x, to.x, percent), Mathf.Lerp(from.y, to.y, percent), Mathf.Lerp(from.z, to.z, percent));
+        }
+
+        protected Vector3 LerpAngleVector3(Vector3 from, Vector3 to, float percent)
         {
             return new Vector3(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent));
         }

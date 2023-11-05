@@ -140,7 +140,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool movementPlayer = false;
         public bool vrmSpringBone = false;
         public bool orbitTargetObject = true;
-        public string blendShapeFileName = "NalulunaAvatarsEvents.json";
+        public string nalulunaAvatarsEventFileName = "NalulunaAvatarsEvents.json";
 
         public static Options Instance {
             get {

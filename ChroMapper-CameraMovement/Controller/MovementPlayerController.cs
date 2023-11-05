@@ -79,6 +79,7 @@ namespace ChroMapper_CameraMovement.Controller
                 if (this.eventID + 1 >= this._movementData.Count)
                 {
                     this.eventID = this._movementData.Count - 2;
+                    this.nextSongTime = _movementData[this.eventID + 1].songTime;
                     break;
                 }
                 this.nextSongTime = _movementData[this.eventID + 1].songTime;

@@ -907,8 +907,6 @@ namespace ChroMapper_CameraMovement.Component
                 customEventsObject = false;
             }
             nalulunaAvatarsEventController = this.gameObject.AddComponent<NalulunaAvatarsEventController>();
-            nalulunaAvatarsEventController._atsc = atsc;
-
             playersPlace = GameObject.Find("PlayersPlace");
             if (playersPlace != null)
                 playersPlaceDefault = playersPlace.transform.position.y;
@@ -946,6 +944,8 @@ namespace ChroMapper_CameraMovement.Component
                 {
                     _cameraMovement.MovementPositionReset();
                     movementPlayerController.MovementPositionReset();
+                    if (VRMAvatarController.avatar != null && VRMAvatarController.avatar.Root.activeSelf && VRMAvatarController.blendShapeController != null)
+                        VRMAvatarController.blendShapeController.SongTimeReset();
                     beforeSeconds = 0;
                 }
                 beforeSeconds = atsc.CurrentSeconds;
@@ -953,6 +953,8 @@ namespace ChroMapper_CameraMovement.Component
                 _cameraMovement.CameraUpdate(atsc.CurrentSeconds, cm_MapEditorCamera, subCamera , AvatarPositionGet());
                 if (!movementPlayerLoadActive && Options.Instance.movementPlayer)
                     movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
+                if (VRMAvatarController.avatar != null && VRMAvatarController.avatar.Root.activeSelf && VRMAvatarController.blendShapeController != null)
+                    VRMAvatarController.blendShapeController.SongTimeUpdate(atsc.CurrentSeconds);
             }
             GameObject targetCamera;
             float targetFOV;

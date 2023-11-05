@@ -164,6 +164,7 @@
     <Compile Include="Component\PlusCameraController.cs" />
     <Compile Include="Configuration\MovementPlayerOptions.cs" />
     <Compile Include="Configuration\Options.cs" />
+    <Compile Include="Controller\BlendShapeController.cs" />
     <Compile Include="Controller\BookmarkController.cs" />
     <Compile Include="Controller\MovementPlayerController.cs" />
     <Compile Include="Controller\WindowController.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="UserInterface\UI.cs" />
     <Compile Include="Util\AddVRMShaders.cs" />
     <Compile Include="Controller\ScriptMapperController.cs" />
+    <Compile Include="Util\DebugTimer.cs" />
     <Compile Include="Util\SimpleJSON.cs" />
     <Compile Include="Controller\VRMAvatarController.cs" />
     <Compile Include="Util\TimeoutTimer.cs" />
@@ -201,11 +203,19 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if exist "$(TargetName)_org.dll" del "$(TargetName)_org.dll"
-ren "$(TargetPath)" "$(TargetName)_org.dll"
 if exist "$(TargetDir)$(TargetName)_org.pdb" del "$(TargetDir)$(TargetName)_org.pdb"
+if $(ConfigurationName)==Release (
+  "$(ILMergeConsolePath)" /ndebug /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetDir)$(TargetName)_all.dll" "$(TargetPath)" "$(ProjectDir)DLL\*.dll"
+)
+if $(ConfigurationName)==Debug (
+  "$(ILMergeConsolePath)" /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetDir)$(TargetName)_all.dll" "$(TargetPath)" "$(ProjectDir)DLL\*.dll"
+)
 if exist "$(TargetDir)$(TargetName).pdb" ren "$(TargetDir)$(TargetName).pdb" "$(TargetName)_org.pdb"
-"$(ILMergeConsolePath)" /ndebug /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetPath)" "$(TargetDir)$(TargetName)_org.dll" "$(ProjectDir)DLL\*.dll"
+ren "$(TargetPath)" "$(TargetName)_org.dll"
+if exist "$(TargetDir)$(TargetName)_all.pdb" ren "$(TargetDir)$(TargetName)_all.pdb" "$(TargetName).pdb"
+ren "$(TargetDir)$(TargetName)_all.dll" "$(TargetName).dll"
 copy /Y "$(TargetFileName)" "$(ChroMapperDir)\Plugins"
+copy /Y "$(TargetDir)$(TargetName).pdb" "$(ChroMapperDir)\Plugins"
 if $(ConfigurationName)==Release (
   if not exist "$(ProjectDir)ReleasesArchives\Release\Plugins" mkdir "$(ProjectDir)ReleasesArchives\Release\Plugins"
   copy /Y "$(TargetFileName)" "$(ProjectDir)ReleasesArchives\Release\Plugins"

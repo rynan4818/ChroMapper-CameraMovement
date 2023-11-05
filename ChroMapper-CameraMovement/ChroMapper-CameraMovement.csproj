@@ -215,14 +215,13 @@ ren "$(TargetPath)" "$(TargetName)_org.dll"
 if exist "$(TargetDir)$(TargetName)_all.pdb" ren "$(TargetDir)$(TargetName)_all.pdb" "$(TargetName).pdb"
 ren "$(TargetDir)$(TargetName)_all.dll" "$(TargetName).dll"
 copy /Y "$(TargetFileName)" "$(ChroMapperDir)\Plugins"
-copy /Y "$(TargetDir)$(TargetName).pdb" "$(ChroMapperDir)\Plugins"
+if exist "$(TargetDir)$(TargetName).pdb" copy /Y "$(TargetDir)$(TargetName).pdb" "$(ChroMapperDir)\Plugins"
 if $(ConfigurationName)==Release (
   if not exist "$(ProjectDir)ReleasesArchives\Release\Plugins" mkdir "$(ProjectDir)ReleasesArchives\Release\Plugins"
   copy /Y "$(TargetFileName)" "$(ProjectDir)ReleasesArchives\Release\Plugins"
   if exist "$(ProjectDir)ReleasesArchives\ChroMapper-CameraMovement-.zip" del "$(ProjectDir)ReleasesArchives\ChroMapper-CameraMovement-.zip"
   powershell compress-archive -Path "$(ProjectDir)ReleasesArchives\Release\*" -DestinationPath "$(ProjectDir)ReleasesArchives\ChroMapper-CameraMovement-.zip"
-)
-</PostBuildEvent>
+)</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

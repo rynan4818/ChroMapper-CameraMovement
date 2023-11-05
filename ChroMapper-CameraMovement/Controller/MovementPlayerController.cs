@@ -181,7 +181,9 @@ namespace ChroMapper_CameraMovement.Controller
                         if (objectName == name)
                         {
                             this._movementModels.Add((avatarModelTree[i], j));
+#if DEBUG
                             Debug.Log(name);
+#endif
                             break;
                         }
                     }
@@ -224,7 +226,9 @@ namespace ChroMapper_CameraMovement.Controller
                         if (objectName == name)
                         {
                             this._movementModels.Add((saberModelTree[i], j));
+#if DEBUG
                             Debug.Log(name);
+#endif
                             break;
                         }
                     }

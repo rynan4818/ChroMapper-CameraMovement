@@ -80,8 +80,8 @@ namespace ChroMapper_CameraMovement.Controller
                     setBlendShapeKeys.Add(setBlendShape.Key);
                     setValues.Add(setBlendShape.Value);
                 }
-#if DEBUG
                 var log1 = SetFace(setBlendShapeKeys, setValues);
+#if DEBUG
                 if (log1 != "")
                     Debug.Log($"{currentSeconds}s :{log1}");
 #endif
@@ -155,8 +155,8 @@ namespace ChroMapper_CameraMovement.Controller
                     setValues.Add(setBlendShape.Value);
                 }
             }
-#if DEBUG
             var log = SetFace(setBlendShapeKeys, setValues);
+#if DEBUG
             if (log != "")
                 Debug.Log($"{currentSeconds}s :{log}");
 #endif

@@ -32,6 +32,7 @@ namespace ChroMapper_CameraMovement.Component
     {
         public string _version { get; set; }
         public List<Events> _events { get; set; } = new List<Events>();
+        public EventSetting _settings { get; set; } = new EventSetting();
     }
     public class Events
     {
@@ -39,6 +40,12 @@ namespace ChroMapper_CameraMovement.Component
         public float _duration { get; set; }
         public string _key { get; set; }
         public string _value { get; set; }
+    }
+    public class EventSetting
+    {
+        public List<string> blendShapesNoBlinkUser { get; set; } = new List<string>();
+        public float defaultFacialExpressionTransitionSpeed { get; set; } = NalulunaAvatarsEventController.DefaultTransitionSpeed;
+        public List<string> noDefaultBlendShapeChangeKeys { get; set; } = new List<string>();
     }
     public class NalulunaAvatarsEventController : MonoBehaviour
     {
@@ -48,7 +55,7 @@ namespace ChroMapper_CameraMovement.Component
         public DateTime _scriptWriteTime;
         public bool _scriptOK;
         public float _checkTime;
-        public List<BlendShapeKey> noDefaultBlendShapeChangeKeys = new List<BlendShapeKey>()
+        public static readonly List<BlendShapeKey> DefaultNoDefaultBlendShapeChangeKeys = new List<BlendShapeKey>()
         {
             BlendShapeKey.CreateFromPreset(BlendShapePreset.A),
             BlendShapeKey.CreateFromPreset(BlendShapePreset.I),
@@ -56,15 +63,16 @@ namespace ChroMapper_CameraMovement.Component
             BlendShapeKey.CreateFromPreset(BlendShapePreset.E),
             BlendShapeKey.CreateFromPreset(BlendShapePreset.O)
         };
-        public List<BlendShapeKey> noBlinkKeys = new List<BlendShapeKey>()
+        public static readonly List<BlendShapeKey> DefaultNoBlinkKeys = new List<BlendShapeKey>()
         {
             BlendShapeKey.CreateFromPreset(BlendShapePreset.Blink),
             BlendShapeKey.CreateFromPreset(BlendShapePreset.Blink_L),
             BlendShapeKey.CreateFromPreset(BlendShapePreset.Blink_R),
-            BlendShapeKey.CreateFromPreset(BlendShapePreset.Joy),
-            BlendShapeKey.CreateFromPreset(BlendShapePreset.Fun)
         };
-        public float transitionSpeed = 10f;
+        public static readonly float DefaultTransitionSpeed = 10f;
+        public List<BlendShapeKey> noDefaultBlendShapeChangeKeys = DefaultNoDefaultBlendShapeChangeKeys;
+        public List<BlendShapeKey> noBlinkKeys = DefaultNoBlinkKeys;
+        public float transitionSpeed = DefaultTransitionSpeed;
 
         private void Start()
         {
@@ -114,6 +122,36 @@ namespace ChroMapper_CameraMovement.Component
             {
                 Debug.Log("No NalulunaAvatars Event data!");
                 return false;
+            }
+            noBlinkKeys = DefaultNoBlinkKeys;
+            noDefaultBlendShapeChangeKeys = DefaultNoDefaultBlendShapeChangeKeys;
+            this.transitionSpeed = DefaultTransitionSpeed;
+            if (this._nalulunaAvatarsEvents._settings != null)
+            {
+                var blendShapesNoBlinkUser = this._nalulunaAvatarsEvents._settings.blendShapesNoBlinkUser;
+                if (blendShapesNoBlinkUser != null && blendShapesNoBlinkUser.Count > 0)
+                {
+                    foreach (var a in blendShapesNoBlinkUser)
+                    {
+                        var b = VRMAvatarController.blendShapeController.GetBlendShapeKeys(new List<string>() { a.Trim().ToUpper() }, new List<float>() { 0 }).Item1;
+                        if (b.Count > 0)
+                            noBlinkKeys.Add(b[0]);
+                    }
+                }
+                var noChangeKeys = this._nalulunaAvatarsEvents._settings.noDefaultBlendShapeChangeKeys;
+                if (noChangeKeys != null && noChangeKeys.Count > 0)
+                {
+                    foreach (var a in noChangeKeys)
+                    {
+                        var b = VRMAvatarController.blendShapeController.GetBlendShapeKeys(new List<string>() { a.Trim().ToUpper() }, new List<float>() { 0 }).Item1;
+                        if (b.Count > 0)
+                            noDefaultBlendShapeChangeKeys.Add(b[0]);
+                    }
+                }
+                if (this._nalulunaAvatarsEvents._settings.defaultFacialExpressionTransitionSpeed > 0f)
+                {
+                    this.transitionSpeed = this._nalulunaAvatarsEvents._settings.defaultFacialExpressionTransitionSpeed;
+                }
             }
             this._nalulunaAvatarsEvents._events.Sort((a, b) => a._time.CompareTo(b._time));
             var tempEventData = new List<(float, string, BlendShapeKey, float)>();
@@ -195,7 +233,7 @@ namespace ChroMapper_CameraMovement.Component
                                 if (beforeDefalutClips.Item3)
                                     beforeOutClips[beforeDefalutClips.Item1] = beforeDefalutClips.Item2;
                                 songTimeBlendShapeKeys.Add((currentTime, beforeOutClips.ToDictionary(x => x.Key, x => x.Value), beforeBlink && !noBlink && autoBlink));
-                                currentTime += 1.66f / transitionSpeed;
+                                currentTime += 1.66f / this.transitionSpeed;
                                 break;
                             }
                         }
@@ -207,7 +245,7 @@ namespace ChroMapper_CameraMovement.Component
                                 if (beforeDefalutClips.Item3)
                                     beforeOutClips[beforeDefalutClips.Item1] = beforeDefalutClips.Item2;
                                 songTimeBlendShapeKeys.Add((currentTime, beforeOutClips.ToDictionary(x => x.Key, x => x.Value), beforeBlink && !noBlink && autoBlink));
-                                currentTime += 1.66f / transitionSpeed;
+                                currentTime += 1.66f / this.transitionSpeed;
                             }
                         }
                     }
@@ -224,7 +262,6 @@ namespace ChroMapper_CameraMovement.Component
                         currentClips[eventData.Item3] = eventData.Item4;
                         break;
                     case "SetBlendShapeNeutral":
-                        Debug.Log($"{currentTime}:{eventData.Item3}:{eventData.Item4}");
                         defaultBlendShapeKey = eventData.Item3;
                         defalutBlendShapeValue = eventData.Item4;
                         break;
@@ -237,8 +274,10 @@ namespace ChroMapper_CameraMovement.Component
                 }
             }
             songTimeBlendShapeKeys.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+#if DEBUG
             foreach (var key in songTimeBlendShapeKeys)
                 Debug.Log($"{key.Item1:0.000}s:{VRMAvatarController.blendShapeController.DebugBlendShapeKyes(key.Item2)}:{key.Item3}");
+#endif
             VRMAvatarController.blendShapeController.songTimeBlendShapeKeys = songTimeBlendShapeKeys;
             VRMAvatarController.blendShapeController.SongTimeReset();
             Debug.Log($"Found {this._nalulunaAvatarsEvents._events.Count} entries in: {this._scriptFile} :{songTimeBlendShapeKeys.Count}");

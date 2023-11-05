@@ -73,6 +73,7 @@ namespace ChroMapper_CameraMovement.Controller
         {
             if (!this._init || this._metaData == null || this._movementData == null)
                 return;
+            //this.nextSongTime = _movementData[this.eventID + 1].songTime; これい入れるとインデックス0の位置がなぜかTポーズなので表示が崩れる
             while (this.nextSongTime <= currentSeconds)
             {
                 this.eventID++;

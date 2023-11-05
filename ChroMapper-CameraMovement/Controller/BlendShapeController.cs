@@ -26,6 +26,7 @@ namespace ChroMapper_CameraMovement.Controller
         public List<BlendShapeKey> beforeKeys { get; set; }
         public List<float> beforeStrength { get; set; }
         public bool beforeBlink { get; set; } = Options.Instance.avatarBlinker;
+        public int beforeEventID { set; get; } = -1;
 
         public void Setup()
         {
@@ -53,8 +54,16 @@ namespace ChroMapper_CameraMovement.Controller
 
         public void SongTimeReset()
         {
-            nextSongTime = 0;
-            eventID = 0;
+            this.nextSongTime = 0;
+            this.eventID = 0;
+        }
+
+        public string DebugBlendShapeKyes(Dictionary<BlendShapeKey, float> a)
+        {
+            var builder = new StringBuilder(100);
+            foreach(var key in a)
+                builder.Append($"{key.Key}={key.Value},");
+            return builder.ToString();
         }
 
         public void SongTimeUpdate(float currentSeconds)
@@ -71,29 +80,42 @@ namespace ChroMapper_CameraMovement.Controller
                     setBlendShapeKeys.Add(setBlendShape.Key);
                     setValues.Add(setBlendShape.Value);
                 }
+#if DEBUG
                 var log1 = SetFace(setBlendShapeKeys, setValues);
                 if (log1 != "")
                     Debug.Log($"{currentSeconds}s :{log1}");
+#endif
                 if (this.beforeBlink != songTimeBlendShapeKeys[0].Item3 && VRMAvatarController.m_blink != null)
                 {
+#if DEBUG
                     Debug.Log($"{currentSeconds}s :AutoBlink {songTimeBlendShapeKeys[0].Item3}");
+#endif
                     VRMAvatarController.m_blink.enabled = songTimeBlendShapeKeys[0].Item3;
                     this.beforeBlink = songTimeBlendShapeKeys[0].Item3;
                 }
                 return;
             }
-            while (nextSongTime <= currentSeconds)
+            this.nextSongTime = songTimeBlendShapeKeys[eventID + 1].Item1;
+            while (this.nextSongTime <= currentSeconds)
             {
                 eventID++;
                 if (eventID + 1 >= songTimeBlendShapeKeys.Count)
                 {
                     eventID = songTimeBlendShapeKeys.Count - 2;
-                    nextSongTime = songTimeBlendShapeKeys[eventID + 1].Item1;
+                    this.nextSongTime = songTimeBlendShapeKeys[eventID + 1].Item1;
                     break;
                 }
-                nextSongTime = songTimeBlendShapeKeys[eventID + 1].Item1;
+                this.nextSongTime = songTimeBlendShapeKeys[eventID + 1].Item1;
             }
-            if (currentSeconds < nextSongTime)
+#if DEBUG
+            if (this.beforeEventID != eventID)
+            {
+                Debug.Log($"Start:{songTimeBlendShapeKeys[eventID].Item1:0.000}:{this.DebugBlendShapeKyes(songTimeBlendShapeKeys[eventID].Item2)}:{songTimeBlendShapeKeys[eventID].Item3}");
+                Debug.Log($"End  :{songTimeBlendShapeKeys[eventID + 1].Item1:0.000}:{this.DebugBlendShapeKyes(songTimeBlendShapeKeys[eventID + 1].Item2)}:{songTimeBlendShapeKeys[eventID + 1].Item3}");
+                this.beforeEventID = eventID;
+            }
+#endif
+            if (currentSeconds < this.nextSongTime)
             {
                 blink = songTimeBlendShapeKeys[eventID].Item3;
                 foreach (var startBlendShape in songTimeBlendShapeKeys[eventID].Item2)
@@ -107,7 +129,7 @@ namespace ChroMapper_CameraMovement.Controller
                         else
                         {
                             var movementStartTime = songTimeBlendShapeKeys[eventID].Item1;
-                            var difference = nextSongTime - movementStartTime;
+                            var difference = this.nextSongTime - movementStartTime;
                             var current = currentSeconds - movementStartTime;
                             float movePerc;
                             if (difference == 0)
@@ -133,12 +155,16 @@ namespace ChroMapper_CameraMovement.Controller
                     setValues.Add(setBlendShape.Value);
                 }
             }
+#if DEBUG
             var log = SetFace(setBlendShapeKeys, setValues);
             if (log != "")
                 Debug.Log($"{currentSeconds}s :{log}");
+#endif
             if (this.beforeBlink != blink && VRMAvatarController.m_blink != null)
             {
+#if DEBUG
                 Debug.Log($"{currentSeconds}s :AutoBlink {blink}");
+#endif
                 VRMAvatarController.m_blink.enabled = blink;
                 this.beforeBlink = blink;
             }

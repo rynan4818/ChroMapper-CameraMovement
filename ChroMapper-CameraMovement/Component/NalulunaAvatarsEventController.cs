@@ -61,7 +61,8 @@ namespace ChroMapper_CameraMovement.Component
             BlendShapeKey.CreateFromPreset(BlendShapePreset.Blink),
             BlendShapeKey.CreateFromPreset(BlendShapePreset.Blink_L),
             BlendShapeKey.CreateFromPreset(BlendShapePreset.Blink_R),
-            BlendShapeKey.CreateFromPreset(BlendShapePreset.Joy)
+            BlendShapeKey.CreateFromPreset(BlendShapePreset.Joy),
+            BlendShapeKey.CreateFromPreset(BlendShapePreset.Fun)
         };
         public float transitionSpeed = 10f;
 
@@ -149,10 +150,13 @@ namespace ChroMapper_CameraMovement.Component
             var beforeBlink = Options.Instance.avatarBlinker;
             var autoBlink = Options.Instance.avatarBlinker;
             var noBlink = false;
+            (BlendShapeKey, float, bool) defalutClips;
+            (BlendShapeKey, float, bool) beforeDefalutClips = (defaultBlendShapeKey, defalutBlendShapeValue, true);
             foreach (var a in blendShapeController.blendShapeClips)
                 currentClips[a.Key] = 0f;
             var currentTime = 0f;
             var songTimeBlendShapeKeys = new List<(float, Dictionary<BlendShapeKey, float>, bool)>();
+            tempEventData.Add((float.MaxValue, "", new BlendShapeKey(), 0));
             foreach (var eventData in tempEventData)
             {
                 if (currentTime < eventData.Item1)
@@ -162,44 +166,65 @@ namespace ChroMapper_CameraMovement.Component
                     {
                         if (a.Value > 0f && !noDefaultBlendShapeChangeKeys.Contains(a.Key))
                         {
-                            Debug.Log("1");
                             defaultChange = false;
                             break;
                         }
                     }
-                    if (defaultChange)
-                        currentClips[defaultBlendShapeKey] = defalutBlendShapeValue;
-                    else
-                        currentClips[defaultBlendShapeKey] = 0f;
+                    defalutClips = (defaultBlendShapeKey, defalutBlendShapeValue, defaultChange);
+                    var outClips = currentClips.ToDictionary(x => x.Key, x => x.Value);
+                    if (defalutClips.Item3)
+                        outClips[defalutClips.Item1] = defalutClips.Item2;
+                    noBlink = false;
+                    foreach (var checkClips in outClips)
+                    {
+                        if (noBlinkKeys.Contains(checkClips.Key) && checkClips.Value > 0f)
+                        {
+                            noBlink = true;
+                            break;
+                        }
+                    }
                     if (currentTime > 0f)
                     {
+                        var clipChange = false;
                         foreach (var a in currentClips)
                         {
                             if (!(beforeClips.ContainsKey(a.Key) && beforeClips[a.Key] == a.Value))
                             {
-                                songTimeBlendShapeKeys.Add((currentTime, beforeClips.ToDictionary(x => x.Key, x => x.Value), beforeBlink && !noBlink && autoBlink));
+                                clipChange = true;
+                                var beforeOutClips = beforeClips.ToDictionary(x => x.Key, x => x.Value);
+                                if (beforeDefalutClips.Item3)
+                                    beforeOutClips[beforeDefalutClips.Item1] = beforeDefalutClips.Item2;
+                                songTimeBlendShapeKeys.Add((currentTime, beforeOutClips.ToDictionary(x => x.Key, x => x.Value), beforeBlink && !noBlink && autoBlink));
                                 currentTime += 1.66f / transitionSpeed;
                                 break;
                             }
                         }
+                        if (!clipChange)
+                        {
+                            if (beforeDefalutClips.Item1.Name != defalutClips.Item1.Name || beforeDefalutClips.Item2 != defalutClips.Item2)
+                            {
+                                var beforeOutClips = beforeClips.ToDictionary(x => x.Key, x => x.Value);
+                                if (beforeDefalutClips.Item3)
+                                    beforeOutClips[beforeDefalutClips.Item1] = beforeDefalutClips.Item2;
+                                songTimeBlendShapeKeys.Add((currentTime, beforeOutClips.ToDictionary(x => x.Key, x => x.Value), beforeBlink && !noBlink && autoBlink));
+                                currentTime += 1.66f / transitionSpeed;
+                            }
+                        }
                     }
-                    songTimeBlendShapeKeys.Add((currentTime, currentClips.ToDictionary(x => x.Key, x => x.Value), !noBlink && autoBlink));
+                    songTimeBlendShapeKeys.Add((currentTime, outClips, !noBlink && autoBlink));
                     if (currentTime < eventData.Item1)
                         currentTime = eventData.Item1;
                     beforeBlink = !noBlink && autoBlink;
                     beforeClips = currentClips.ToDictionary(x => x.Key, x => x.Value);
+                    beforeDefalutClips = defalutClips;
                 }
                 switch (eventData.Item2)
                 {
                     case "BlendShape":
                         currentClips[eventData.Item3] = eventData.Item4;
-                        if (noBlinkKeys.Contains(eventData.Item3) && eventData.Item4 > 0f)
-                            noBlink = true;
-                        else
-                            noBlink = false;
                         break;
                     case "SetBlendShapeNeutral":
-                        Debug.Log($"2{eventData.Item3}");
+                        Debug.Log($"{currentTime}:{eventData.Item3}:{eventData.Item4}");
                         defaultBlendShapeKey = eventData.Item3;
                         defalutBlendShapeValue = eventData.Item4;
                         break;
@@ -212,10 +237,10 @@ namespace ChroMapper_CameraMovement.Component
                 }
             }
             songTimeBlendShapeKeys.Sort((a, b) => a.Item1.CompareTo(b.Item1));
+            foreach (var key in songTimeBlendShapeKeys)
+                Debug.Log($"{key.Item1:0.000}s:{VRMAvatarController.blendShapeController.DebugBlendShapeKyes(key.Item2)}:{key.Item3}");
             VRMAvatarController.blendShapeController.songTimeBlendShapeKeys = songTimeBlendShapeKeys;
             VRMAvatarController.blendShapeController.SongTimeReset();
-            foreach (var a in songTimeBlendShapeKeys)
-                Debug.Log($"{a.Item1}s:{a.Item2}:{a.Item3}");
             Debug.Log($"Found {this._nalulunaAvatarsEvents._events.Count} entries in: {this._scriptFile} :{songTimeBlendShapeKeys.Count}");
             this._scriptOK = true;
             return true;

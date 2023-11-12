@@ -17,7 +17,9 @@ BeatSaberでカメラワークを作成するための、[ChroMapper](https://gi
 # アバターについて
 [カスタムアバター](https://modelsaber.com/Avatars/) および VRM の3Dアバターを読み込んで表示できます。
 
-本プラグイン用のカスタムアバターの作成は[CameraMovementAvatarExporterパッケージ](https://github.com/rynan4818/CameraMovementAvatarExporter)を使用すると簡単です。
+[MovementRecorder](https://github.com/rynan4818/MovementRecorder)で記録したアバターとセイバーの動きを再生できます。
+
+譜面フォルダにある`NalulunaAvatarsEvents.json`の[読み込みとプレビューに対応しています](https://github.com/rynan4818/ChroMapper-CameraMovement#nalulunaavatarsevents%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
 
 VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan4818/ChroMapper-VRMAvatar)を作りました。VRMアバターをChroMapperに読み込む単独で動くプラグインです。
 
@@ -82,8 +84,9 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
 ## 各パネル説明
 譜面を読み込んでエディタ画面を出して下さい。**Tabキー**を押すと右側にアイコンパネルが出ますので、水色のカメラアイコンを押すと下の画像 CameraMovementの設定パネルが開きます。
 
-![image](https://user-images.githubusercontent.com/14249877/170858312-2cec4b44-fed5-4248-83b0-a2bbc6df1278.png)
+![image](https://github.com/rynan4818/ChroMapper-CameraMovement/assets/14249877/ee5815d1-7184-4a71-8a7b-c82c651ad286)
 
+### チェックボックス
 * CameraMovement ： CameraMovementプラグインの有効／無効切り替え。（作譜時に無効にする場合など)
 * Movement Enable ： カメラスクリプトに合わせてカメラが移動します。
 * UI Hidden ： 作譜用のグリッドUI、ライティングブロック、音声波形などを消します。
@@ -94,14 +97,17 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
 * Sub Camera ： 常にスクリプトに合わせて動くサブカメラを表示します。
 * Bookmark Edit ： ブックマークの編集パネルを下に表示します。
 * Camera Contral ： カメラコントロールのパネルを下に表示します。
+* Movement Player ： [MovementRecorder](https://github.com/rynan4818/MovementRecorder)で記録したアバターとセイバーの動きを再現します。
+### ボタン
 * More Seting ： 詳細設定パネルを表示します。
 * Reload ： 設定やスクリプトを読み込み直します
 * Multi Display ： マルチディスプレイパネルを表示します。
 * Script Mapper Run [F3] ： 譜面データを保存して、Script Mapperでブックマークをカメラスクリプトに変換します。F3キーでショートカット。
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。
+* Movement Player ： Movement Playerで再生する動きファイルなどの設定をします。
 * Close ： パネルを閉じます。
 
-![image](https://user-images.githubusercontent.com/14249877/173173694-493c7e73-fe88-4fee-99ed-5a9b339ccc0a.png)
+![image](https://github.com/rynan4818/ChroMapper-CameraMovement/assets/14249877/d6b1fd9c-3f46-410d-857c-f8cfb8ade789)
 
 * Custom or VRM Avatar ： 読み込んだカスタムアバター・VRMアバターモデルを表示します。
 * Avatar File ： `*.vrm` VRMファイルもしくは、`*.avatar` [カスタムアバターのファイル](https://modelsaber.com/Avatars/)を`Select`ボタンで選択します。デフォルト設定はChroMapper.exeと同じフォルダにある[Sour Miku Black v2](https://modelsaber.com/Avatars/?id=1564625718&pc)になっています。
@@ -132,6 +138,9 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
 * bookmark Lines Top ： Bookmark Linesを全てのオブジェクトの最前面に表示します。
 * Camera Direction Scroll Reversal : カメラが後ろを向いているときにタイムラインの移動方向が逆になります。(デフォルトは無効)
 * Default Invert Scroll Time : `Camera Direction Scroll Reversal`が有効時のタイムラインの移動方向が逆になります。
+* Set current dispaly to Avatar Scale ： 現在表示しているアバターのスケールを読み取ってAvatar Scaleの設定にします。
+* VRM Spring Bone ： チェックを外すとSpring Boneの機能がオフになります。MovementRecorderでは揺れ物も一緒に記録するので、オンにすると競合して表示が破綻します。
+* Orbit Camera Target ： 注視点カメラ移動モード(ALT+マウス)のターゲット表示の有無を設定します。
 * Setting Save ： 設定パネルの内容およびブックマーク編集パネルのコマンドボタンの内容を設定ファイルに保存します。(メイン設定の同名ボタンと機能は同じ)
 * Close ： More Settingパネルを閉じます。
 
@@ -190,6 +199,82 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
 ※マルチディスプレイモード時にメインウィンドウのサイズを変更すると、画面が崩れることがありますがウィンドウをドラッグで移動すると直ります。
 
 ※作譜作業用には[MultiDisplayWindow](https://github.com/rynan4818/ChroMapper-MultiDisplayWindow)として、マルチディスプレイウインドウ機能を別プラグインにしました。ただし、マルチディスプレイは本プラグインと同時使用はできないため、切り替えるときには一度ChroMapperを再起動して下さい。
+
+![image](https://github.com/rynan4818/ChroMapper-CameraMovement/assets/14249877/96bdc4b6-2c4f-403e-a062-2751c305482e)
+
+- `Movemnet File`にMovementRecorderで記録したファイルを選択
+- `Saber File`にセイバーのファイルを選択します(記録時に使用したセイバー以外だと正常表示されない可能性があります)
+- `Saber Enabled`はオフにするとセイバーの表示を消します
+- `Set Default Saber`をチェックすると、デフォルトとして次回別の譜面の設定画面でデフォルト設定になります。
+- `Players Place Offset`はアバター表示modで床を下げている場合に合わせて、ChroMapperのステージオブジェクトを上下移動します
+- `Save`ボタンで本設定を譜面フォルダに保存して次回自動で読み込みます
+
+## NalulunaAvatarsEventsについて
+譜面フォルダにある`NalulunaAvatarsEvents.json`の読み込みとプレビューに対応しています。(VRM表示のアバターのみ対応)
+
+ファイルの更新を0.5秒毎にチェックしていますので、作成しながらプレビュー出来ます。
+
+### `_events` コマンド対応
+| _key             | 機能                      | _value |
+| -----------------|---------------------------|---------------------------------------------
+| BlendShape          | BlendShape設定           |  "プリセット, 値" |
+| SetBlendShapeNeutral | BlendShapeデフォルト変更 |  "プリセット, 値" |
+| StartAutoBlink      | AutoBlink開始            |  なし[VMCAvatarMaterialChange用] |
+| StopAutoBlink      | AutoBlink停止            |  なし[VMCAvatarMaterialChange用] |
+
+### 以下のコマンドは無視されます
+| _key             | 機能                      | 備考 |
+| -----------------|---------------------------|---------------------------------------------
+| SetBlendShapeSing  | 口パク用のBlendShape設定 | [口パクは再現しないので無効] |
+| StartSing          | 口パク開始               | [口パクは再現しないので無効] |
+| StopSing           | 口パク停止               | [口パクは再現しないので無効] |
+| StopAutoBlendShape | 自動表情機能を無効       | [CameraMovementでは不要なので無効] |
+| StartAutoBlendShape | 自動表情機能を有効      |  [CameraMovementでは不要なので無効] |
+| StopLipSync        | リップシンクを一時的に無効 | [CameraMovementでは不要なので無効] |
+| StartLipSync       | リップシンクを有効        | [CameraMovementでは不要なので無効] |
+
+NalulunaAvatarsではAutoBlinkは`Blink`,`BlinkL`,`BlinkR`の_keyで自動停止 ※本実装も標準設定済み
+
+`NalulunaAvatars.json`の`blendShapesNoBlinkUser`で追加設定可能。`defaultFacialExpressionTransitionSpeed` で表情遷移の速度設定。デフォルトは10。数値が大きいほど遷移が速くなり、100でほぼ瞬間的に遷移する。
+
+本実装では100で1フレーム=1/60=0.016s とし、1.66 / defaultFacialExpressionTransitionSpeed で実装
+
+### `NalulunaAvatarsEvents.json`作成例
+```json
+{
+    "_version": "0.0.1",
+    "_events": [
+        { "_time": 0.0, "_duration": 0.0, "_key": "StopAutoBlendShape" }, ※本実装では無視
+        { "_time": 0.0, "_duration": 0.0, "_key": "StopLipSync" }, ※本実装では無視
+        { "_time": 0.0, "_duration": 0.0, "_key": "SetBlendShapeSing", "_value": "O, 0.7" }, ※本実装では無視
+        { "_time": 1.0, "_duration": 2.0, "_key": "BlendShape", "_value": "Joy" },
+        { "_time": 1.0, "_duration": 2.0, "_key": "BlendShape", "_value": "A" }, ※NalulunaAvatarsでは同じ時間の別の_keyは上書きされるかも
+        { "_time": 4.0, "_duration": 1.0, "_key": "BlendShape", "_value": "Angry" },
+        { "_time": 6.0, "_duration": 1.0, "_key": "BlendShape", "_value": "Blink, 0.5" },
+        { "_time": 8.0, "_duration": 0.0, "_key": "SetBlendShapeNeutral", "_value": "Fun" },
+        { "_time": 9.0, "_duration": 0.0, "_key": "StartSing" }, ※本実装では無視
+        { "_time": 10.0, "_duration": 1.0, "_key": "BlendShape", "_value": "Joy" },
+        { "_time": 12.0, "_duration": 0.0, "_key": "StopSing" }, ※本実装では無視
+        { "_time": 13.0, "_duration": 0.0, "_key": "SetBlendShapeNeutral", "_value": "Neutral" },
+        { "_time": 14.0, "_duration": 0.0, "_key": "StartSing" }, ※本実装では無視
+        { "_time": 16.0, "_duration": 2.0, "_key": "StopSing" }, ※本実装では無視
+        { "_time": 66.0, "_duration": 0.5, "_key": "BlendShape", "_value": "Joy" },
+        { "_time": 66.0, "_duration": 0.5, "_key": "BlendShape", "_value": "A" }, ※NalulunaAvatarsでは同じ時間の別の_keyは上書きされるかも
+        { "_time": 90.0, "_duration": 1.5, "_key": "BlendShape", "_value": "Joy" },
+        { "_time": 90.0, "_duration": 1.5, "_key": "BlendShape", "_value": "A" } ※NalulunaAvatarsでは同じ時間の別の_keyは上書きされるかも
+    ],
+    "_settings": { ※本実装独自の設定
+        "blendShapesNoBlinkUser": [ ※追加のAutoBlinkしない_key 標準で"Blink","BlinkL","BlinkR"は設定済み
+            "Joy",
+            "Fun"
+        ],
+        "defaultFacialExpressionTransitionSpeed" : 20, ※表情遷移速度の設定値変更
+        "noDefaultBlendShapeChangeKeys": [ ※デフォルト表情を変更しない_key 標準で"A","I","U","E","O"は設定済み
+            "Test"
+        ]
+    }
+}
+```
 
 ## Duration取込み誤差について
 カメラスクリプトはDuration(移動時間)の積算で表現していますが、CameraPlusやCameraMovementで取り込む際に有効桁数6~9桁(float)で丸められるため、ScriptMapperの出力内容によっては誤差が積算されてブックマークの位置に対してカメラ移動がズレる可能性があります。また、Durationは0.01秒未満の値は0.01秒に繰り上げるため、0.01秒未満のDurationがあるとズレが積算します。

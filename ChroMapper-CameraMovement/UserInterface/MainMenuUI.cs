@@ -145,11 +145,13 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -230);
 
-            var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", () =>
+            var customEventButton = UI.AddButton(_cameraMovementMainMenu.transform, "Custom Evment", "Custom Evment", () =>
             {
-                Options.Instance.SettingSave();
+                if (!Options.Instance.cameraMovementEnable) return;
+                UI._customEventUI._customEventMenu.SetActive(true);
+                UI.KeyDisableCheck();
             });
-            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -260);
+            UI.MoveTransform(customEventButton.transform, 70, 25, 0.28f, 1, 0, -260);
 
             var movementPlayerButton = UI.AddButton(_cameraMovementMainMenu.transform, "Movement Player", "Movement Player", () =>
             {
@@ -159,6 +161,12 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI.KeyDisableCheck();
             });
             UI.MoveTransform(movementPlayerButton.transform, 70, 25, 0.72f, 1, 0, -260);
+
+            var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", () =>
+            {
+                Options.Instance.SettingSave();
+            });
+            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -290);
 
             var mainMenuCloseButton = UI.AddButton(_cameraMovementMainMenu.transform, "Close", "Close", () =>
             {

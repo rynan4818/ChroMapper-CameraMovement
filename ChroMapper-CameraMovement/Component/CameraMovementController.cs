@@ -27,6 +27,7 @@ namespace ChroMapper_CameraMovement.Component
         public static AudioTimeSyncController atsc;
         public static AutoSaveController autoSave;
         public static SpectrogramSideSwapper spectrogramSideSwapper;
+        public static CustomEventGridContainer customEventGridContainer;
         public static BookmarkLinesController bookmarkLinesController;
         public static VRMAvatarController vrmAvatarController;
         public static MultiDisplayController multiDisplayController;
@@ -900,6 +901,8 @@ namespace ChroMapper_CameraMovement.Component
                 customEventsLabelsChildLocalOffset = customEventsLabelsChild.LocalOffset;
                 customEventsGridChildLocalOffset = customEventsGridChild.LocalOffset;
                 customEventsObject = true;
+                if (customEventsObject)
+                    customEventGridContainer = FindObjectOfType<CustomEventGridContainer>();
             }
             catch
             {

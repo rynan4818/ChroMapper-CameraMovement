@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.IO;
-using ChroMapper_CameraMovement.Util.SimpleJSON;
+using SimpleJSON;
 using UnityEngine;
 
 namespace ChroMapper_CameraMovement.Configuration

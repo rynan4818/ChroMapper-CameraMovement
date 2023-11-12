@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.IO;
-using ChroMapper_CameraMovement.Util.SimpleJSON;
+using SimpleJSON;
 using UnityEngine;
 
 namespace ChroMapper_CameraMovement.Configuration
@@ -77,6 +77,8 @@ namespace ChroMapper_CameraMovement.Configuration
         public float multiDisplayMenuUIAnchoredPosY = 0;
         public float movementPlayerUIAnchoredPosX = 0;
         public float movementPlayerUIAnchoredPosY = 0;
+        public float customEventUIAnchoredPosX = 0;
+        public float customEventUIAnchoredPosY = 0;
         public float orbitDefaultFOV = 60f;
         public float orbitRotSensitivity = 0.5f;
         public float orbitZoomSensitivity = 0.001f;

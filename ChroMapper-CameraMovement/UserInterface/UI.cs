@@ -24,6 +24,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
         public static MultiDisplayUI _multiDisplayUI = new MultiDisplayUI();
         public static MovementPlayerUI _movementPlayerUI = new MovementPlayerUI();
+        public static CustomEventUI _customEventUI = new CustomEventUI();
         public static List<Type> queuedToDisable = new List<Type>();
         public static List<Type> queuedToEnable = new List<Type>();
         public static bool keyDisable { get; private set; }
@@ -85,6 +86,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraControlMenuUI.AddMenu(topBarCanvas);
             _multiDisplayUI.AddMenu(topBarCanvas);
             _movementPlayerUI.AddMenu(topBarCanvas);
+            _customEventUI.AddMenu(topBarCanvas);
             KeyDisableCheck();
         }
 

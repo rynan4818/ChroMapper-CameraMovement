@@ -17,7 +17,7 @@ BeatSaberでカメラワークを作成するための、[ChroMapper](https://gi
 # アバターについて
 [カスタムアバター](https://modelsaber.com/Avatars/) および VRM の3Dアバターを読み込んで表示できます。
 
-本プラグイン用のカスタムアバターの作成は[CameraMovementAvatarExporterパッケージ](https://github.com/rynan4818/CameraMovementAvatarExporter)を使用すると簡単です。
+[MovementRecorder](https://github.com/rynan4818/MovementRecorder)で記録したアバターとセイバーの動きを再生できます。
 
 VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan4818/ChroMapper-VRMAvatar)を作りました。VRMアバターをChroMapperに読み込む単独で動くプラグインです。
 

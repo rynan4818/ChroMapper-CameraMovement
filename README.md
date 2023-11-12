@@ -19,6 +19,8 @@ BeatSaberでカメラワークを作成するための、[ChroMapper](https://gi
 
 [MovementRecorder](https://github.com/rynan4818/MovementRecorder)で記録したアバターとセイバーの動きを再生できます。
 
+譜面フォルダにある`NalulunaAvatarsEvents.json`の[読み込みとプレビューに対応しています](https://github.com/rynan4818/ChroMapper-CameraMovement#nalulunaavatarsevents%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
+
 VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan4818/ChroMapper-VRMAvatar)を作りました。VRMアバターをChroMapperに読み込む単独で動くプラグインです。
 
 # 使用方法

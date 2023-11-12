@@ -35,6 +35,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static bool inputRoundActive;
         public static bool inputEndEdit;
         public static bool inputSelect;
+        public static Dictionary<Type, bool> keyEnableState = new Dictionary<Type, bool>();
 
         private static readonly Type[] editActionMapsDisabled =
         {
@@ -92,6 +93,9 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             foreach (Type actionMap in actionMaps)
             {
+                if (keyEnableState.ContainsKey(actionMap) && !keyEnableState[actionMap])
+                    continue;
+                keyEnableState[actionMap] = false;
                 queuedToEnable.Remove(actionMap);
                 if (!queuedToDisable.Contains(actionMap))
                     queuedToDisable.Add(actionMap);
@@ -102,6 +106,9 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             foreach (Type actionMap in actionMaps)
             {
+                if (keyEnableState.ContainsKey(actionMap) && keyEnableState[actionMap])
+                    continue;
+                keyEnableState[actionMap] = true;
                 queuedToDisable.Remove(actionMap);
                 if (!queuedToEnable.Contains(actionMap))
                     queuedToEnable.Add(actionMap);
@@ -119,8 +126,9 @@ namespace ChroMapper_CameraMovement.UserInterface
                 keyDisable = true;
             }
             else
-            {
-                EnableAction(actionMapsDisabled);
+           {
+                var a = typeof(CMInput).GetNestedTypes().Where(x => x.IsInterface).ToArray();
+                EnableAction(a);
                 keyDisable = false;
             }
         }

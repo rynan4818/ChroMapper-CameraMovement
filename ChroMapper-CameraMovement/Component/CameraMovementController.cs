@@ -183,6 +183,7 @@ namespace ChroMapper_CameraMovement.Component
 
         public void Reload()
         {
+            UI.KeyDisableCheck();
             StartCoroutine(this.VRMAvatarLoadAsync());
             StartCoroutine(this.CustomAvatarLoad());
             StartCoroutine(this.CustomrSaberload());
@@ -565,7 +566,6 @@ namespace ChroMapper_CameraMovement.Component
                 Options.Instance.bookmarkEdit = false;
                 Options.Instance.cameraControl = false;
                 Reload();
-                UI.KeyDisableCheck();
                 cm_UIMode.GetComponent<UIMode>().SetUIMode(UIModeType.Preview, false);
             }
             else
@@ -580,7 +580,6 @@ namespace ChroMapper_CameraMovement.Component
                 cm_MapEditorCamera.transform.rotation = previewEve.Item8;
                 Settings.Instance.CameraFOV = previewEve.Item9;
                 Reload();
-                UI.KeyDisableCheck();
                 cm_UIMode.GetComponent<UIMode>().SetUIMode(UIModeType.Normal, false);
             }
         }
@@ -922,7 +921,10 @@ namespace ChroMapper_CameraMovement.Component
             if (MultiDisplayController.activeWindow > 1)
                 multiDisplayController.SetTargetDisplay();
             if (Options.Instance.cameraMovementEnable)
+            {
+                KeyEnable();
                 Reload();
+            }
             else
             {
                 avatarHead.SetActive(false);

@@ -86,7 +86,6 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraControlMenuUI.AddMenu(topBarCanvas);
             _multiDisplayUI.AddMenu(topBarCanvas);
             _movementPlayerUI.AddMenu(topBarCanvas);
-            KeyDisableCheck();
         }
 
         public static void DisableAction(Type[] actionMaps)

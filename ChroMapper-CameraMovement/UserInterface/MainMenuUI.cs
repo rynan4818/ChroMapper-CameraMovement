@@ -43,7 +43,6 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 movementController._bookmarkController?.BookMarkChangeUpdate();
                 movementController.Reload();
-                UI.KeyDisableCheck();
             });
             cameraMovementTitle.Item2.fontSize = 16;
             cameraMovementTitle.Item2.alignment = TextAlignmentOptions.Center;

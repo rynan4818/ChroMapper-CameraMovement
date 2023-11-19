@@ -233,11 +233,12 @@ Scriptmapperで作れないような複雑なカメラワークをBlenderで作�
 | StopLipSync        | リップシンクを一時的に無効 | [CameraMovementでは不要なので無効] |
 | StartLipSync       | リップシンクを有効        | [CameraMovementでは不要なので無効] |
 
-NalulunaAvatarsではAutoBlinkは`Blink`,`BlinkL`,`BlinkR`の_keyで自動停止 ※本実装も標準設定済み
-
-`NalulunaAvatars.json`の`blendShapesNoBlinkUser`で追加設定可能。`defaultFacialExpressionTransitionSpeed` で表情遷移の速度設定。デフォルトは10。数値が大きいほど遷移が速くなり、100でほぼ瞬間的に遷移する。
-
-本実装では100で1フレーム=1/60=0.016s とし、1.66 / defaultFacialExpressionTransitionSpeed で実装
+* NalulunaAvatarsではAutoBlinkは`Blink`,`BlinkL`,`BlinkR`の_keyで自動停止
+    * 本実装も標準設定済み
+* NalulunaAvatarsでは`NalulunaAvatars.json`の`blendShapesNoBlinkUser`で追加設定可能。
+    * 本実装では`NalulunaAvatarsEvents.json`内の`_settings`で設定可能
+* NalulunaAvatarsでは`defaultFacialExpressionTransitionSpeed` で表情遷移の速度設定可能。デフォルトは10。数値が大きいほど遷移が速くなり、100でほぼ瞬間的に遷移する。
+    * 本実装では100で1フレーム=1/60=0.016s とし、1.66 / defaultFacialExpressionTransitionSpeed で実装し`_settings`で設定可能
 
 ### `NalulunaAvatarsEvents.json`作成例
 ```json

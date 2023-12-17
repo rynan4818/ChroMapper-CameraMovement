@@ -29,6 +29,8 @@ VRM対応の副産物として[ChroMapper-VRMAvatar](https://github.com/rynan481
 
 **[BeatSaberでカメラを動かしてみよう](https://note.com/rynan/n/n2830a21add26)**
 
+**[カメラスクリプト作成で使うCameraMovement応用編](https://note.com/rynan/n/n11ed6bbd0eaa)**
+
 [CustomSongTimeEvents](https://github.com/rynan4818/CustomSongTimeEvents)を適用したCustom Avatars, Custom Platformsモデルを使用することで、カメラワークとプラットフォームのイベントプレビュー、Custom Avatarsの自動表情制御なども同時に可能になります。
 
 Scriptmapperで作れないような複雑なカメラワークをBlenderで作る[Blender2ScriptMapper](https://github.com/rynan4818/blender2ScriptMapper) も作成しましたので参考にしてください。

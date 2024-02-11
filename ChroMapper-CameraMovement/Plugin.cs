@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Util;
+using ChroMapper_CameraMovement.Configuration;
 
 namespace ChroMapper_CameraMovement
 {
@@ -40,6 +41,7 @@ namespace ChroMapper_CameraMovement
                 return;
             if (movement != null && movement.isActiveAndEnabled)
                 return;
+            Options.Instance.cameraMovementEnable = false;
             movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
             MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
             _ui.AddMenu(mapEditorUI);

@@ -703,6 +703,11 @@ namespace ChroMapper_CameraMovement.Component
             avatarLeg.layer = avatarLayer;
             avatarBody.layer = avatarLayer;
             avatarHair.layer = avatarLayer;
+            avatarHead.SetActive(false);
+            avatarArm.SetActive(false);
+            avatarLeg.SetActive(false);
+            avatarBody.SetActive(false);
+            avatarHair.SetActive(false);
 
             //BookMarkTrack構築
             var measureLines = GameObject.Find("Moveable Grid/Measure Lines");
@@ -920,20 +925,7 @@ namespace ChroMapper_CameraMovement.Component
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
             if (MultiDisplayController.activeWindow > 1)
                 multiDisplayController.SetTargetDisplay();
-            if (Options.Instance.cameraMovementEnable)
-            {
-                KeyEnable();
-                Reload();
-            }
-            else
-            {
-                avatarHead.SetActive(false);
-                avatarArm.SetActive(false);
-                avatarLeg.SetActive(false);
-                avatarBody.SetActive(false);
-                avatarHair.SetActive(false);
-                KeyDisable();
-            }
+            KeyDisable();
         }
         private void Update()
         {

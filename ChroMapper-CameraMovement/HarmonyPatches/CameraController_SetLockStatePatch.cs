@@ -2,8 +2,8 @@
 
 namespace ChroMapper_CameraMovement.HarmonyPatches
 {
-    [HarmonyPatch(typeof(CameraController), "SetLockState")]
-    public class CameraControllerPatch
+    [HarmonyPatch(typeof(CameraController), nameof(CameraController.SetLockState))]
+    public class CameraController_SetLockStatePatch
     {
         public static bool OriginalSetLockStateDisable = false;
         public static bool Prefix()

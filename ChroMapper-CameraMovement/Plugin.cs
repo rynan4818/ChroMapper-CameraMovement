@@ -1,12 +1,10 @@
 ﻿using HarmonyLib;
-using System;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Util;
-using ChroMapper_CameraMovement.HarmonyPatches;
 
 namespace ChroMapper_CameraMovement
 {
@@ -22,13 +20,6 @@ namespace ChroMapper_CameraMovement
         private void Init()
         {
             _harmony = new Harmony(HARMONY_ID);
-            var orginal = AccessTools.Method("BookmarkRenderingController:CreateGridBookmark");
-            var postfix = AccessTools.Method(typeof(BookmarkRenderingControllerPatch), "CreateGridBookmarkPostfix");
-            if (orginal != null)
-            {
-                Debug.Log("CreateGridBookmark Patch Load");
-                _harmony.Patch(orginal, null, new HarmonyMethod(postfix));
-            }
             _harmony.PatchAll(Assembly.GetExecutingAssembly());
             Debug.Log("Camera Movement Plugin has loaded!");
             SceneManager.sceneLoaded += SceneLoaded;

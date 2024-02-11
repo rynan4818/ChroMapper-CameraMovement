@@ -4,9 +4,8 @@ using ChroMapper_CameraMovement.Util;
 
 namespace ChroMapper_CameraMovement.HarmonyPatches
 {
-    [HarmonyPatch(typeof(Shader))]
-    [HarmonyPatch(nameof(Shader.Find))]
-    static class ShaderPatch
+    [HarmonyPatch(typeof(Shader), nameof(Shader.Find))]
+    static class Shader_FindPatch
     {
         static bool Prefix(ref Shader __result, string name)
         {

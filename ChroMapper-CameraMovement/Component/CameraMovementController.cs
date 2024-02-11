@@ -914,7 +914,7 @@ namespace ChroMapper_CameraMovement.Component
             _bookmarkController.bookmarkLinesController = bookmarkLinesController;
             _bookmarkController.atsc = atsc;
             _bookmarkController.Start();
-            SpectrogramSideSwapperPatch.OnSwapSides += WaveFormOffset;
+            SpectrogramSideSwapper_SwapSidesPatch.OnSwapSides += WaveFormOffset;
             atsc.PlayToggle += OnPlayToggle;
             orbitCamera.targetObject = avatarHead;
             multiDisplayController = cm_MapEditorCamera.gameObject.AddComponent<MultiDisplayController>();
@@ -1015,7 +1015,7 @@ namespace ChroMapper_CameraMovement.Component
         private void OnDestroy()
         {
             _bookmarkController.OnDestroy();
-            SpectrogramSideSwapperPatch.OnSwapSides -= WaveFormOffset;
+            SpectrogramSideSwapper_SwapSidesPatch.OnSwapSides -= WaveFormOffset;
             atsc.PlayToggle -= OnPlayToggle;
             previewAction.Disable();
             scriptMapperAction.Disable();

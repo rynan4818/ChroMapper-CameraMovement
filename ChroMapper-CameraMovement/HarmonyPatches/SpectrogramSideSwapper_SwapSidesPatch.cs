@@ -3,8 +3,8 @@ using HarmonyLib;
 
 namespace ChroMapper_CameraMovement.HarmonyPatches
 {
-    [HarmonyPatch(typeof(SpectrogramSideSwapper), "SwapSides")]
-    public class SpectrogramSideSwapperPatch
+    [HarmonyPatch(typeof(SpectrogramSideSwapper), nameof(SpectrogramSideSwapper.SwapSides))]
+    public class SpectrogramSideSwapper_SwapSidesPatch
     {
         public static void Postfix()
         {

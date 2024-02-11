@@ -4,7 +4,7 @@ using HarmonyLib;
 namespace ChroMapper_CameraMovement.HarmonyPatches
 {
     [HarmonyPatch(typeof(BookmarkContainer), "HandleNewBookmarkName")]
-    class BookmarkContainerPatch
+    public class BookmarkContainer_HandleNewBookmarkNamePatch
     {
         public static void Postfix()
         {

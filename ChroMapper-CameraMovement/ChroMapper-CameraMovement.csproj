@@ -168,11 +168,11 @@
     <Compile Include="Controller\BookmarkController.cs" />
     <Compile Include="Controller\MovementPlayerController.cs" />
     <Compile Include="Controller\WindowController.cs" />
-    <Compile Include="HarmonyPatches\BookmarkContainerPatch.cs" />
-    <Compile Include="HarmonyPatches\BookmarkRenderingControllerPatch.cs" />
-    <Compile Include="HarmonyPatches\CameraControllerPatch.cs" />
-    <Compile Include="HarmonyPatches\ShaderPatch.cs" />
-    <Compile Include="HarmonyPatches\SpectrogramSideSwapperPatch.cs" />
+    <Compile Include="HarmonyPatches\BookmarkContainer_HandleNewBookmarkNamePatch.cs" />
+    <Compile Include="HarmonyPatches\CameraController_SetLockStatePatch.cs" />
+    <Compile Include="HarmonyPatches\BookmarkRenderingController_SetGridBookmarkNameColorPatch.cs" />
+    <Compile Include="HarmonyPatches\Shader_FindPatch.cs" />
+    <Compile Include="HarmonyPatches\SpectrogramSideSwapper_SwapSidesPatch.cs" />
     <Compile Include="Component\CameraMovementController.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

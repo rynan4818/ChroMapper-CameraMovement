@@ -161,13 +161,13 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 savedMousePos = Mouse.current.position.ReadValue();
                 Cursor.lockState = CursorLockMode.Locked;
-                CameraControllerPatch.OriginalSetLockStateDisable = true;
+                CameraController_SetLockStatePatch.OriginalSetLockStateDisable = true;
             }
             else if (!lockMouse && mouseLocked)
             {
                 Cursor.lockState = CursorLockMode.None;
                 Mouse.current.WarpCursorPosition(new Vector2(savedMousePos.x, Screen.height - savedMousePos.y));
-                CameraControllerPatch.OriginalSetLockStateDisable = false;
+                CameraController_SetLockStatePatch.OriginalSetLockStateDisable = false;
             }
         }
 

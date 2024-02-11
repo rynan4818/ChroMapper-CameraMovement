@@ -15,6 +15,7 @@ namespace ChroMapper_CameraMovement.Controller
     public class BookmarkController
     {
         public BookmarkManager bookmarkManager;
+        public BookmarkRenderingController bookmarkRenderingController;
         public List<BookmarkContainer> bookmarkContainers;
         public AudioTimeSyncController atsc;
         public BookmarkLinesController bookmarkLinesController { get; set; }
@@ -26,6 +27,9 @@ namespace ChroMapper_CameraMovement.Controller
         }
         public void BookmarkTrackSet()
         {
+            Type type = bookmarkRenderingController.GetType();
+            MethodInfo method = type.GetMethod("RefreshBookmarkGridLine", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
+            method.Invoke(bookmarkRenderingController, new object[] { null });
             if (Options.Instance.bookmarkLines && Options.Instance.cameraMovementEnable)
                 bookmarkLinesController.RefreshBookmarkLines(bookmarkContainers);
         }
@@ -186,14 +190,15 @@ namespace ChroMapper_CameraMovement.Controller
         public void Start()
         {
             bookmarkManager = UnityEngine.Object.FindObjectOfType<BookmarkManager>();
+            bookmarkRenderingController = UnityEngine.Object.FindObjectOfType<BookmarkRenderingController>();
             bookmarkManager.BookmarksUpdated += BookMarkChangeUpdate;
-            BookmarkContainerPatch.OnNewBookmarkName += BookMarkChangeUpdate;
+            BookmarkContainer_HandleNewBookmarkNamePatch.OnNewBookmarkName += BookMarkChangeUpdate;
             BookMarkChangeUpdate();
         }
         public void OnDestroy()
         {
             bookmarkManager.BookmarksUpdated -= BookMarkChangeUpdate;
-            BookmarkContainerPatch.OnNewBookmarkName -= BookMarkChangeUpdate;
+            BookmarkContainer_HandleNewBookmarkNamePatch.OnNewBookmarkName -= BookMarkChangeUpdate;
         }
     }
 }

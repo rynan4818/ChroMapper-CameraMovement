@@ -52,7 +52,7 @@ namespace ChroMapper_CameraMovement.Controller
         {
             if (bookmarkContainers.Count > 0)
             {
-                var lastBookmark = bookmarkContainers.FindLast(x => x.Data.JsonTime <= atsc.CurrentSongBpmTime);
+                var lastBookmark = bookmarkContainers.FindLast(x => x.Data.SongBpmTime <= atsc.CurrentSongBpmTime);
                 if (bookmarkContainers.IndexOf(lastBookmark) == -1)
                 {
                     UI._bookmarkMenuUI.CurrentBookmarkUpdate("", 0, 0);

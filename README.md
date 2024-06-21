@@ -412,7 +412,6 @@ ChroMapper-CameraMovement.dllには[UniVRM](https://github.com/vrm-c/UniVRM) の
 - VRMShaders.GLTF.IO.Runtime.dll
 - VRMShaders.GLTF.UniUnlit.Runtime.dll
 - VRMShaders.VRM.IO.Runtime.dll
-- netstandard.dll
 
 また、以下のシェーダーをアセットバンドルで`vrmavatar.shaders`にまとめ、DLLに埋め込んでいます。
 - Assets\VRMShaders\GLTF\UniUnlit\Resources\UniGLTF\UniUnlit.shader
@@ -423,18 +422,6 @@ ChroMapper-CameraMovement.dllには[UniVRM](https://github.com/vrm-c/UniVRM) の
 
 UniVRMの著作権表記・ライセンスは以下の通りです。
 - https://github.com/vrm-c/UniVRM/blob/master/LICENSE.txt
-
-### Json.NET
-Movementスクリプトの読込に[Json.NET](https://www.newtonsoft.com/json)使用しています。`Newtonsoft.Json.dll`をILMergeによって内包しています。
-
-Json.NETの著作権表記・ライセンスは以下の通りです。
-- https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
-
-### SimpleJSON
-設定ファイルのJSONパースに[SimpleJSON](https://github.com/Bunny83/SimpleJSON)を使用しています。
-
-SimpleJSONの著作権表記・ライセンスは以下の通りです。
-- https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE
 
 ## アイコン素材
 - ICONION

@@ -16,7 +16,6 @@ https://github.com/rynan4818/ChroMapper-CameraMovement/blob/main/LICENSE
 
         FastSpringBone.dll
         MToon.dll
-        netstandard.dll
         UniGLTF.dll
         UniHumanoid.dll
         VRM.dll
@@ -36,18 +35,6 @@ https://github.com/rynan4818/ChroMapper-CameraMovement/blob/main/LICENSE
 
 UniVRMの著作権表記・ライセンスは以下の通りです。
 https://github.com/vrm-c/UniVRM/blob/master/LICENSE.txt
-
-○Json.NET(https://www.newtonsoft.com/json)ライブラリの Newtonsoft.Json.dll をILMergeによって内包しています。
-
-Json.NETの著作権表記・ライセンスは以下の通りです。
-https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md
-
-○SimpleJSON
-
-設定ファイルのJSONパースにSimpleJSON(https://github.com/Bunny83/SimpleJSON)を使用しています。
-
-SimpleJSONの著作権表記・ライセンスは以下の通りです。
-https://github.com/Bunny83/SimpleJSON/blob/master/LICENSE
 
 ○アイコン素材について
 

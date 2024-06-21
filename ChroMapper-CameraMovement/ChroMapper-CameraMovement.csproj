@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\ILMerge.3.0.41\build\ILMerge.props" Condition="Exists('..\packages\ILMerge.3.0.41\build\ILMerge.props')" />
+  <Import Project="..\packages\ILRepack.2.0.34\build\ILRepack.props" Condition="Exists('..\packages\ILRepack.2.0.34\build\ILRepack.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -48,7 +48,9 @@
     <Reference Include="Plugins">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\Plugins.dll</HintPath>
     </Reference>
-    <Reference Include="netstandard" />
+    <Reference Include="netstandard">
+      <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\netstandard.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -132,6 +134,10 @@
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UniGLTF">
       <HintPath>DLL\UniGLTF.dll</HintPath>
     </Reference>
@@ -144,10 +150,6 @@
     </Reference>
     <Reference Include="VRMShaders.GLTF.IO.Runtime">
       <HintPath>DLL\VRMShaders.GLTF.IO.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>DLL\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -186,7 +188,6 @@
     <Compile Include="Util\AddVRMShaders.cs" />
     <Compile Include="Controller\ScriptMapperController.cs" />
     <Compile Include="Util\DebugTimer.cs" />
-    <Compile Include="Util\SimpleJSON.cs" />
     <Compile Include="Controller\VRMAvatarController.cs" />
     <Compile Include="Util\TimeoutTimer.cs" />
     <Compile Include="Util\UnityUtility.cs" />
@@ -205,10 +206,10 @@
     <PostBuildEvent>if exist "$(TargetName)_org.dll" del "$(TargetName)_org.dll"
 if exist "$(TargetDir)$(TargetName)_org.pdb" del "$(TargetDir)$(TargetName)_org.pdb"
 if $(ConfigurationName)==Release (
-  "$(ILMergeConsolePath)" /ndebug /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetDir)$(TargetName)_all.dll" "$(TargetPath)" "$(ProjectDir)DLL\*.dll"
+  "$(ILRepack)" /ndebug /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetDir)$(TargetName)_all.dll" "$(TargetPath)" "$(ProjectDir)DLL\*.dll" /log:"$(TargetDir)$(AssemblyName).ILRepack.log
 )
 if $(ConfigurationName)==Debug (
-  "$(ILMergeConsolePath)" /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetDir)$(TargetName)_all.dll" "$(TargetPath)" "$(ProjectDir)DLL\*.dll"
+  "$(ILRepack)" /targetplatform:v4 /wildcards /lib:"$(ChroMapperDir)\ChroMapper_Data\Managed" /out:"$(TargetDir)$(TargetName)_all.dll" "$(TargetPath)" "$(ProjectDir)DLL\*.dll" /log:"$(TargetDir)$(AssemblyName).ILRepack.log
 )
 if exist "$(TargetDir)$(TargetName).pdb" ren "$(TargetDir)$(TargetName).pdb" "$(TargetName)_org.pdb"
 ren "$(TargetPath)" "$(TargetName)_org.dll"
@@ -227,6 +228,6 @@ if $(ConfigurationName)==Release (
     <PropertyGroup>
       <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\ILMerge.3.0.41\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILMerge.3.0.41\build\ILMerge.props'))" />
+    <Error Condition="!Exists('..\packages\ILRepack.2.0.34\build\ILRepack.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILRepack.2.0.34\build\ILRepack.props'))" />
   </Target>
 </Project>

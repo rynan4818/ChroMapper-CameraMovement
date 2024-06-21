@@ -42,9 +42,6 @@ namespace ChroMapper_CameraMovement.Component
         {
             bookmarkContainers = bc;
             init = false;
-            if (bookmarkContainers.Count == 0) return;
-            Debug.Log("BookmarkLinesController Refreshing measure lines...");
-
             var checkContainers = bookmarkTexts.Keys.ToList();
             var counter = 1;
             bookmarkContainers.ForEach(bookmark =>

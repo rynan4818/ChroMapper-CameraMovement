@@ -252,7 +252,7 @@ namespace ChroMapper_CameraMovement.Component
                 avatarLeg.gameObject.SetActive(false);
                 avatarHair.gameObject.SetActive(false);
             }
-            subCameraArrow.SetActive(Options.Instance.subCameraModel);
+            subCameraArrow.SetActive(Options.Instance.subCameraModel && Options.Instance.cameraMovementEnable);
             subCameraArrowTrail.Clear();
             OnPlayToggle(atsc.IsPlaying);
             beforeSeconds = 0;

@@ -178,11 +178,6 @@ namespace ChroMapper_CameraMovement.Component
                 WindowController.windowReplace(windowInfos[2].Item2, null, mainPosSize.Item1 + 100, mainPosSize.Item2 + 300, (int)(windowInfos[2].Item3 * 0.5), (int)(windowInfos[2].Item4 * 0.5), false);
             return true;
         }
-        public void Start()
-        {
-            activeWindowNumber = -1;
-            subActive = false;
-        }
 
         public void Update()
         {

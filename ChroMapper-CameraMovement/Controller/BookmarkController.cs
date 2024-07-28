@@ -7,7 +7,6 @@ using UnityEngine;
 using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.UserInterface;
-using ChroMapper_CameraMovement.HarmonyPatches;
 using SFB;
 
 namespace ChroMapper_CameraMovement.Controller
@@ -35,13 +34,13 @@ namespace ChroMapper_CameraMovement.Controller
         }
         public void BookmarkWidthChange()
         {
-            var bookmarkWidth = 10f;
+            var bookmarkWidth = Settings.Instance.BookmarkTimelineWidth;
             if (Options.Instance.cameraMovementEnable)
                 bookmarkWidth = Options.Instance.bookmarkWidth;
             bookmarkContainers.ForEach(container =>
             {
                 var rectTransform = (RectTransform)container.transform;
-                rectTransform.sizeDelta = new Vector2(bookmarkWidth, 20f);
+                rectTransform.sizeDelta = new Vector2(bookmarkWidth, rectTransform.sizeDelta.y);
             });
         }
         public void BookMarkChangeUpdate()
@@ -159,9 +158,10 @@ namespace ChroMapper_CameraMovement.Controller
             var bookmarkContainer = bookmarkContainers[bookmarkNo - 1];
             PersistentUI.Instance.ShowInputBox("Mapper", "bookmark.update.dialog", (res) =>
             {
-                Type type = bookmarkContainer.GetType();
-                MethodInfo method = type.GetMethod("HandleNewBookmarkName", BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance);
-                method.Invoke(bookmarkContainer, new object[] { res });
+                if (string.IsNullOrEmpty(res) || string.IsNullOrWhiteSpace(res)) return;
+                bookmarkContainer.Data.Name = res;
+                bookmarkManager.BookmarksUpdated.Invoke();
+                bookmarkContainer.UpdateUIText();
             }
             , null, bookmarkContainer.Data.Name);
         }
@@ -192,13 +192,11 @@ namespace ChroMapper_CameraMovement.Controller
             bookmarkManager = UnityEngine.Object.FindObjectOfType<BookmarkManager>();
             bookmarkRenderingController = UnityEngine.Object.FindObjectOfType<BookmarkRenderingController>();
             bookmarkManager.BookmarksUpdated += BookMarkChangeUpdate;
-            BookmarkContainer_HandleNewBookmarkNamePatch.OnNewBookmarkName += BookMarkChangeUpdate;
             BookMarkChangeUpdate();
         }
         public void OnDestroy()
         {
             bookmarkManager.BookmarksUpdated -= BookMarkChangeUpdate;
-            BookmarkContainer_HandleNewBookmarkNamePatch.OnNewBookmarkName -= BookMarkChangeUpdate;
         }
     }
 }

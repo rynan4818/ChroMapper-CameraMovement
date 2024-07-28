@@ -259,6 +259,7 @@ namespace ChroMapper_CameraMovement.Component
             _reload = true;
             _cameraMovement.LoadCameraData(ScriptGet());
             _cameraMovement.MovementPositionReset();
+            _bookmarkController?.BookmarkContainerGet();
             _bookmarkController?.BookmarkWidthChange();
             _bookmarkController?.BookmarkTrackSet();
             bookmarkLines.SetActive(Options.Instance.bookmarkLines && Options.Instance.cameraMovementEnable);

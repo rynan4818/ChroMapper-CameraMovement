@@ -170,7 +170,6 @@
     <Compile Include="Controller\BookmarkController.cs" />
     <Compile Include="Controller\MovementPlayerController.cs" />
     <Compile Include="Controller\WindowController.cs" />
-    <Compile Include="HarmonyPatches\BookmarkContainer_HandleNewBookmarkNamePatch.cs" />
     <Compile Include="HarmonyPatches\CameraController_SetLockStatePatch.cs" />
     <Compile Include="HarmonyPatches\BookmarkRenderingController_SetGridBookmarkNameColorPatch.cs" />
     <Compile Include="HarmonyPatches\Shader_FindPatch.cs" />

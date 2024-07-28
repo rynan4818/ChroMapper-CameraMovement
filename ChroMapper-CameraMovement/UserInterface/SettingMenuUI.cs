@@ -169,8 +169,8 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var bookmarkWidthInput = UI.AddTextInput(_cameraMovementSettingMenu.transform, "Bookmark Width", "Bookmark Width", Options.Instance.bookmarkWidth.ToString(), (value) =>
             {
-                float res;
-                if (float.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
+                int res;
+                if (int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out res))
                 {
                     Options.Instance.bookmarkWidth = res;
                     movementController.Reload();

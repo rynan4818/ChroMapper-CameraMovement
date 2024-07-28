@@ -25,7 +25,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public string scriptFileName = "SongScript.json";
         public string scriptMapperExe = "scriptmapper.exe";
         public string scriptMapperLog = "log_latest.txt";
-        public float bookmarkWidth = 10f;
+        public int bookmarkWidth = 10;
         public bool bookmarkLines = true;
         public bool bookmarkLinesShowOnTop = false;
         public float bookmarkInsertOffset = 12f;

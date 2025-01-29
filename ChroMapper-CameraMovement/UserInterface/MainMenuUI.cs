@@ -4,6 +4,7 @@ using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Controller;
 using System.Text.RegularExpressions;
 using TMPro;
+using System;
 
 namespace ChroMapper_CameraMovement.UserInterface
 {
@@ -12,6 +13,14 @@ namespace ChroMapper_CameraMovement.UserInterface
         public GameObject _cameraMovementMainMenu;
         public static CameraMovementController movementController;
         public static GameObject cm_MapEditorCamera;
+        public UIButton mainMenuCounterButton;
+        public float counterOffset = 0;
+
+        public void UpdateCounter()
+        {
+            var counter = CameraMovementController.atsc.CurrentSeconds - counterOffset;
+            mainMenuCounterButton.Text.text = $"{Math.Truncate(counter)} s:{Math.Round(counter % 1.0f *60)} f";
+        }
 
         public void AnchoredPosSave()
         {
@@ -164,6 +173,13 @@ namespace ChroMapper_CameraMovement.UserInterface
                 _cameraMovementMainMenu.SetActive(false);
             });
             UI.MoveTransform(mainMenuCloseButton.transform, 70, 25, 0.72f, 1, 0, -290);
+
+            mainMenuCounterButton = UI.AddButton(_cameraMovementMainMenu.transform, "Counter", "0 s:0 f", () =>
+            {
+                counterOffset = CameraMovementController.atsc.CurrentSeconds;
+                UpdateCounter();
+            });
+            UI.MoveTransform(mainMenuCounterButton.transform, 70, 25, 0.28f, 1, 0, -290);
 
             _cameraMovementMainMenu.SetActive(false);
             UI._extensionBtn.Click = () =>

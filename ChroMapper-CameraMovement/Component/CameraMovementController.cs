@@ -950,6 +950,7 @@ namespace ChroMapper_CameraMovement.Component
                     movementPlayerController.MovementUpdate(atsc.CurrentSeconds);
                 if (VRMAvatarController.avatar != null && VRMAvatarController.avatar.Root.activeSelf && VRMAvatarController.blendShapeController != null)
                     VRMAvatarController.blendShapeController.SongTimeUpdate(atsc.CurrentSeconds);
+                UI._mainMenuUI.UpdateCounter();
             }
             GameObject targetCamera;
             float targetFOV;

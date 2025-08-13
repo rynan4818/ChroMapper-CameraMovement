@@ -77,7 +77,7 @@ namespace ChroMapper_CameraMovement.Component
         private void Start()
         {
             this._checkTime = 0;
-            this._scriptFile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.nalulunaAvatarsEventFileName).Replace("/", "\\");
+            this._scriptFile = Path.Combine(BeatSaberSongContainer.Instance.Info.Directory, Options.Instance.nalulunaAvatarsEventFileName).Replace("/", "\\");
             this.ResetEventData();
         }
         private void Update()

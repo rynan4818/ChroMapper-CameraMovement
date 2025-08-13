@@ -72,7 +72,7 @@ namespace ChroMapper_CameraMovement.Controller
         }
         public void BookmarkExport()
         {
-            var paths = StandaloneFileBrowser.SaveFilePanel("Bookmark Export CSV File", BeatSaberSongContainer.Instance.Song.Directory, "bookmark.csv", "csv");
+            var paths = StandaloneFileBrowser.SaveFilePanel("Bookmark Export CSV File", BeatSaberSongContainer.Instance.Info.Directory, "bookmark.csv", "csv");
             if (paths.Length > 0)
             {
                 var sb = new StringBuilder();
@@ -96,7 +96,7 @@ namespace ChroMapper_CameraMovement.Controller
         }
         public void BookmarkImport()
         {
-            var paths = StandaloneFileBrowser.OpenFilePanel("Bookmark Import CSV File", BeatSaberSongContainer.Instance.Song.Directory, "csv", false)[0];
+            var paths = StandaloneFileBrowser.OpenFilePanel("Bookmark Import CSV File", BeatSaberSongContainer.Instance.Info.Directory, "csv", false)[0];
             if (File.Exists(paths))
             {
                 var replaceBookmak = new List<(float, string)>();

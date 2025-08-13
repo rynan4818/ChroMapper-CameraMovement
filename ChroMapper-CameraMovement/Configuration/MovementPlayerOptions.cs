@@ -16,7 +16,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public float playersPlaceOffset = 0;
         public static string GetSettingFile()
         {
-            return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, settingJsonFile);
+            return Path.Combine(BeatSaberSongContainer.Instance.Info.Directory, settingJsonFile);
         }
         public static MovementPlayerOptions SettingLoad()
         {

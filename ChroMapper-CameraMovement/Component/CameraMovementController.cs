@@ -110,11 +110,11 @@ namespace ChroMapper_CameraMovement.Component
 
         public static string ScriptGet()
         {
-            return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
+            return Path.Combine(BeatSaberSongContainer.Instance.Info.Directory, Options.Instance.scriptFileName).Replace("/", "\\");
         }
         public static string MapGet()
         {
-            return Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, BeatSaberSongContainer.Instance.DifficultyData.BeatmapFilename).Replace("/", "\\");
+            return Path.Combine(BeatSaberSongContainer.Instance.Info.Directory, BeatSaberSongContainer.Instance.MapDifficultyInfo.BeatmapFileName).Replace("/", "\\");
         }
         public void CameraPositionAndRotationSet(Vector3 position,Vector3 rotation)
         {

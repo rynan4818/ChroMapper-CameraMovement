@@ -81,10 +81,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 catch
                 {
-                    dir = BeatSaberSongContainer.Instance.Song.Directory;
+                    dir = BeatSaberSongContainer.Instance.Info.Directory;
                 }
                 if (!Directory.Exists(dir))
-                    dir = BeatSaberSongContainer.Instance.Song.Directory;
+                    dir = BeatSaberSongContainer.Instance.Info.Directory;
                 var paths = StandaloneFileBrowser.OpenFilePanel("Movement File", dir, ext, false);
                 if (paths.Length > 0 && File.Exists(paths[0]))
                 {

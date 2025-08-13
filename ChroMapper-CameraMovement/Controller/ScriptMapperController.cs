@@ -81,7 +81,7 @@ namespace ChroMapper_CameraMovement.Controller
             }
             _scriptMapperProcess = null;
             var err = false;
-            var logfile = Path.Combine(BeatSaberSongContainer.Instance.Song.Directory, Options.Instance.scriptMapperLog).Replace("/", "\\");
+            var logfile = Path.Combine(BeatSaberSongContainer.Instance.Info.Directory, Options.Instance.scriptMapperLog).Replace("/", "\\");
             if (File.Exists(logfile))
             {
                 using (StreamReader results = File.OpenText(logfile))

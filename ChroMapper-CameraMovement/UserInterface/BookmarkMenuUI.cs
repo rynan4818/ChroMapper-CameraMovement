@@ -21,7 +21,9 @@ namespace ChroMapper_CameraMovement.UserInterface
         public UIButton quickCommand3Button;
         public UIButton quickCommand4Button;
         public UIButton quickCommand5Button;
-        public UIButton quickCommand6Button;
+        private SplineEditor activeEditorInstance;
+        private UIButton splineEditButton;
+
         public int currentBookmarkNo = 0;
         public bool commandSet = false;
 
@@ -65,6 +67,10 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var bookmarkMenuInput = UI.AddTextInput(_cameraMovementBookmarkMenu.transform, "No.-", "No.-", "", (value) =>
             {
+                if (activeEditorInstance != null)
+                {
+                    CancelSplineEdit();
+                }
             });
             UI.MoveTransform(bookmarkMenuInput.Item1, 150, 16, 0.1f, 1, 10, -15);
             bookmarkMenuInputLabel = bookmarkMenuInput.Item2;
@@ -76,6 +82,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             var bookmarkMenuCopyButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Copy to Edit", "Copy to Edit", () =>
             {
                 bookmarkMenuInputText.InputField.text = currentBookmarkLabelText.text;
+                if (activeEditorInstance != null)
+                {
+                    CancelSplineEdit();
+                }
             });
             bookmarkMenuCopyButton.Text.fontSize = 9;
             UI.MoveTransform(bookmarkMenuCopyButton.transform, 35, 20, 0.1f, 1, -10, -35);
@@ -83,6 +93,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             var bookmarkMenuClearButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Clear", "Clear", () =>
             {
                 bookmarkMenuInputText.InputField.text = "";
+                if (activeEditorInstance != null)
+                {
+                    CancelSplineEdit();
+                }
             });
             bookmarkMenuClearButton.Text.fontSize = 10;
             UI.MoveTransform(bookmarkMenuClearButton.transform, 30, 20, 0.1f, 1, 25, -35);
@@ -211,26 +225,63 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(quickCommand5Button.transform, 50, 20, 0.1f, 1, 590, -15);
 
-            quickCommand6Button = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Command6", Options.Instance.quickCommand6, () =>
-            {
-                if (commandSet)
-                {
-                    commandSet = false;
-                    bookmarkSetCheckboxToggle.isOn = false;
-                    if (bookmarkMenuInputText.InputField.text.Trim() != "")
-                    {
-                        Options.Instance.quickCommand6 = bookmarkMenuInputText.InputField.text.Trim();
-                        quickCommand6Button.SetText(Options.Instance.quickCommand6);
-                    }
-                }
-                else
-                {
-                    bookmarkMenuInputText.InputField.text += Options.Instance.quickCommand6;
-                }
-            });
-            UI.MoveTransform(quickCommand6Button.transform, 50, 20, 0.1f, 1, 640, -15);
+            splineEditButton = UI.AddButton(_cameraMovementBookmarkMenu.transform, "Spline", "Spline", OnSplineEditButtonPressed);
+            splineEditButton.Text.fontSize = 10;
+            UI.MoveTransform(splineEditButton.transform, 50, 20, 0.1f, 1, 640, -15);
 
             _cameraMovementBookmarkMenu.SetActive(Options.Instance.cameraMovementEnable && Options.Instance.bookmarkEdit);
+        }
+
+        /// <summary>
+        /// Spline 編集ボタンが押された時のトグルロジック
+        /// </summary>
+        private void OnSplineEditButtonPressed()
+        {
+            if (activeEditorInstance == null)
+            {
+                string command = bookmarkMenuInputText.InputField.text.Trim();
+                if (!command.StartsWith("spline", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    Debug.LogWarning("SplineEditor: spline コマンドではありません。");
+                    return;
+                }
+                try
+                {
+                    activeEditorInstance = new GameObject("SplineEditor_Instance").AddComponent<SplineEditor>();
+                    activeEditorInstance.StartEditing(command);
+                    bookmarkMenuInputText.InputField.interactable = false;
+                    splineEditButton.SetText("Complete");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"SplineEditor: 編集の開始に失敗しました。{e.Message}");
+                    if (activeEditorInstance != null)
+                        Object.Destroy(activeEditorInstance.gameObject);
+                    activeEditorInstance = null;
+                }
+            }
+            else
+            {
+                string newCommand = activeEditorInstance.EndEditing();
+                activeEditorInstance = null;
+                splineEditButton.SetText("Spline");
+                bookmarkMenuInputText.InputField.interactable = true;
+                bookmarkMenuInputText.InputField.text = newCommand;
+            }
+        }
+
+        /// <summary>
+        /// 他の操作によって Spline 編集を強制キャンセルする処理
+        /// </summary>
+        private void CancelSplineEdit()
+        {
+            if (activeEditorInstance == null)
+                return;
+            Debug.LogWarning("SplineEditor: 編集がキャンセルされました。");
+            activeEditorInstance.EndEditing();
+            activeEditorInstance = null;
+            splineEditButton.SetText("Spline");
+            bookmarkMenuInputText.InputField.interactable = true;
         }
     }
 }

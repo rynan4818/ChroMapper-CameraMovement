@@ -3,44 +3,62 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Linq;
 using ChroMapper_CameraMovement.Configuration;
 
 namespace ChroMapper_CameraMovement.Component
 {
-    /// <summary>
-    /// spline コマンドのビジュアル編集を管理
-    /// </summary>
     public class SplineEditor : MonoBehaviour
     {
-        // --- 入力アクション ---
-        private InputAction splineDragAction;
-        private InputAction mousePositionAction;
+        // --- データ構造 ---
+        private class SplineBlock
+        {
+            public string CommandType; // "spline" or "bspline"
+            public List<GameObject> Handles = new List<GameObject>();
+            public List<SplinePointData> PointData = new List<SplinePointData>();
+            public GameObject TargetStartHandle;
+            public GameObject TargetEndHandle;
+            public LineRenderer PathLineRenderer;
+            public LineRenderer TargetLineRenderer; // 移動モード時のみ
 
-        // --- 内部ステート ---
-        private List<GameObject> controlPointHandles = new List<GameObject>();
-        private LineRenderer activeLineRenderer;
-        private List<SplinePointData> pointDataCache = new List<SplinePointData>();
-        private string originalTargetParams = "";
-        private string originalEaseName = "";
-
-        // --- マウスドラッグ用変数 ---
-        private GameObject selectedHandle;
-        private Camera mainCamera;
-        private Plane dragPlane;
-        private Vector3 offset;
-
-        // --- マーカーの表示設定 ---
-        private static readonly float handleScale = 0.15f;
-        private static readonly Color handleColor = new Color(0.1f, 1.0f, 0.1f, 0.8f); // 緑
-        private static readonly Color lineColor = Color.green;
-        private static readonly float lineWidth = 0.05f;
+            // パラメータ
+            public bool IsMovingTargetMode = false;
+            public bool HasCnct = false;
+            public bool HasSync = false;
+            public string EaseName = "";
+            public List<string> OtherParams = new List<string>();
+        }
 
         private class SplinePointData
         {
             public float rz;
             public float fov;
         }
+
+        // --- 入力アクション ---
+        private InputAction splineDragAction;
+        private InputAction mousePositionAction;
+
+        // --- 内部ステート ---
+        private List<SplineBlock> splineBlocks = new List<SplineBlock>();
+
+        // --- マウスドラッグ用 ---
+        private GameObject selectedHandle;
+        private Camera mainCamera;
+        private Plane dragPlane;
+        private Vector3 offset;
+
+        // --- 見た目設定 ---
+        private static readonly float handleScale = 0.15f;
+        private static readonly float lineWidth = 0.05f;
+
+        private static readonly Color cameraHandleColor = new Color(0.1f, 1.0f, 0.1f, 0.8f);
+        private static readonly Color cameraLineColor = Color.green;
+        private static readonly Color bsplineLineColor = new Color(0.0f, 0.8f, 1.0f, 1.0f);
+        private static readonly Color targetHandleColor = new Color(1.0f, 0.0f, 1.0f, 0.8f);
+        private static readonly Color targetLineColor = new Color(1.0f, 0.0f, 1.0f, 0.5f);
 
         private void Awake()
         {
@@ -62,7 +80,7 @@ namespace ChroMapper_CameraMovement.Component
             Cleanup();
         }
 
-        public void StartEditing(string commandString)
+        public void StartEditing(string fullCommandString)
         {
             Cleanup();
 
@@ -73,11 +91,16 @@ namespace ChroMapper_CameraMovement.Component
                 return;
             }
 
-            List<Vector3> parsedEditorPositions = ParseCommand(commandString);
-            if (parsedEditorPositions == null) return;
+            string[] commands = fullCommandString.Split(new char[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
 
-            InstantiateHandles(parsedEditorPositions);
-            UpdateLineRenderer();
+            if (commands.Length == 0) return;
+
+            foreach (var cmd in commands)
+            {
+                ParseAndCreateBlock(cmd);
+            }
+
+            UpdateAllLineRenderers();
 
             splineDragAction.Enable();
             mousePositionAction.Enable();
@@ -93,8 +116,6 @@ namespace ChroMapper_CameraMovement.Component
             Cleanup();
             return newCommand;
         }
-
-        // --- 毎フレームの処理 (ドラッグと軌道更新) ---
 
         private void Update()
         {
@@ -112,34 +133,32 @@ namespace ChroMapper_CameraMovement.Component
 
         private void LateUpdate()
         {
-            if (activeLineRenderer != null)
-            {
-                UpdateLineRenderer();
-            }
+            UpdateAllLineRenderers();
         }
-
-        // --- InputAction イベントハンドラ ---
 
         private void OnDragStarted(InputAction.CallbackContext context)
         {
             if (mainCamera == null) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
-            }
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
 
             Vector2 mousePosition = mousePositionAction.ReadValue<Vector2>();
             Ray ray = mainCamera.ScreenPointToRay(mousePosition);
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                if (controlPointHandles.Contains(hit.collider.gameObject))
+                GameObject hitObj = hit.collider.gameObject;
+
+                foreach (var block in splineBlocks)
                 {
-                    selectedHandle = hit.collider.gameObject;
-                    dragPlane = new Plane(mainCamera.transform.forward, selectedHandle.transform.position);
-                    if (dragPlane.Raycast(ray, out float distance))
+                    if (block.Handles.Contains(hitObj) || hitObj == block.TargetStartHandle || hitObj == block.TargetEndHandle)
                     {
-                        offset = selectedHandle.transform.position - ray.GetPoint(distance);
+                        selectedHandle = hitObj;
+                        dragPlane = new Plane(mainCamera.transform.forward, selectedHandle.transform.position);
+                        if (dragPlane.Raycast(ray, out float distance))
+                        {
+                            offset = selectedHandle.transform.position - ray.GetPoint(distance);
+                        }
+                        return;
                     }
                 }
             }
@@ -150,39 +169,45 @@ namespace ChroMapper_CameraMovement.Component
             selectedHandle = null;
         }
 
-        // --- コアロジック (解析、生成、再構築) ---
+        // --- コアロジック: 解析と生成 ---
 
-        /// <summary>
-        /// q_... の座標の読み込み
-        /// </summary>
-        private List<Vector3> ParseCommand(string commandString)
+        private void ParseAndCreateBlock(string commandString)
         {
+            SplineBlock block = new SplineBlock();
+
+            if (commandString.StartsWith("bspline"))
+            {
+                block.CommandType = "bspline";
+            }
+            else
+            {
+                block.CommandType = "spline";
+            }
+
             string paramText;
             try
             {
-                paramText = commandString.Split(new char[] { ',', '_' }, 2)[1];
+                var split = commandString.Split(new char[] { ',', '_' }, 2);
+                if (split.Length < 2) return;
+                paramText = split[1];
             }
             catch
             {
-                Debug.LogError($"SplineEditor: コマンド '{commandString}' の解析に失敗しました。spline,q_... の形式ではありません。");
-                return null;
+                Debug.LogError($"SplineEditor: コマンド解析失敗: {commandString}");
+                return;
             }
 
             string[] paramsList = paramText.Split(',');
-
-            List<Vector3> parsedEditorPositions = new List<Vector3>();
-            pointDataCache.Clear();
             List<string> targetParamsList = new List<string>();
-            originalEaseName = "";
 
             foreach (string param in paramsList)
             {
-                string paramStripped = param.Trim();
-                if (string.IsNullOrEmpty(paramStripped)) continue;
+                string p = param.Trim();
+                if (string.IsNullOrEmpty(p)) continue;
 
-                if (paramStripped.StartsWith("q_"))
+                if (p.StartsWith("q_"))
                 {
-                    string[] parts = paramStripped.Split('_');
+                    string[] parts = p.Split('_');
                     if (parts.Length >= 8)
                     {
                         Vector3 finalPos = new Vector3(
@@ -190,153 +215,357 @@ namespace ChroMapper_CameraMovement.Component
                             float.Parse(parts[2], CultureInfo.InvariantCulture),
                             float.Parse(parts[3], CultureInfo.InvariantCulture)
                         );
-                        parsedEditorPositions.Add(FinalToEditor(finalPos));
-                        //rz と fov をキャッシュ
-                        pointDataCache.Add(new SplinePointData
+
+                        GameObject handle = CreateHandle($"Handle_{block.Handles.Count}", FinalToEditor(finalPos), cameraHandleColor);
+                        block.Handles.Add(handle);
+
+                        block.PointData.Add(new SplinePointData
                         {
                             rz = float.Parse(parts[6], CultureInfo.InvariantCulture),
                             fov = float.Parse(parts[7], CultureInfo.InvariantCulture)
                         });
                     }
                 }
-                else if (char.IsLetter(paramStripped[0]))
+                else if (p.ToLower() == "cnct")
                 {
-                    if (string.IsNullOrEmpty(originalEaseName))
-                        originalEaseName = paramStripped;
+                    block.HasCnct = true;
+                }
+                else if (p.ToLower() == "sync")
+                {
+                    block.HasSync = true;
+                }
+                else if (char.IsLetter(p[0]) && string.IsNullOrEmpty(block.EaseName) && p.ToLower() != "cnct" && p.ToLower() != "sync" && !p.StartsWith("r"))
+                {
+                    block.EaseName = p;
                 }
                 else
                 {
-                    targetParamsList.Add(paramStripped);
+                    if (IsNumeric(p))
+                    {
+                        targetParamsList.Add(p);
+                    }
+                    else
+                    {
+                        block.OtherParams.Add(p);
+                    }
                 }
             }
 
-            if (parsedEditorPositions.Count < 2)
+            ParseTargetParams(block, targetParamsList);
+
+            GameObject lineObj = new GameObject($"SplineLine_{splineBlocks.Count}");
+            Color lineColor = (block.CommandType == "bspline") ? bsplineLineColor : cameraLineColor;
+            block.PathLineRenderer = CreateLineRenderer(lineObj, lineColor);
+
+            if (block.IsMovingTargetMode)
             {
-                Debug.LogError($"SplineEditor: 軌道には最低2点の q_... 制御点が必要です。");
-                return null;
+                GameObject tLineObj = new GameObject($"TargetLine_{splineBlocks.Count}");
+                block.TargetLineRenderer = CreateLineRenderer(tLineObj, targetLineColor);
             }
 
-            originalTargetParams = string.Join(",", targetParamsList);
-            return parsedEditorPositions;
+            splineBlocks.Add(block);
         }
 
-        private void InstantiateHandles(List<Vector3> parsedEditorPositions)
+        private bool IsNumeric(string s)
         {
-            controlPointHandles.Clear();
-
-            for (int i = 0; i < parsedEditorPositions.Count; i++)
-            {
-                GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                handle.name = $"SplineHandle_{i}";
-                handle.transform.position = parsedEditorPositions[i];
-                handle.transform.localScale = Vector3.one * handleScale;
-
-                Renderer handleRenderer = handle.GetComponent<Renderer>();
-                if (handleRenderer != null)
-                {
-                    handleRenderer.material.shader = Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply");
-                    handleRenderer.material.color = handleColor;
-                    handleRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                    handleRenderer.receiveShadows = false;
-                }
-
-                controlPointHandles.Add(handle);
-            }
-
-            GameObject lineObj = new GameObject("SplineVisualizer_Line");
-            activeLineRenderer = lineObj.AddComponent<LineRenderer>();
-
-            activeLineRenderer.startWidth = lineWidth;
-            activeLineRenderer.endWidth = lineWidth;
-
-            Material lineMaterial = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-            activeLineRenderer.material = lineMaterial;
-            activeLineRenderer.startColor = lineColor;
-            activeLineRenderer.endColor = lineColor;
-            activeLineRenderer.useWorldSpace = true;
+            return float.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out _);
         }
 
-        private void UpdateLineRenderer()
+        private void ParseTargetParams(SplineBlock block, List<string> paramsList)
         {
-            if (controlPointHandles.Count < 2) return;
+            Vector3? tStart = null;
+            Vector3? tEnd = null;
 
-            List<Vector3> linePoints = new List<Vector3>();
-            int numSegments = controlPointHandles.Count - 1;
-            int samplesPerSegment = 20;
-
-            for (int i = 0; i < numSegments; i++)
+            if (paramsList.Count >= 6)
             {
-                Vector3 p1 = controlPointHandles[i].transform.position;
-                Vector3 p2 = controlPointHandles[i + 1].transform.position;
-                Vector3 p0 = (i > 0) ? controlPointHandles[i - 1].transform.position : p1;
-                Vector3 p3 = (i < numSegments - 1) ? controlPointHandles[i + 2].transform.position : p2;
+                Vector3 t1 = new Vector3(float.Parse(paramsList[0]), float.Parse(paramsList[1]), float.Parse(paramsList[2]));
+                Vector3 t2 = new Vector3(float.Parse(paramsList[3]), float.Parse(paramsList[4]), float.Parse(paramsList[5]));
+                tStart = FinalToEditor(t1);
+                tEnd = FinalToEditor(t2);
+                block.IsMovingTargetMode = true;
+            }
+            else if (paramsList.Count >= 3)
+            {
+                Vector3 t1 = new Vector3(float.Parse(paramsList[0]), float.Parse(paramsList[1]), float.Parse(paramsList[2]));
+                tStart = FinalToEditor(t1);
+                block.IsMovingTargetMode = false;
+            }
+            else
+            {
+                tStart = FinalToEditor(new Vector3(0, 1.6f, 0));
+                block.IsMovingTargetMode = false;
+            }
 
-                for (int j = 0; j <= samplesPerSegment; j++)
+            if (tStart.HasValue)
+            {
+                block.TargetStartHandle = CreateHandle("TargetStart", tStart.Value, targetHandleColor);
+            }
+            if (tEnd.HasValue && block.IsMovingTargetMode)
+            {
+                block.TargetEndHandle = CreateHandle("TargetEnd", tEnd.Value, targetHandleColor);
+            }
+        }
+
+        // --- 描画更新 ---
+
+        private void UpdateAllLineRenderers()
+        {
+            for (int i = 0; i < splineBlocks.Count; i++)
+            {
+                SplineBlock prevBlock = (i > 0) ? splineBlocks[i - 1] : null;
+                // ★修正: 次のブロックを取得して渡す
+                SplineBlock nextBlock = (i < splineBlocks.Count - 1) ? splineBlocks[i + 1] : null;
+
+                UpdateBlockLines(splineBlocks[i], prevBlock, nextBlock);
+            }
+        }
+
+        private void UpdateBlockLines(SplineBlock block, SplineBlock prevBlock, SplineBlock nextBlock)
+        {
+            // 1. カメラ軌道
+            if (block.PathLineRenderer != null)
+            {
+                // 描画用の座標リストを構築
+                List<Vector3> drawPoints = new List<Vector3>();
+
+                // cnctがある場合、前のブロックの最後の点を「始点」として追加
+                if (block.HasCnct && prevBlock != null && prevBlock.Handles.Count > 0)
                 {
-                    float t = j / (float)samplesPerSegment;
-                    Vector3 point = GetCatmullRomPosition(p0, p1, p2, p3, t);
-                    linePoints.Add(point);
+                    drawPoints.Add(prevBlock.Handles[prevBlock.Handles.Count - 1].transform.position);
+                }
+
+                // 現在のブロックの点を追加
+                foreach (var h in block.Handles)
+                {
+                    drawPoints.Add(h.transform.position);
+                }
+
+                // 点が2つ未満なら線は引けない
+                if (drawPoints.Count < 2)
+                {
+                    block.PathLineRenderer.positionCount = 0;
+                }
+                else
+                {
+                    List<Vector3> linePoints = new List<Vector3>();
+                    int numSegments = drawPoints.Count - 1;
+                    int samplesPerSegment = 20;
+                    bool isBSpline = (block.CommandType == "bspline");
+
+                    for (int i = 0; i < numSegments; i++)
+                    {
+                        Vector3 p1 = drawPoints[i];
+                        Vector3 p2 = drawPoints[i + 1];
+
+                        // ガイド点 p0 の計算 (始点側)
+                        Vector3 p0;
+                        if (i > 0)
+                        {
+                            p0 = drawPoints[i - 1];
+                        }
+                        else
+                        {
+                            // 最初の区間の場合
+                            if (block.HasCnct && prevBlock != null && prevBlock.Handles.Count >= 2)
+                            {
+                                // cnct時は、前のブロックの「後ろから2番目」をガイドにする
+                                p0 = prevBlock.Handles[prevBlock.Handles.Count - 2].transform.position;
+                            }
+                            else
+                            {
+                                p0 = p1;
+                            }
+                        }
+
+                        // ガイド点 p3 の計算 (終点側)
+                        Vector3 p3;
+                        if (i < numSegments - 1)
+                        {
+                            p3 = drawPoints[i + 2];
+                        }
+                        else
+                        {
+                            // ★修正: 最後の区間の処理
+                            // 「次のブロック」が存在し、かつ「次のブロックがcnct (接続) モード」である場合、
+                            // 現在の軌道は次のブロックの始点へ向かって滑らかに繋がるべきなので、
+                            // 次のブロックの最初のハンドルを P3 (ガイド点) として参照する。
+                            if (nextBlock != null && nextBlock.HasCnct && nextBlock.Handles.Count > 0)
+                            {
+                                p3 = nextBlock.Handles[0].transform.position;
+                            }
+                            else
+                            {
+                                // 接続がない場合は従来どおり p2 を代用 (あるいは p2 + (p2-p1) 等で外挿)
+                                p3 = p2;
+                            }
+                        }
+
+                        for (int j = 0; j <= samplesPerSegment; j++)
+                        {
+                            float t = j / (float)samplesPerSegment;
+                            if (isBSpline)
+                            {
+                                linePoints.Add(GetBSplinePosition(p0, p1, p2, p3, t));
+                            }
+                            else
+                            {
+                                linePoints.Add(GetCatmullRomPosition(p0, p1, p2, p3, t));
+                            }
+                        }
+                    }
+                    block.PathLineRenderer.positionCount = linePoints.Count;
+                    block.PathLineRenderer.SetPositions(linePoints.ToArray());
                 }
             }
 
-            activeLineRenderer.positionCount = linePoints.Count;
-            activeLineRenderer.SetPositions(linePoints.ToArray());
+            // 2. 注視点軌道 (Linear)
+            if (block.IsMovingTargetMode && block.TargetStartHandle != null && block.TargetEndHandle != null && block.TargetLineRenderer != null)
+            {
+                block.TargetLineRenderer.positionCount = 2;
+                block.TargetLineRenderer.SetPosition(0, block.TargetStartHandle.transform.position);
+                block.TargetLineRenderer.SetPosition(1, block.TargetEndHandle.transform.position);
+            }
         }
 
-        /// <summary>
-        /// マーカーの座標をq_...形式のコマンド文字列に再構築
-        /// </summary>
+        // --- コマンド再構築 ---
+
         private string RebuildCommandString()
         {
-            StringBuilder sb = new StringBuilder("spline");
-            if (!string.IsNullOrEmpty(originalTargetParams))
+            StringBuilder fullSb = new StringBuilder();
+
+            for (int b = 0; b < splineBlocks.Count; b++)
             {
-                sb.Append(",");
-                sb.Append(originalTargetParams);
+                var block = splineBlocks[b];
+
+                if (b > 0) fullSb.Append(" ");
+
+                StringBuilder sb = new StringBuilder(block.CommandType);
+
+                if (block.TargetStartHandle != null)
+                {
+                    sb.Append(",");
+                    Vector3 finalStart = EditorToFinal(block.TargetStartHandle.transform.position);
+
+                    if (block.IsMovingTargetMode && block.TargetEndHandle != null)
+                    {
+                        Vector3 finalEnd = EditorToFinal(block.TargetEndHandle.transform.position);
+                        sb.AppendFormat(CultureInfo.InvariantCulture, "{0:0.##},{1:0.##},{2:0.##},{3:0.##},{4:0.##},{5:0.##}",
+                            finalStart.x, finalStart.y, finalStart.z,
+                            finalEnd.x, finalEnd.y, finalEnd.z);
+                    }
+                    else
+                    {
+                        sb.AppendFormat(CultureInfo.InvariantCulture, "{0:0.##},{1:0.##},{2:0.##}",
+                            finalStart.x, finalStart.y, finalStart.z);
+                    }
+                }
+
+                for (int i = 0; i < block.Handles.Count; i++)
+                {
+                    sb.Append(",");
+                    Vector3 finalPos = EditorToFinal(block.Handles[i].transform.position);
+                    SplinePointData data = block.PointData[i];
+
+                    string q_str = string.Format(CultureInfo.InvariantCulture,
+                        "q_{0:0.##}_{1:0.##}_{2:0.##}_0_0_{3:0.#}_{4:F0}",
+                        finalPos.x, finalPos.y, finalPos.z, data.rz, data.fov
+                    );
+                    sb.Append(q_str);
+                }
+
+                if (!string.IsNullOrEmpty(block.EaseName))
+                {
+                    sb.Append(",");
+                    sb.Append(block.EaseName);
+                }
+
+                if (block.HasCnct) sb.Append(",cnct");
+                if (block.HasSync) sb.Append(",sync");
+
+                foreach (var p in block.OtherParams)
+                {
+                    sb.Append(",");
+                    sb.Append(p);
+                }
+
+                fullSb.Append(sb.ToString());
             }
-            for (int i = 0; i < controlPointHandles.Count; i++)
-            {
-                sb.Append(",");
-                Vector3 editorPos = controlPointHandles[i].transform.position;
-                Vector3 finalPos = EditorToFinal(editorPos);
-                SplinePointData data = pointDataCache[i];
-                string q_str = string.Format(CultureInfo.InvariantCulture,
-                    "q_{0:0.##}_{1:0.##}_{2:0.##}_0_0_{3:0.#}_{4:F0}",
-                    finalPos.x, finalPos.y, finalPos.z, data.rz, data.fov
-                );
-                sb.Append(q_str);
-            }
-            if (!string.IsNullOrEmpty(originalEaseName))
-            {
-                sb.Append(",");
-                sb.Append(originalEaseName);
-            }
-            return sb.ToString();
+
+            return fullSb.ToString();
         }
 
         private void Cleanup()
         {
-            foreach (GameObject handle in controlPointHandles)
+            foreach (var block in splineBlocks)
             {
-                if (handle != null) Destroy(handle);
+                foreach (var h in block.Handles) if (h) Destroy(h);
+                if (block.TargetStartHandle) Destroy(block.TargetStartHandle);
+                if (block.TargetEndHandle) Destroy(block.TargetEndHandle);
+                if (block.PathLineRenderer) Destroy(block.PathLineRenderer.gameObject);
+                if (block.TargetLineRenderer) Destroy(block.TargetLineRenderer.gameObject);
             }
-            controlPointHandles.Clear();
-            if (activeLineRenderer != null)
-            {
-                if (activeLineRenderer.gameObject != null) Destroy(activeLineRenderer.gameObject);
-            }
+            splineBlocks.Clear();
+            selectedHandle = null;
         }
 
-        // --- スプライン計算 (Catmull-Rom) ---
+        // --- 共通生成メソッド ---
+        private GameObject CreateHandle(string name, Vector3 pos, Color color)
+        {
+            GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            handle.name = name;
+            handle.transform.position = pos;
+            handle.transform.localScale = Vector3.one * handleScale;
+
+            Renderer r = handle.GetComponent<Renderer>();
+            if (r != null)
+            {
+                r.material.shader = Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply");
+                r.material.color = color;
+                r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                r.receiveShadows = false;
+            }
+            return handle;
+        }
+
+        private LineRenderer CreateLineRenderer(GameObject obj, Color color)
+        {
+            LineRenderer lr = obj.AddComponent<LineRenderer>();
+            lr.startWidth = lineWidth;
+            lr.endWidth = lineWidth;
+            lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+            lr.startColor = color;
+            lr.endColor = color;
+            lr.useWorldSpace = true;
+            return lr;
+        }
+
+        // --- 座標変換 ---
+        private Vector3 EditorToFinal(Vector3 editorPos)
+        {
+            float scale = Options.Instance.avatarCameraScale;
+            if (Mathf.Abs(scale) < 1e-6) return editorPos;
+            Vector3 pos = editorPos;
+            pos -= new Vector3(0, Options.Instance.originMatchOffsetY, Options.Instance.originMatchOffsetZ);
+            pos /= scale;
+            pos -= new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
+            return pos;
+        }
+
+        private Vector3 FinalToEditor(Vector3 finalPos)
+        {
+            Vector3 pos = finalPos;
+            pos += new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
+            pos *= Options.Instance.avatarCameraScale;
+            pos += new Vector3(0, Options.Instance.originMatchOffsetY, Options.Instance.originMatchOffsetZ);
+            return pos;
+        }
+
+        // --- 数学関数 ---
         private static float CatmullRomInterpolate(float p0, float p1, float p2, float p3, float t)
         {
             float t2 = t * t;
             float t3 = t2 * t;
-
-            return 0.5f * ((2f * p1) +
-                            (-p0 + p2) * t +
-                            (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 +
-                            (-p0 + 3f * p1 - 3f * p2 + p3) * t3);
+            return 0.5f * ((2f * p1) + (-p0 + p2) * t + (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 + (-p0 + 3f * p1 - 3f * p2 + p3) * t3);
         }
         private static Vector3 GetCatmullRomPosition(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
         {
@@ -347,34 +576,22 @@ namespace ChroMapper_CameraMovement.Component
             );
         }
 
-        /// <summary>
-        /// ChroMapper座標を q_...座標に変換
-        /// </summary>
-        private Vector3 EditorToFinal(Vector3 editorPos)
+        private static float BSplineInterpolate(float p0, float p1, float p2, float p3, float t)
         {
-            float scale = Options.Instance.avatarCameraScale;
-            if (Mathf.Abs(scale) < 1e-6)
-            {
-                Debug.LogError("SplineEditor: avatarCameraScale がゼロのため、座標を正しく逆変換できません。");
-                return editorPos;
-            }
-            Vector3 pos = editorPos;
-            pos -= new Vector3(0, Options.Instance.originMatchOffsetY, Options.Instance.originMatchOffsetZ);
-            pos /= scale;
-            pos -= new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
-            return pos;
+            float t2 = t * t;
+            float t3 = t2 * t;
+            return (p0 * Mathf.Pow(1 - t, 3) +
+                    p1 * (3 * t3 - 6 * t2 + 4) +
+                    p2 * (-3 * t3 + 3 * t2 + 3 * t + 1) +
+                    p3 * t3) / 6.0f;
         }
-
-        /// <summary>
-        /// q_...座標をChroMpper座標に変換
-        /// </summary>
-        private Vector3 FinalToEditor(Vector3 finalPos)
+        private static Vector3 GetBSplinePosition(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
         {
-            Vector3 pos = finalPos;
-            pos += new Vector3(Options.Instance.originXoffset, Options.Instance.originYoffset, Options.Instance.originZoffset);
-            pos *= Options.Instance.avatarCameraScale;
-            pos += new Vector3(0, Options.Instance.originMatchOffsetY, Options.Instance.originMatchOffsetZ);
-            return pos;
+            return new Vector3(
+                BSplineInterpolate(p0.x, p1.x, p2.x, p3.x, t),
+                BSplineInterpolate(p0.y, p1.y, p2.y, p3.y, t),
+                BSplineInterpolate(p0.z, p1.z, p2.z, p3.z, t)
+            );
         }
     }
 }

@@ -240,7 +240,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             if (activeEditorInstance == null)
             {
                 string command = bookmarkMenuInputText.InputField.text.Trim();
-                if (!command.StartsWith("spline", System.StringComparison.OrdinalIgnoreCase))
+                if (!command.StartsWith("spline", System.StringComparison.OrdinalIgnoreCase) && !command.StartsWith("bspline", System.StringComparison.OrdinalIgnoreCase))
                 {
                     Debug.LogWarning("SplineEditor: spline コマンドではありません。");
                     return;

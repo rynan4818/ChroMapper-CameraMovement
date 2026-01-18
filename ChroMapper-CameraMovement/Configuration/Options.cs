@@ -24,6 +24,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public float avatarArmSize = 1.17f;
         public string scriptFileName = "SongScript.json";
         public string scriptMapperExe = "scriptmapper.exe";
+        public bool scriptMapperIronPython = false;
         public string scriptMapperLog = "log_latest.txt";
         public int bookmarkWidth = 10;
         public bool bookmarkLines = true;

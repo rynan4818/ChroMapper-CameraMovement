@@ -6,6 +6,7 @@ using ChroMapper_CameraMovement.Component;
 using ChroMapper_CameraMovement.UserInterface;
 using ChroMapper_CameraMovement.Util;
 using ChroMapper_CameraMovement.Configuration;
+using ChroMapper_CameraMovement.Controller;
 
 namespace ChroMapper_CameraMovement
 {
@@ -45,6 +46,12 @@ namespace ChroMapper_CameraMovement
             movement = new GameObject("CameraMovement").AddComponent<CameraMovementController>();
             MapEditorUI mapEditorUI = UnityEngine.Object.FindObjectOfType<MapEditorUI>();
             _ui.AddMenu(mapEditorUI);
+
+            // IronPythonエンジンの先行初期化
+            if (Options.Instance.scriptMapperIronPython)
+            {
+                IronPythonController.Instance.Initialize();
+            }
         }
     }
 }

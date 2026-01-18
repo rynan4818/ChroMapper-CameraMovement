@@ -36,6 +36,16 @@ namespace ChroMapper_CameraMovement.Controller
                 UnityEngine.Debug.LogError("No map data!");
                 return;
             }
+
+            // IronPython Mode
+            if (Options.Instance.scriptMapperIronPython)
+            {
+                IronPythonController.Instance.ExecuteScriptMapper(path, () => {
+                    ScriptMapperFinished?.Invoke();
+                });
+                return;
+            }
+
             var scriptmapper = Path.Combine(Environment.CurrentDirectory, Options.Instance.scriptMapperExe);
             if (!File.Exists(scriptmapper))
             {

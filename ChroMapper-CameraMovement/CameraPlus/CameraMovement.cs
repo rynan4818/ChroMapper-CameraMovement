@@ -271,6 +271,26 @@ namespace ChroMapper_CameraMovement.CameraPlus
             return new Vector3(Mathf.LerpAngle(from.x, to.x, percent), Mathf.LerpAngle(from.y, to.y, percent), Mathf.LerpAngle(from.z, to.z, percent));
         }
 
+        public bool LoadFromJson(string jsonText)
+        {
+            if (data.LoadFromJson(jsonText))
+            {
+                if (data.Movements.Count == 0)
+                {
+                    Debug.Log("CameraMovement:No movement data!");
+                    return false;
+                }
+                eventID = 0;
+                UpdatePosAndRot();
+                dataLoaded = true;
+
+                Debug.Log($"CameraMovement:Loaded {data.Movements.Count} movements from JSON data.");
+                return true;
+            }
+            dataLoaded = false;
+            return false;
+        }
+
         public bool LoadCameraData(string pathFile)
         {
             string path = pathFile;
@@ -281,17 +301,8 @@ namespace ChroMapper_CameraMovement.CameraPlus
                 movementsFileTime = movementTimeStamp;
                 dataLoaded = false;
                 string jsonText = File.ReadAllText(path);
-                if (data.LoadFromJson(jsonText))
+                if (LoadFromJson(jsonText))
                 {
-                    if (data.Movements.Count == 0)
-                    {
-                        Debug.Log("CameraMovement:No movement data!");
-                        return false;
-                    }
-                    eventID = 0;
-                    UpdatePosAndRot();
-                    dataLoaded = true;
-
                     Debug.Log($"CameraMovement:Found {data.Movements.Count} entries in: {path}");
                     return true;
                 }

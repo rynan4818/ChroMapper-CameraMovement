@@ -191,6 +191,9 @@
     <Compile Include="Controller\VRMAvatarController.cs" />
     <Compile Include="Util\TimeoutTimer.cs" />
     <Compile Include="Util\UnityUtility.cs" />
+    <Compile Include="Util\OscClient.cs" />
+    <Compile Include="Util\OscDataTypes.cs" />
+    <Compile Include="Util\OscPacketEncoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icon.png" />

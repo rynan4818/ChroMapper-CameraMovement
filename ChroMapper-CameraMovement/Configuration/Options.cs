@@ -141,6 +141,8 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool vrmSpringBone = false;
         public bool orbitTargetObject = true;
         public string nalulunaAvatarsEventFileName = "NalulunaAvatarsEvents.json";
+        public bool ocsEnable = false;
+        public int ocsPort = 42818;
 
         public static Options Instance {
             get {

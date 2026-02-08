@@ -11,6 +11,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using ChroMapper_CameraMovement.Configuration;
 using ChroMapper_CameraMovement.Component;
+using ScriptMapper.Core.Models;
 
 namespace ChroMapper_CameraMovement.CameraPlus
 {
@@ -191,6 +192,131 @@ namespace ChroMapper_CameraMovement.CameraPlus
                 }
                 return false;
             }
+
+            /// <summary>
+            /// ScriptMapper.Core.Map() の戻り値 (SongScriptData) を直接読み込みます。
+            /// DTOクラスを使用しているため、型安全かつ高速にデータを変換できます。
+            /// </summary>
+            public bool LoadFromScriptMapperResult(SongScriptData result)
+            {
+                durationErrorWarning = false;
+                float duration_sum = 0;
+                decimal duration_sumd = 0;
+                MaxDurationError = 0;
+                MinDurationError = 0;
+                TotalDurationError = 0;
+                Movements.Clear();
+
+                try
+                {
+                    if (result == null) return false;
+
+                    // 全体設定の取得
+                    ActiveInPauseMenu = result.ActiveInPauseMenu;
+                    TurnToHeadUseCameraSetting = result.TurnToHeadUseCameraSetting;
+
+                    // 各 Movement データの解析
+                    if (result.Movements != null)
+                    {
+                        foreach (var mData in result.Movements)
+                        {
+                            var newMovement = new Movements();
+
+                            // 座標/回転データの取得 (Vector3Data/Vector3FovData から Unity Vector3 へ変換)
+                            // ただし double -> float のキャストが必要
+
+                            if (mData.StartPos != null)
+                            {
+                                newMovement.StartPos = new Vector3((float)mData.StartPos.x, (float)mData.StartPos.y, (float)mData.StartPos.z);
+                                newMovement.StartFOV = (float)mData.StartPos.FOV;
+                            }
+
+                            if (mData.StartRot != null)
+                                newMovement.StartRot = new Vector3((float)mData.StartRot.x, (float)mData.StartRot.y, (float)mData.StartRot.z);
+                            else
+                                newMovement.StartRot = Vector3.zero;
+
+                            if (mData.StartHeadOffset != null)
+                                newMovement.StartHeadOffset = new Vector3((float)mData.StartHeadOffset.x, (float)mData.StartHeadOffset.y, (float)mData.StartHeadOffset.z);
+                            else
+                                newMovement.StartHeadOffset = Vector3.zero;
+
+                            if (mData.EndPos != null)
+                            {
+                                newMovement.EndPos = new Vector3((float)mData.EndPos.x, (float)mData.EndPos.y, (float)mData.EndPos.z);
+                                newMovement.EndFOV = (float)mData.EndPos.FOV;
+                            }
+
+                            if (mData.EndRot != null)
+                                newMovement.EndRot = new Vector3((float)mData.EndRot.x, (float)mData.EndRot.y, (float)mData.EndRot.z);
+                            else
+                                newMovement.EndRot = Vector3.zero;
+
+                            if (mData.EndHeadOffset != null)
+                                newMovement.EndHeadOffset = new Vector3((float)mData.EndHeadOffset.x, (float)mData.EndHeadOffset.y, (float)mData.EndHeadOffset.z);
+                            else
+                                newMovement.EndHeadOffset = Vector3.zero;
+
+                            // VisibleObject (各表示フラグ)
+                            if (mData.VisibleObject != null)
+                            {
+                                newMovement.SectionVisibleObject = new VisibleObject();
+                                var v = mData.VisibleObject;
+                                if (v.ContainsKey("avatar")) newMovement.SectionVisibleObject.avatar = v["avatar"];
+                                if (v.ContainsKey("ui")) newMovement.SectionVisibleObject.ui = v["ui"];
+                                if (v.ContainsKey("wall")) newMovement.SectionVisibleObject.wall = v["wall"];
+                                if (v.ContainsKey("wallFrame")) newMovement.SectionVisibleObject.wallFrame = v["wallFrame"];
+                                if (v.ContainsKey("saber")) newMovement.SectionVisibleObject.saber = v["saber"];
+                                if (v.ContainsKey("notes")) newMovement.SectionVisibleObject.notes = v["notes"];
+                                if (v.ContainsKey("debris")) newMovement.SectionVisibleObject.debris = v["debris"];
+                            }
+
+                            // その他のフラグと時間
+                            newMovement.TurnToHead = mData.TurnToHead;
+                            newMovement.TurnToHeadHorizontal = mData.TurnToHeadHorizontal;
+                            newMovement.Delay = (float)mData.Delay;
+
+                            float duration = (float)mData.Duration;
+                            newMovement.Duration = Mathf.Clamp(duration, 0.01f, float.MaxValue);
+
+                            // 精度誤差計算
+                            duration_sum += newMovement.Duration;
+                            decimal duration_d = (decimal)mData.Duration;
+                            duration_sumd += duration_d;
+
+                            float duration_error = duration_sum - (float)duration_sumd;
+                            if (MaxDurationError < duration_error) MaxDurationError = duration_error;
+                            if (MinDurationError > duration_error) MinDurationError = duration_error;
+
+                            newMovement.EaseTransition = mData.EaseTransition;
+
+                            Movements.Add(newMovement);
+                        }
+
+                        TotalDurationError = duration_sum - (float)duration_sumd;
+                        Debug.Log($"Duration total error: {Math.Round(TotalDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
+                        Debug.Log($"Duration max error: {Math.Round(MaxDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
+                        Debug.Log($"Duration min error: {Math.Round(MinDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms");
+                        if (MaxDurationError > Options.Instance.durationErrorWarning)
+                        {
+                            durationErrorWarning = true;
+                            PersistentUI.Instance.DisplayMessage($"Duration max error: {Math.Round(MaxDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms", PersistentUI.DisplayMessageType.Bottom);
+                        }
+                        if (-MinDurationError > Options.Instance.durationErrorWarning)
+                        {
+                            durationErrorWarning = true;
+                            PersistentUI.Instance.DisplayMessage($"Duration min error: {Math.Round(MinDurationError, 4, MidpointRounding.AwayFromZero) * 1000f}ms", PersistentUI.DisplayMessageType.Bottom);
+                        }
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"CameraMovement: ScriptMapper result loading failed. {ex.Message}");
+                }
+                return false;
+            }
+
         }
 
         public void CameraUpdate(float currentSeconds, GameObject cm_MapEditorCamera, Camera sub_camera, Vector3 turnToTarget)
@@ -295,6 +421,27 @@ namespace ChroMapper_CameraMovement.CameraPlus
                     Debug.Log($"CameraMovement:Found {data.Movements.Count} entries in: {path}");
                     return true;
                 }
+            }
+            dataLoaded = false;
+            return false;
+        }
+
+        public bool LoadCameraData(SongScriptData result)
+        {
+            dataLoaded = false;
+            if (data.LoadFromScriptMapperResult(result))
+            {
+                if (data.Movements.Count == 0)
+                {
+                    Debug.Log("CameraMovement:No movement data!");
+                    return false;
+                }
+                eventID = 0;
+                UpdatePosAndRot();
+                dataLoaded = true;
+
+                Debug.Log($"CameraMovement:Found {data.Movements.Count} entries in ScriptMapper");
+                return true;
             }
             dataLoaded = false;
             return false;

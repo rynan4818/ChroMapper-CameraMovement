@@ -30,6 +30,11 @@ namespace ChroMapper_CameraMovement.Controller
 
         public void ScriptMapperRun()
         {
+            if (Options.Instance.scriptMapperCSharp)
+            {
+                _ = ScriptMapperCSharpController.Instance.ScriptMapperRun();
+                return;
+            }
             var path = CameraMovementController.MapGet();
             if (!File.Exists(path))
             {

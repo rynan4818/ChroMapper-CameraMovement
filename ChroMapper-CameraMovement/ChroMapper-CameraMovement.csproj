@@ -151,6 +151,9 @@
     <Reference Include="VRMShaders.GLTF.IO.Runtime">
       <HintPath>DLL\VRMShaders.GLTF.IO.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="ScriptMapper.Core">
+      <HintPath>DLL\ScriptMapper.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CameraPlus\CameraMovement.cs" />
@@ -170,6 +173,7 @@
     <Compile Include="Controller\BlendShapeController.cs" />
     <Compile Include="Controller\BookmarkController.cs" />
     <Compile Include="Controller\MovementPlayerController.cs" />
+    <Compile Include="Controller\ScriptMapperCSharpController.cs" />
     <Compile Include="Controller\WindowController.cs" />
     <Compile Include="HarmonyPatches\CameraController_SetLockStatePatch.cs" />
     <Compile Include="HarmonyPatches\BookmarkRenderingController_SetGridBookmarkNameColorPatch.cs" />
@@ -183,6 +187,7 @@
     <Compile Include="UserInterface\MainMenuUI.cs" />
     <Compile Include="UserInterface\MovementPlayerUI.cs" />
     <Compile Include="UserInterface\MultiDisplayUI.cs" />
+    <Compile Include="Util\ScriptMapperLogger.cs" />
     <Compile Include="UserInterface\SettingMenuUI.cs" />
     <Compile Include="UserInterface\UI.cs" />
     <Compile Include="Util\AddVRMShaders.cs" />

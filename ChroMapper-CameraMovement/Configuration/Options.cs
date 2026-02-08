@@ -141,6 +141,7 @@ namespace ChroMapper_CameraMovement.Configuration
         public bool vrmSpringBone = false;
         public bool orbitTargetObject = true;
         public string nalulunaAvatarsEventFileName = "NalulunaAvatarsEvents.json";
+        public bool scriptMapperCSharp = true;
 
         public static Options Instance {
             get {

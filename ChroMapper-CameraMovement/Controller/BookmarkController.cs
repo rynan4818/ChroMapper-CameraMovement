@@ -50,6 +50,8 @@ namespace ChroMapper_CameraMovement.Controller
             BookmarkWidthChange();
             BookmarkTrackSet();
             BookMarkUpdate();
+            if (Options.Instance.scriptMapperCSharp)
+                _ = ScriptMapperCSharpController.Instance.ScriptMapperRun();
         }
         public void BookMarkUpdate()
         {

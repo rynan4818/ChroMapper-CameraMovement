@@ -121,6 +121,12 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (!Options.Instance.cameraMovementEnable) return;
                 movementController.Reload();
             });
+            UI.AddCheckbox(_cameraMovementMainMenu.transform, "OSC Sender", "OSC Sender", new Vector2(0, -190), movementController.oscSender, (check) =>
+            {
+                movementController.oscSender = check;
+                if (!Options.Instance.cameraMovementEnable) return;
+                movementController.OscSenderSet();
+            });
 
             var mainMenuMoreSettingsButton = UI.AddButton(_cameraMovementMainMenu.transform, "More Settings", "More Settings", () =>
             {
@@ -128,14 +134,14 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI._settingMenuUI._cameraMovementSettingMenu.SetActive(true);
                 UI.KeyDisableCheck();
             });
-            UI.MoveTransform(mainMenuMoreSettingsButton.transform, 70, 25, 0.28f, 1, 0, -200);
+            UI.MoveTransform(mainMenuMoreSettingsButton.transform, 70, 23, 0.28f, 1, 0, -212);
 
             var mainMenuReloadButton = UI.AddButton(_cameraMovementMainMenu.transform, "Reload", "Reload", () =>
             {
                 if (!Options.Instance.cameraMovementEnable) return;
                 movementController.Reload();
             });
-            UI.MoveTransform(mainMenuReloadButton.transform, 70, 25, 0.72f, 1, 0, -200);
+            UI.MoveTransform(mainMenuReloadButton.transform, 70, 23, 0.72f, 1, 0, -212);
 
             var mainMenuMultiDisplayButton = UI.AddButton(_cameraMovementMainMenu.transform, "Multi Display", "Multi Display", () =>
             {
@@ -143,7 +149,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI._multiDisplayUI._cameraMovementMultiDisplay.SetActive(true);
                 UI.KeyDisableCheck();
             });
-            UI.MoveTransform(mainMenuMultiDisplayButton.transform, 70, 25, 0.28f, 1, 0, -230);
+            UI.MoveTransform(mainMenuMultiDisplayButton.transform, 70, 23, 0.28f, 1, 0, -238);
 
             var regexKey = new Regex(@"<\w+>/");
             var mainMenuScriptMapperRunButton = UI.AddButton(_cameraMovementMainMenu.transform, "Script Mapper Run", $"Script Mapper Run [{regexKey.Replace(Options.Instance.scriptMapperKeyBinding, "").ToUpper()}]", () =>
@@ -151,13 +157,13 @@ namespace ChroMapper_CameraMovement.UserInterface
                 if (!Options.Instance.cameraMovementEnable) return;
                 ScriptMapperController.Instance.ScriptMapperRun();
             });
-            UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 25, 0.72f, 1, 0, -230);
+            UI.MoveTransform(mainMenuScriptMapperRunButton.transform, 70, 23, 0.72f, 1, 0, -238);
 
             var mainMenuSettingSaveButton = UI.AddButton(_cameraMovementMainMenu.transform, "Setting Save", "Setting Save", () =>
             {
                 Options.Instance.SettingSave();
             });
-            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 25, 0.28f, 1, 0, -260);
+            UI.MoveTransform(mainMenuSettingSaveButton.transform, 70, 23, 0.28f, 1, 0, -264);
 
             var movementPlayerButton = UI.AddButton(_cameraMovementMainMenu.transform, "Movement Player", "Movement Player", () =>
             {
@@ -166,20 +172,20 @@ namespace ChroMapper_CameraMovement.UserInterface
                 UI._movementPlayerUI._movementPlayerMenu.SetActive(true);
                 UI.KeyDisableCheck();
             });
-            UI.MoveTransform(movementPlayerButton.transform, 70, 25, 0.72f, 1, 0, -260);
+            UI.MoveTransform(movementPlayerButton.transform, 70, 23, 0.72f, 1, 0, -264);
 
             var mainMenuCloseButton = UI.AddButton(_cameraMovementMainMenu.transform, "Close", "Close", () =>
             {
                 _cameraMovementMainMenu.SetActive(false);
             });
-            UI.MoveTransform(mainMenuCloseButton.transform, 70, 25, 0.72f, 1, 0, -290);
+            UI.MoveTransform(mainMenuCloseButton.transform, 70, 23, 0.72f, 1, 0, -290);
 
             mainMenuCounterButton = UI.AddButton(_cameraMovementMainMenu.transform, "Counter", "0 s:0 f", () =>
             {
                 counterOffset = CameraMovementController.atsc.CurrentSeconds;
                 UpdateCounter();
             });
-            UI.MoveTransform(mainMenuCounterButton.transform, 70, 25, 0.28f, 1, 0, -290);
+            UI.MoveTransform(mainMenuCounterButton.transform, 70, 23, 0.28f, 1, 0, -290);
 
             _cameraMovementMainMenu.SetActive(false);
             UI._extensionBtn.Click = () =>

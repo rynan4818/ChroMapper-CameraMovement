@@ -36,6 +36,7 @@ namespace ChroMapper_CameraMovement.Component
         public static MovementPlayerController movementPlayerController;
         public static MovementPlayerOptions movementPlayerOptions;
         public static NalulunaAvatarsEventController nalulunaAvatarsEventController;
+        public static OscController oscController;
         public static GameObject cm_MapEditorCamera;
         public static GameObject cm_UIMode;
         public static GameObject avatarHead;
@@ -105,6 +106,8 @@ namespace ChroMapper_CameraMovement.Component
         public int customSaberLoad = 0;
         public bool movementPlayerLoadActive;
         public float playersPlaceDefault = 0;
+        public bool oscSender = false;
+
         public static List<(Transform, Vector3, Quaternion, Vector3)> avatarDefaultTransform { set; get; }
         public static List<(Transform, Vector3, Quaternion, Vector3)> saberDefaultTransform { set; get; }
 
@@ -675,6 +678,24 @@ namespace ChroMapper_CameraMovement.Component
             input1000upAction.Disable();
             input1000downAction.Disable();
         }
+
+        public void OscSenderSet()
+        {
+            if (oscSender)
+                oscController.Connect();
+            else
+                oscController.Disconnect();
+        }
+
+        public void OscSend()
+        {
+            var beat = atsc.CurrentSongBpmTime;
+            var pos = CameraPositionGet();
+            var rot = CameraTransformGet();
+            var fov = CameraFOVGet();
+            oscController.SendState(pos, rot.rotation, fov, beat);
+        }
+
         private IEnumerator Start()
         {
             _cameraMovement = new CameraMovement();
@@ -684,6 +705,7 @@ namespace ChroMapper_CameraMovement.Component
             vrmAvatarController = new VRMAvatarController();
             movementPlayerController = new MovementPlayerController();
             movementPlayerOptions = MovementPlayerOptions.SettingLoad();
+            oscController = new OscController();
 
             orbitCamera = this.gameObject.AddComponent<OrbitCameraController>();
             plusCamera = this.gameObject.AddComponent<PlusCameraController>();
@@ -951,6 +973,7 @@ namespace ChroMapper_CameraMovement.Component
                 if (VRMAvatarController.avatar != null && VRMAvatarController.avatar.Root.activeSelf && VRMAvatarController.blendShapeController != null)
                     VRMAvatarController.blendShapeController.SongTimeUpdate(atsc.CurrentSeconds);
                 UI._mainMenuUI.UpdateCounter();
+                OscSend();
             }
             GameObject targetCamera;
             float targetFOV;
@@ -975,6 +998,7 @@ namespace ChroMapper_CameraMovement.Component
                 beforePositon = targetCamera.transform.position;
                 beforeRotation = targetCamera.transform.rotation;
                 beforeFOV = targetFOV;
+                OscSend();
             }
             if (!Options.Instance.cameraDirectionScrollReversal) return;
             if (Options.Instance.cameraControlSub)
@@ -1008,6 +1032,7 @@ namespace ChroMapper_CameraMovement.Component
 
         private void OnDestroy()
         {
+            oscController.Disconnect();
             _bookmarkController.OnDestroy();
             SpectrogramSideSwapper_SwapSidesPatch.OnSwapSides -= WaveFormOffset;
             atsc.PlayToggle -= OnPlayToggle;

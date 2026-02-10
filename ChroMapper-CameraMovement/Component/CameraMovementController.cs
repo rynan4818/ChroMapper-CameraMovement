@@ -690,10 +690,11 @@ namespace ChroMapper_CameraMovement.Component
         public void OscSend()
         {
             var beat = atsc.CurrentSongBpmTime;
+            var seconds = atsc.CurrentSeconds;
             var pos = CameraPositionGet();
             var rot = CameraTransformGet();
             var fov = CameraFOVGet();
-            oscController.SendState(pos, rot.rotation, fov, beat);
+            oscController.SendState(pos, rot.rotation, fov, beat, seconds);
         }
 
         private IEnumerator Start()

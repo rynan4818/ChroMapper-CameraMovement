@@ -36,7 +36,7 @@ namespace ChroMapper_CameraMovement.Controller
         /// 送信処理: カメラ座標・角度・FOV・再生位置を引数に受け取って接続中なら送信します。
         /// 未接続状態ならfalseを返します。
         /// </summary>
-        public bool SendState(Vector3 pos, Quaternion rot, float fov, float currentBeat)
+        public bool SendState(Vector3 pos, Quaternion rot, float fov, float currentBeat, float currentSeconds)
         {
             if (!IsConnected || _client == null)
             {
@@ -47,7 +47,7 @@ namespace ChroMapper_CameraMovement.Controller
                 _client.Send("/camera/info", "Camera", new float[] {
                     pos.x, pos.y, pos.z,
                     rot.x, rot.y, rot.z, rot.w,
-                    fov, currentBeat
+                    fov, currentBeat, currentSeconds
                 });
                 return true;
             }

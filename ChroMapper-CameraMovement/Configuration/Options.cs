@@ -77,6 +77,12 @@ namespace ChroMapper_CameraMovement.Configuration
         public float multiDisplayMenuUIAnchoredPosY = 0;
         public float movementPlayerUIAnchoredPosX = 0;
         public float movementPlayerUIAnchoredPosY = 0;
+        public float packageExportMenuUIAnchoredPosX = 0;
+        public float packageExportMenuUIAnchoredPosY = 0;
+        public string packageExportCameraScriptAuthorName = "";
+        public string packageExportNamingMode = "Default";
+        public string packageExportCustomFormat = "{MapId}_{SongName}_{LevelAuthorName}";
+        public string packageExportPackagingMode = "FolderKeepOriginalJson";
         public float orbitDefaultFOV = 60f;
         public float orbitRotSensitivity = 0.5f;
         public float orbitZoomSensitivity = 0.001f;

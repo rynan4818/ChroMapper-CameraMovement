@@ -32,7 +32,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         {
             movementController = Plugin.movement;
             //Main Menu
-            _cameraMovementMainMenu = UI.SetMenu(new GameObject("CameraMovement Menu"), topBarCanvas, AnchoredPosSave, 170, 315, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY);
+            _cameraMovementMainMenu = UI.SetMenu(new GameObject("CameraMovement Menu"), topBarCanvas, AnchoredPosSave, 170, 340, Options.Instance.mainMenuUIAnchoredPosX, Options.Instance.mainMenuUIAnchoredPosY);
             var cameraMovementTitle = UI.AddCheckbox(_cameraMovementMainMenu.transform, "CameraMovement", "CameraMovement", new Vector2(-17, -19), Options.Instance.cameraMovementEnable, (check) =>
             {
                 Options.Instance.cameraMovementEnable = check;
@@ -48,6 +48,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     UI._cameraControlMenuUI._cameraControlMenu.SetActive(false);
                     UI._settingMenuUI._cameraMovementSettingMenu.SetActive(false);
                     UI._multiDisplayUI._cameraMovementMultiDisplay.SetActive(false);
+                    UI._packageExportMenuUI._cameraMovementPackageExportMenu.SetActive(false);
                     Plugin.movement.KeyDisable();
                 }
                 movementController._bookmarkController?.BookMarkChangeUpdate();
@@ -174,6 +175,13 @@ namespace ChroMapper_CameraMovement.UserInterface
             });
             UI.MoveTransform(movementPlayerButton.transform, 70, 23, 0.72f, 1, 0, -264);
 
+            var packageExportButton = UI.AddButton(_cameraMovementMainMenu.transform, "Export Package", "Export Package", () =>
+            {
+                if (!Options.Instance.cameraMovementEnable) return;
+                UI._packageExportMenuUI.OpenMenu();
+            });
+            UI.MoveTransform(packageExportButton.transform, 70, 23, 0.28f, 1, 0, -290);
+
             var mainMenuCloseButton = UI.AddButton(_cameraMovementMainMenu.transform, "Close", "Close", () =>
             {
                 _cameraMovementMainMenu.SetActive(false);
@@ -185,7 +193,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 counterOffset = CameraMovementController.atsc.CurrentSeconds;
                 UpdateCounter();
             });
-            UI.MoveTransform(mainMenuCounterButton.transform, 70, 23, 0.28f, 1, 0, -290);
+            UI.MoveTransform(mainMenuCounterButton.transform, 70, 23, 0.28f, 1, 0, -316);
 
             _cameraMovementMainMenu.SetActive(false);
             UI._extensionBtn.Click = () =>

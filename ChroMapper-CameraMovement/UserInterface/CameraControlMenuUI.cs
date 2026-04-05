@@ -410,10 +410,10 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 else
                 {
-                    fov = Settings.Instance.CameraFOV;
+                    fov = movementController.CameraFOVGet();
                 }
                 movementController.CameraPositionAndRotationSet(new_position, new_rotation);
-                Settings.Instance.CameraFOV = fov;
+                movementController.CameraFOVSet(fov);
             });
             UI.MoveTransform(cameraControlMenuPasteButton.transform, 35, 20, 0, 1, 365, -40);
 
@@ -421,14 +421,15 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 var positon = movementController.CameraPositionGet();
                 var rotation = movementController.CameraTransformGet().eulerAngles;
+                var fov = movementController.CameraFOVGet();
                 string text;
                 if (Options.Instance.qFormat)
                 {
-                    text = $"q_{positon.x.ToString("0.##")}_{positon.y.ToString("0.##")}_{positon.z.ToString("0.##")}_{rotation.x.ToString("0.#")}_{rotation.y.ToString("0.#")}_{rotation.z.ToString("0.#")}_{Settings.Instance.CameraFOV.ToString("0.#")}";
+                    text = $"q_{positon.x.ToString("0.##")}_{positon.y.ToString("0.##")}_{positon.z.ToString("0.##")}_{rotation.x.ToString("0.#")}_{rotation.y.ToString("0.#")}_{rotation.z.ToString("0.#")}_{fov.ToString("0.#")}";
                 }
                 else
                 {
-                    text = $"{positon.x.ToString("0.##")}\t{positon.y.ToString("0.##")}\t{positon.z.ToString("0.##")}\tFALSE\t{rotation.x.ToString("0.#")}\t{rotation.y.ToString("0.#")}\t{rotation.z.ToString("0.#")}\t{Settings.Instance.CameraFOV.ToString("0.#")}";
+                    text = $"{positon.x.ToString("0.##")}\t{positon.y.ToString("0.##")}\t{positon.z.ToString("0.##")}\tFALSE\t{rotation.x.ToString("0.#")}\t{rotation.y.ToString("0.#")}\t{rotation.z.ToString("0.#")}\t{fov.ToString("0.#")}";
                 }
                 GUIUtility.systemCopyBuffer = text;
             });

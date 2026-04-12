@@ -46,7 +46,7 @@ namespace ChroMapper_CameraMovement.Component
             orbitActiveAction.started += OnOrbitActive;
             orbitActiveAction.performed += OnOrbitActive;
             orbitActiveAction.canceled += OnOrbitActive;
-            orbitActiveAction.Enable();
+            orbitActiveAction.Disable();
             orbitSubActiveAction = new InputAction("Orbit Sub Active");
             orbitSubActiveAction.AddBinding(Options.Instance.orbitSubActiveKeyBinding);
             orbitSubActiveAction.started += OnOrbitSubActive;

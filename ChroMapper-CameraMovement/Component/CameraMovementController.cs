@@ -964,15 +964,15 @@ namespace ChroMapper_CameraMovement.Component
 
             previewAction = new InputAction("Preview", binding: Options.Instance.previewKeyBinding);
             previewAction.performed += OnPreviewShortcut;
-            previewAction.Enable();
+            previewAction.Disable();
             scriptMapperAction = new InputAction("Script Mapper run", binding: Options.Instance.scriptMapperKeyBinding);
             scriptMapperAction.performed += OnScriptMapperShortcut;
-            scriptMapperAction.Enable();
+            scriptMapperAction.Disable();
             dragWindowsAction = new InputAction("Drag Windows", binding: Options.Instance.dragWindowKeyBinding);
             dragWindowsAction.started += OnDragWIndows;
             dragWindowsAction.performed += OnDragWIndows;
             dragWindowsAction.canceled += OnDragWIndows;
-            dragWindowsAction.Enable();
+            dragWindowsAction.Disable();
             subCameraRectAction = new InputAction("Sub Camera");
             subCameraRectAction.AddCompositeBinding("2DVector")
                 .With("Up", "<Keyboard>/upArrow")

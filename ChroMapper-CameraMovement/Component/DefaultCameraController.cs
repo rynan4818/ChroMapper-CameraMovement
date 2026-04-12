@@ -35,7 +35,7 @@ namespace ChroMapper_CameraMovement.Component
             defaultActiveAction.started += OnDefaultActive;
             defaultActiveAction.performed += OnDefaultActive;
             defaultActiveAction.canceled += OnDefaultActive;
-            defaultActiveAction.Enable();
+            defaultActiveAction.Disable();
             elevateActiveAction = new InputAction("DefaultCamera Elevate Action");
             elevateActiveAction.AddCompositeBinding("1DAxis")
                 .With("positive", Options.Instance.defaultCameraElevatePositiveKeyBinding)

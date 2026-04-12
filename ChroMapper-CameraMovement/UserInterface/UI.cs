@@ -479,13 +479,16 @@ namespace ChroMapper_CameraMovement.UserInterface
         }
         public static void InputRound(InputAction.CallbackContext context, int up)
         {
-            if (!context.ReadValueAsButton())
+            if (context.canceled)
             {
                 inputRoundActive = false;
                 return;
             }
-            if (inputRoundActive)
+
+            if (!context.performed || inputRoundActive)
                 return;
+
+            inputRoundActive = true;
             TextInputState currentInput;
             if (currentInputTextInput != null && focusMoveList.TryGetValue(currentInputTextInput, out currentInput))
             {

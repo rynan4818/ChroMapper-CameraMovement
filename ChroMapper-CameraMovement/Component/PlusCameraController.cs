@@ -35,7 +35,7 @@ namespace ChroMapper_CameraMovement.Component
             plusActiveAction.started += OnPlusActive;
             plusActiveAction.performed += OnPlusActive;
             plusActiveAction.canceled += OnPlusActive;
-            plusActiveAction.Enable();
+            plusActiveAction.Disable();
             zRotActiveAction = new InputAction("PlusCamera Z Rot Active");
             zRotActiveAction.AddBinding(Options.Instance.plusZrotActiveKeyBinding);
             zRotActiveAction.started += OnZrotActive;

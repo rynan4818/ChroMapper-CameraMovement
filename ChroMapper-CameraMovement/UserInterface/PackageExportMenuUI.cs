@@ -186,8 +186,7 @@ namespace ChroMapper_CameraMovement.UserInterface
         private void CloseMenu()
         {
             SetStatus("");
-            _cameraMovementPackageExportMenu.SetActive(false);
-            UI.KeyDisableCheck();
+            UI.HideMenu(_cameraMovementPackageExportMenu);
         }
 
         private bool ReloadDefaults()

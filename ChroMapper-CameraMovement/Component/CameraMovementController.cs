@@ -643,6 +643,9 @@ namespace ChroMapper_CameraMovement.Component
             scriptMapperAction.Disable();
             dragWindowsAction.Disable();
             subCameraRectAction.Disable();
+            orbitCamera?.Deactivate();
+            plusCamera?.Deactivate();
+            defaultCamera?.Deactivate();
             orbitCamera.orbitActiveAction.Disable();
             plusCamera.plusActiveAction.Disable();
             defaultCamera.defaultActiveAction.Disable();
@@ -662,12 +665,24 @@ namespace ChroMapper_CameraMovement.Component
 
         public void KeyEnable()
         {
-            previewAction.Enable();
-            scriptMapperAction.Enable();
-            dragWindowsAction.Enable();
-            orbitCamera.orbitActiveAction.Enable();
-            plusCamera.plusActiveAction.Enable();
-            defaultCamera.defaultActiveAction.Enable();
+            if (Options.Instance.cameraMovementEnable)
+            {
+                previewAction.Enable();
+                scriptMapperAction.Enable();
+                dragWindowsAction.Enable();
+                orbitCamera.orbitActiveAction.Enable();
+                plusCamera.plusActiveAction.Enable();
+                defaultCamera.defaultActiveAction.Enable();
+            }
+            else
+            {
+                previewAction.Disable();
+                scriptMapperAction.Disable();
+                dragWindowsAction.Disable();
+                orbitCamera.orbitActiveAction.Disable();
+                plusCamera.plusActiveAction.Disable();
+                defaultCamera.defaultActiveAction.Disable();
+            }
             inputFocusMoveAction.Disable();
             input1upAction.Disable();
             input1downAction.Disable();

@@ -159,8 +159,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 _playersPlaceOffsetCheck.InputField.text = _playersPlaceBackup.ToString();
                 _setDefaultSaberCheck.isOn = false;
                 _setDefaultSaber = false;
-                _movementPlayerMenu.SetActive(false);
-                UI.KeyDisableCheck();
+                UI.HideMenu(_movementPlayerMenu);
             });
             UI.MoveTransform(cancelButton.transform, 70, 25, 0, 1, 339.8f, -134);
 
@@ -172,8 +171,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 _setDefaultSaber = false;
                 _setDefaultSaberCheck.isOn = false;
-                _movementPlayerMenu.SetActive(false);
-                UI.KeyDisableCheck();
+                UI.HideMenu(_movementPlayerMenu);
                 movementController.Reload();
             });
             UI.MoveTransform(openButton.transform, 70, 25, 0, 1, 424.4f, -134);

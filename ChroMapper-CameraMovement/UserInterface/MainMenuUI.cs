@@ -44,11 +44,13 @@ namespace ChroMapper_CameraMovement.UserInterface
                 }
                 else
                 {
-                    UI._bookmarkMenuUI._cameraMovementBookmarkMenu.SetActive(false);
-                    UI._cameraControlMenuUI._cameraControlMenu.SetActive(false);
-                    UI._settingMenuUI._cameraMovementSettingMenu.SetActive(false);
-                    UI._multiDisplayUI._cameraMovementMultiDisplay.SetActive(false);
-                    UI._packageExportMenuUI._cameraMovementPackageExportMenu.SetActive(false);
+                    UI.HideMenu(UI._bookmarkMenuUI._cameraMovementBookmarkMenu, false);
+                    UI.HideMenu(UI._cameraControlMenuUI._cameraControlMenu, false);
+                    UI.HideMenu(UI._settingMenuUI._cameraMovementSettingMenu, false);
+                    UI.HideMenu(UI._multiDisplayUI._cameraMovementMultiDisplay, false);
+                    UI.HideMenu(UI._movementPlayerUI._movementPlayerMenu, false);
+                    UI.HideMenu(UI._packageExportMenuUI._cameraMovementPackageExportMenu, false);
+                    UI.KeyDisableCheck();
                     Plugin.movement.KeyDisable();
                 }
                 movementController._bookmarkController?.BookMarkChangeUpdate();
@@ -106,14 +108,20 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 Options.Instance.bookmarkEdit = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                UI._bookmarkMenuUI._cameraMovementBookmarkMenu.SetActive(check);
+                if (check)
+                    UI._bookmarkMenuUI._cameraMovementBookmarkMenu.SetActive(true);
+                else
+                    UI.HideMenu(UI._bookmarkMenuUI._cameraMovementBookmarkMenu, false);
                 UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Camera Control", "Camera Control", new Vector2(0, -160), Options.Instance.cameraControl, (check) =>
             {
                 Options.Instance.cameraControl = check;
                 if (!Options.Instance.cameraMovementEnable) return;
-                UI._cameraControlMenuUI._cameraControlMenu.SetActive(check);
+                if (check)
+                    UI._cameraControlMenuUI._cameraControlMenu.SetActive(true);
+                else
+                    UI.HideMenu(UI._cameraControlMenuUI._cameraControlMenu, false);
                 UI.KeyDisableCheck();
             });
             UI.AddCheckbox(_cameraMovementMainMenu.transform, "Movement Player", "Movement Player", new Vector2(0, -175), Options.Instance.movementPlayer, (check) =>
@@ -184,7 +192,7 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var mainMenuCloseButton = UI.AddButton(_cameraMovementMainMenu.transform, "Close", "Close", () =>
             {
-                _cameraMovementMainMenu.SetActive(false);
+                UI.HideMenu(_cameraMovementMainMenu, false);
             });
             UI.MoveTransform(mainMenuCloseButton.transform, 70, 23, 0.72f, 1, 0, -290);
 
@@ -198,7 +206,10 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraMovementMainMenu.SetActive(false);
             UI._extensionBtn.Click = () =>
             {
-                _cameraMovementMainMenu.SetActive(!_cameraMovementMainMenu.activeSelf);
+                if (_cameraMovementMainMenu.activeSelf)
+                    UI.HideMenu(_cameraMovementMainMenu, false);
+                else
+                    _cameraMovementMainMenu.SetActive(true);
             };
         }
     }

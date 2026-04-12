@@ -65,8 +65,7 @@ namespace ChroMapper_CameraMovement.Component
         private void LateUpdate()
         {
             if (!canPlusCamera) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (IsPointerOverEditorUI()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
             if (canRotCamera && canPosCamera)
@@ -84,41 +83,62 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
+        private bool IsPointerOverEditorUI()
+        {
+            return customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(0, true) ||
+                (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject());
+        }
+
+        public void Deactivate()
+        {
+            var wasActive = canPlusCamera;
+
+            canPlusCamera = false;
+            canZrotCamera = false;
+            canPosCamera = false;
+            canRotCamera = false;
+            mouseX = mouseY = 0f;
+
+            scrollActiveAction?.Disable();
+            moveActiveAction?.Disable();
+            rotActiveAction?.Disable();
+            posActiveAction?.Disable();
+            zRotActiveAction?.Disable();
+
+            if (Options.Instance.cameraMovementEnable)
+            {
+                CameraMovementController.orbitCamera?.orbitActiveAction.Enable();
+                CameraMovementController.defaultCamera?.defaultActiveAction.Enable();
+            }
+
+            UI.EnableAction(typeof(PlusCameraController), actionMapsDisableTimeLine);
+
+            if (wasActive || Cursor.lockState == CursorLockMode.Locked)
+                UI.SetLockState(false);
+        }
+
         public void OnPlusActive(InputAction.CallbackContext context)
         {
+            if (context.canceled)
+            {
+                Deactivate();
+                return;
+            }
+            if (!context.performed) return;
             if (!UI.keyDisable) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
-            canPlusCamera = context.performed;
-            if (canPlusCamera)
-            {
-                UI.DisableAction(actionMapsDisableTimeLine);
-                CameraMovementController.defaultCamera.defaultActiveAction.Disable();
-                CameraMovementController.orbitCamera.orbitActiveAction.Disable();
-                zRotActiveAction.Enable();
-                posActiveAction.Enable();
-                rotActiveAction.Enable();
-                moveActiveAction.Enable();
-                scrollActiveAction.Enable();
-                if (MultiDisplayController.activeWindowNumber == 0)
-                    UI.SetLockState(true);
-            }
-            else
-            {
-                scrollActiveAction.Disable();
-                moveActiveAction.Disable();
-                rotActiveAction.Disable();
-                posActiveAction.Disable();
-                zRotActiveAction.Disable();
-                CameraMovementController.orbitCamera.orbitActiveAction.Enable();
-                CameraMovementController.defaultCamera.defaultActiveAction.Enable();
-                UI.EnableAction(actionMapsDisableTimeLine);
-                canZrotCamera = false;
-                canPosCamera = false;
-                canRotCamera = false;
-                if (MultiDisplayController.activeWindowNumber == 0)
-                    UI.SetLockState(false);
-            }
+            canPlusCamera = true;
+            UI.DisableAction(typeof(PlusCameraController), actionMapsDisableTimeLine);
+            CameraMovementController.defaultCamera.defaultActiveAction.Disable();
+            CameraMovementController.orbitCamera.orbitActiveAction.Disable();
+            zRotActiveAction.Enable();
+            posActiveAction.Enable();
+            rotActiveAction.Enable();
+            moveActiveAction.Enable();
+            scrollActiveAction.Enable();
+            if (MultiDisplayController.activeWindowNumber == 0)
+                UI.SetLockState(true);
         }
         public void OnZrotActive(InputAction.CallbackContext context)
         {
@@ -135,8 +155,7 @@ namespace ChroMapper_CameraMovement.Component
         public void OnMoveAction(InputAction.CallbackContext context)
         {
             if (!canPlusCamera) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (IsPointerOverEditorUI()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
 
@@ -161,8 +180,7 @@ namespace ChroMapper_CameraMovement.Component
         public void OnScrollAction(InputAction.CallbackContext context)
         {
             if (!canPlusCamera) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (IsPointerOverEditorUI()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
 

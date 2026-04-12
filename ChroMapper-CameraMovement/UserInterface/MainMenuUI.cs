@@ -50,8 +50,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                     UI.HideMenu(UI._multiDisplayUI._cameraMovementMultiDisplay, false);
                     UI.HideMenu(UI._movementPlayerUI._movementPlayerMenu, false);
                     UI.HideMenu(UI._packageExportMenuUI._cameraMovementPackageExportMenu, false);
-                    UI.KeyDisableCheck();
-                    Plugin.movement.KeyDisable();
+                    Plugin.movement.ShutdownPluginRuntimeState(false);
                 }
                 movementController._bookmarkController?.BookMarkChangeUpdate();
                 movementController.Reload();

@@ -25,6 +25,7 @@ namespace ChroMapper_CameraMovement.Component
         public float z;
         public Camera[] targetCamera { get; set; } = { null, null, null };
         private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
+        private bool inputActionsDisposed;
 
         private void Start()
         {
@@ -119,6 +120,47 @@ namespace ChroMapper_CameraMovement.Component
 
             if (wasActive || Cursor.lockState == CursorLockMode.Locked)
                 UI.SetLockState(false);
+        }
+
+        public void Shutdown()
+        {
+            canDefaultCamera = false;
+            zRotReset = false;
+            mouseX = mouseY = 0f;
+            x = y = z = 0f;
+
+            defaultActiveAction?.Disable();
+            zRotResetActiveAction?.Disable();
+            moveActiveAction?.Disable();
+            elevateActiveAction?.Disable();
+            rotActiveAction?.Disable();
+            UI.EnableAction(typeof(DefaultCameraController), actionMapsDisableTimeLine);
+        }
+
+        public void DisposeInputActions()
+        {
+            if (inputActionsDisposed)
+                return;
+
+            inputActionsDisposed = true;
+            Shutdown();
+            DisposeInputAction(ref defaultActiveAction);
+            DisposeInputAction(ref elevateActiveAction);
+            DisposeInputAction(ref rotActiveAction);
+            DisposeInputAction(ref moveActiveAction);
+            DisposeInputAction(ref zRotResetActiveAction);
+        }
+
+        private static void DisposeInputAction(ref InputAction action)
+        {
+            action?.Disable();
+            action?.Dispose();
+            action = null;
+        }
+
+        private void OnDestroy()
+        {
+            DisposeInputActions();
         }
 
         public void OnDefaultActive(InputAction.CallbackContext context)

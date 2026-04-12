@@ -31,6 +31,7 @@ namespace ChroMapper_CameraMovement
         [Exit]
         private void Exit()
         {
+            SceneManager.sceneLoaded -= SceneLoaded;
             _harmony.UnpatchSelf();
             Debug.Log("Camera Movement:Application has closed!");
         }

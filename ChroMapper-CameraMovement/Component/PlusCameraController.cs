@@ -26,6 +26,7 @@ namespace ChroMapper_CameraMovement.Component
         public Camera[] targetCamera { get; set; } = { null, null, null };
         public bool fovTargetMainCamera { get; set; } = true;
         private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
+        private bool inputActionsDisposed;
 
         private void Start()
         {
@@ -115,6 +116,50 @@ namespace ChroMapper_CameraMovement.Component
 
             if (wasActive || Cursor.lockState == CursorLockMode.Locked)
                 UI.SetLockState(false);
+        }
+
+        public void Shutdown()
+        {
+            canPlusCamera = false;
+            canZrotCamera = false;
+            canPosCamera = false;
+            canRotCamera = false;
+            mouseX = mouseY = 0f;
+
+            plusActiveAction?.Disable();
+            scrollActiveAction?.Disable();
+            moveActiveAction?.Disable();
+            rotActiveAction?.Disable();
+            posActiveAction?.Disable();
+            zRotActiveAction?.Disable();
+            UI.EnableAction(typeof(PlusCameraController), actionMapsDisableTimeLine);
+        }
+
+        public void DisposeInputActions()
+        {
+            if (inputActionsDisposed)
+                return;
+
+            inputActionsDisposed = true;
+            Shutdown();
+            DisposeInputAction(ref plusActiveAction);
+            DisposeInputAction(ref zRotActiveAction);
+            DisposeInputAction(ref posActiveAction);
+            DisposeInputAction(ref rotActiveAction);
+            DisposeInputAction(ref moveActiveAction);
+            DisposeInputAction(ref scrollActiveAction);
+        }
+
+        private static void DisposeInputAction(ref InputAction action)
+        {
+            action?.Disable();
+            action?.Dispose();
+            action = null;
+        }
+
+        private void OnDestroy()
+        {
+            DisposeInputActions();
         }
 
         public void OnPlusActive(InputAction.CallbackContext context)

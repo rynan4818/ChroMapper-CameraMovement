@@ -233,6 +233,51 @@ namespace ChroMapper_CameraMovement.UserInterface
             return !IsPluginUIObject(selectedObject);
         }
 
+        public static void ReleasePluginActionMapLocksForShutdown()
+        {
+            var allActionMaps = typeof(CMInput).GetNestedTypes().Where(x => x.IsInterface).ToArray();
+            EnableAction(menuActionOwner, allActionMaps);
+            EnableAction(textInputActionOwner, allActionMaps);
+            EnableAction(typeof(DefaultCameraController), allActionMaps);
+            EnableAction(typeof(PlusCameraController), allActionMaps);
+            EnableAction(typeof(OrbitCameraController), allActionMaps);
+            QueuedActionMaps();
+            FlushInputInstallerQueuesImmediately();
+        }
+
+        public static void ResetTransientStateForShutdown(bool clearRegisteredInputs)
+        {
+            var currentEventSystem = CurrentEventSystem;
+            var selectedObject = currentEventSystem != null ? currentEventSystem.currentSelectedGameObject : null;
+            if (IsPluginUIObject(selectedObject))
+                currentEventSystem.SetSelectedGameObject(null);
+
+            currentInputField = null;
+            inputFocusMoveActive = false;
+            inputRoundActive = false;
+            inputEndEdit = false;
+            inputSelect = false;
+            textInputLockActive = false;
+            textInputLockedWithMenuDisable = false;
+            keyDisable = false;
+            queuedToDisableByOwner.Clear();
+            queuedToEnableByOwner.Clear();
+            keyEnableStateByOwner.Clear();
+
+            if (clearRegisteredInputs)
+                focusMoveList = new Dictionary<string, (string, UITextInput, int?)>();
+        }
+
+        private static void FlushInputInstallerQueuesImmediately()
+        {
+            var installerType = typeof(CMInputCallbackInstaller);
+            var instanceField = installerType.GetField("instance", BindingFlags.NonPublic | BindingFlags.Static);
+            var updateMethod = installerType.GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
+            var installer = instanceField != null ? instanceField.GetValue(null) : null;
+            if (installer != null && updateMethod != null)
+                updateMethod.Invoke(installer, null);
+        }
+
         private static void BeginTextInputLock(string fallbackName)
         {
             if (inputFocusMoveActive)

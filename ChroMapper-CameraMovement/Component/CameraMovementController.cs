@@ -558,34 +558,46 @@ namespace ChroMapper_CameraMovement.Component
 
         public void OnPreview()
         {
-            previewMode = !previewMode;
             if (previewMode)
-            {
-                previewEve = (Options.Instance.movement, Options.Instance.uIhidden, Options.Instance.bookmarkLines, Options.Instance.subCamera, Options.Instance.bookmarkEdit, Options.Instance.cameraControl,
-                    cm_MapEditorCamera.transform.position, cm_MapEditorCamera.transform.rotation, Settings.Instance.CameraFOV);
-                Options.Instance.movement = true;
-                Options.Instance.uIhidden = false;
-                Options.Instance.bookmarkLines = false;
-                Options.Instance.subCamera = false;
-                Options.Instance.bookmarkEdit = false;
-                Options.Instance.cameraControl = false;
-                Reload();
-                cm_UIMode.GetComponent<UIMode>().SetUIMode(UIModeType.Preview, false);
-            }
+                ExitPreviewMode(true);
             else
-            {
-                Options.Instance.movement = previewEve.Item1;
-                Options.Instance.uIhidden = previewEve.Item2;
-                Options.Instance.bookmarkLines = previewEve.Item3;
-                Options.Instance.subCamera = previewEve.Item4;
-                Options.Instance.bookmarkEdit = previewEve.Item5;
-                Options.Instance.cameraControl = previewEve.Item6;
-                cm_MapEditorCamera.transform.position = previewEve.Item7;
-                cm_MapEditorCamera.transform.rotation = previewEve.Item8;
-                Settings.Instance.CameraFOV = previewEve.Item9;
+                EnterPreviewMode(true);
+        }
+
+        private void EnterPreviewMode(bool reload)
+        {
+            previewMode = true;
+            previewEve = (Options.Instance.movement, Options.Instance.uIhidden, Options.Instance.bookmarkLines, Options.Instance.subCamera, Options.Instance.bookmarkEdit, Options.Instance.cameraControl,
+                cm_MapEditorCamera.transform.position, cm_MapEditorCamera.transform.rotation, Settings.Instance.CameraFOV);
+            Options.Instance.movement = true;
+            Options.Instance.uIhidden = false;
+            Options.Instance.bookmarkLines = false;
+            Options.Instance.subCamera = false;
+            Options.Instance.bookmarkEdit = false;
+            Options.Instance.cameraControl = false;
+            if (reload)
                 Reload();
-                cm_UIMode.GetComponent<UIMode>().SetUIMode(UIModeType.Normal, false);
-            }
+            cm_UIMode?.GetComponent<UIMode>()?.SetUIMode(UIModeType.Preview, false);
+        }
+
+        private void ExitPreviewMode(bool reload)
+        {
+            if (!previewMode)
+                return;
+
+            previewMode = false;
+            Options.Instance.movement = previewEve.Item1;
+            Options.Instance.uIhidden = previewEve.Item2;
+            Options.Instance.bookmarkLines = previewEve.Item3;
+            Options.Instance.subCamera = previewEve.Item4;
+            Options.Instance.bookmarkEdit = previewEve.Item5;
+            Options.Instance.cameraControl = previewEve.Item6;
+            cm_MapEditorCamera.transform.position = previewEve.Item7;
+            cm_MapEditorCamera.transform.rotation = previewEve.Item8;
+            Settings.Instance.CameraFOV = previewEve.Item9;
+            if (reload)
+                Reload();
+            cm_UIMode?.GetComponent<UIMode>()?.SetUIMode(UIModeType.Normal, false);
         }
 
         private void OnPreviewShortcut(InputAction.CallbackContext context)
@@ -659,6 +671,68 @@ namespace ChroMapper_CameraMovement.Component
         public bool SubCameraRectEnableGet()
         {
             return subCameraRectAction.enabled;
+        }
+
+        public void ShutdownPluginRuntimeState(bool disposeActions)
+        {
+            ExitPreviewMode(false);
+            dragWindowKeyEnable = false;
+            UI.SetLockState(false);
+            SubCameraRectDisable();
+
+            orbitCamera?.Shutdown();
+            plusCamera?.Shutdown();
+            defaultCamera?.Shutdown();
+
+            DisableInputAction(previewAction);
+            DisableInputAction(scriptMapperAction);
+            DisableInputAction(dragWindowsAction);
+            DisableInputAction(subCameraRectAction);
+            DisableInputAction(inputFocusMoveAction);
+            DisableInputAction(input1upAction);
+            DisableInputAction(input1downAction);
+            DisableInputAction(input10upAction);
+            DisableInputAction(input10downAction);
+            DisableInputAction(input100upAction);
+            DisableInputAction(input100downAction);
+            DisableInputAction(input1000upAction);
+            DisableInputAction(input1000downAction);
+
+            UI.ReleasePluginActionMapLocksForShutdown();
+            UI.ResetTransientStateForShutdown(disposeActions);
+
+            if (!disposeActions)
+                return;
+
+            DisposeInputAction(ref previewAction);
+            DisposeInputAction(ref scriptMapperAction);
+            DisposeInputAction(ref dragWindowsAction);
+            DisposeInputAction(ref subCameraRectAction);
+            DisposeInputAction(ref inputFocusMoveAction);
+            DisposeInputAction(ref input1upAction);
+            DisposeInputAction(ref input1downAction);
+            DisposeInputAction(ref input10upAction);
+            DisposeInputAction(ref input10downAction);
+            DisposeInputAction(ref input100upAction);
+            DisposeInputAction(ref input100downAction);
+            DisposeInputAction(ref input1000upAction);
+            DisposeInputAction(ref input1000downAction);
+
+            orbitCamera?.DisposeInputActions();
+            plusCamera?.DisposeInputActions();
+            defaultCamera?.DisposeInputActions();
+        }
+
+        private static void DisableInputAction(InputAction action)
+        {
+            action?.Disable();
+        }
+
+        private static void DisposeInputAction(ref InputAction action)
+        {
+            action?.Disable();
+            action?.Dispose();
+            action = null;
         }
 
         public void KeyDisable()
@@ -1073,13 +1147,11 @@ namespace ChroMapper_CameraMovement.Component
         private void OnDestroy()
         {
             oscController.Disconnect();
-            _bookmarkController.OnDestroy();
+            _bookmarkController?.OnDestroy();
             SpectrogramSideSwapper_SwapSidesPatch.OnSwapSides -= WaveFormOffset;
-            atsc.PlayToggle -= OnPlayToggle;
-            previewAction.Disable();
-            scriptMapperAction.Disable();
-            dragWindowsAction.Disable();
-            subCameraRectAction.Disable();
+            if (atsc != null)
+                atsc.PlayToggle -= OnPlayToggle;
+            ShutdownPluginRuntimeState(true);
             if (VRMAvatarController.loadActive)
                 Debug.LogWarning("VRM Avatar Load Active!");
         }

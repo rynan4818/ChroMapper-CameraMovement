@@ -17,6 +17,12 @@ namespace ChroMapper_CameraMovement.UserInterface
 {
     public class UI
     {
+        private sealed class TextInputState
+        {
+            public UITextInput NextInput;
+            public int? RoundDigits;
+        }
+
         public static readonly ExtensionButton _extensionBtn = new ExtensionButton();
         public static MainMenuUI _mainMenuUI = new MainMenuUI();
         public static SettingMenuUI _settingMenuUI = new SettingMenuUI();
@@ -28,8 +34,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static bool keyDisable { get; private set; }
         public static Vector2 savedMousePos;
         public static EventSystem eventsystem;
-        public static string currentInputField;
-        public static Dictionary<string, (string, UITextInput, int?)> focusMoveList;
+        private static UITextInput currentInputTextInput;
+        private static Dictionary<UITextInput, TextInputState> focusMoveList;
         public static bool inputFocusMoveActive;
         public static bool inputRoundActive;
         public static bool inputEndEdit;
@@ -79,8 +85,8 @@ namespace ChroMapper_CameraMovement.UserInterface
         public void AddMenu(MapEditorUI mapEditorUI)
         {
             keyDisable = false;
-            currentInputField = null;
-            focusMoveList = new Dictionary<string, (string, UITextInput, int?)>();
+            currentInputTextInput = null;
+            focusMoveList = new Dictionary<UITextInput, TextInputState>();
             inputFocusMoveActive = false;
             inputRoundActive = false;
             inputEndEdit = false;
@@ -238,7 +244,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             if (obj == null || !obj.activeInHierarchy || !IsPluginUIObject(obj))
                 return false;
 
-            foreach (var (_, textInput, _) in focusMoveList.Values)
+            foreach (var textInput in focusMoveList.Keys)
             {
                 if (textInput == null)
                     continue;
@@ -285,7 +291,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             if (IsPluginUIObject(selectedObject))
                 currentEventSystem.SetSelectedGameObject(null);
 
-            currentInputField = null;
+            currentInputTextInput = null;
             inputFocusMoveActive = false;
             inputRoundActive = false;
             inputEndEdit = false;
@@ -298,7 +304,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             keyEnableStateByOwner.Clear();
 
             if (clearRegisteredInputs)
-                focusMoveList = new Dictionary<string, (string, UITextInput, int?)>();
+                focusMoveList = new Dictionary<UITextInput, TextInputState>();
         }
 
         private static void FlushInputInstallerQueuesImmediately()
@@ -311,7 +317,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 updateMethod.Invoke(installer, null);
         }
 
-        private static void BeginTextInputLock(string fallbackName)
+        private static void BeginTextInputLock(UITextInput textInput)
         {
             if (inputFocusMoveActive)
                 return;
@@ -328,8 +334,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 textInputLockActive = true;
             }
 
-            var selectedObject = CurrentEventSystem != null ? CurrentEventSystem.currentSelectedGameObject : null;
-            currentInputField = selectedObject != null ? selectedObject.name : fallbackName;
+            currentInputTextInput = textInput;
             inputSelect = true;
         }
 
@@ -348,7 +353,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 Plugin.movement.KeyEnable();
             }
 
-            currentInputField = null;
+            currentInputTextInput = null;
             inputEndEdit = true;
             textInputLockActive = false;
             textInputLockedWithMenuDisable = false;
@@ -459,16 +464,16 @@ namespace ChroMapper_CameraMovement.UserInterface
             if (inputFocusMoveActive)
                 return;
             inputFocusMoveActive = true;
-            (string, UITextInput, int?) currentInput;
-            if (focusMoveList.TryGetValue(currentInputField, out currentInput))
+            TextInputState currentInput;
+            if (currentInputTextInput != null && focusMoveList.TryGetValue(currentInputTextInput, out currentInput))
             {
-                if (currentInput.Item1 == null)
+                if (currentInput.NextInput == null)
                     return;
-                (string, UITextInput, int?) nextInput;
-                if (focusMoveList.TryGetValue(currentInput.Item1, out nextInput))
+
+                if (focusMoveList.ContainsKey(currentInput.NextInput))
                 {
-                    nextInput.Item2.InputField.Select();
-                    currentInputField = currentInput.Item1;
+                    currentInput.NextInput.InputField.Select();
+                    currentInputTextInput = currentInput.NextInput;
                 }
             }
         }
@@ -481,21 +486,21 @@ namespace ChroMapper_CameraMovement.UserInterface
             }
             if (inputRoundActive)
                 return;
-            (string, UITextInput, int?) currentInput;
-            if (focusMoveList.TryGetValue(currentInputField, out currentInput))
+            TextInputState currentInput;
+            if (currentInputTextInput != null && focusMoveList.TryGetValue(currentInputTextInput, out currentInput))
             {
-                if (currentInput.Item3 == null)
+                if (currentInput.RoundDigits == null)
                     return;
-                var roundDigits = (int)currentInput.Item3;
+                var roundDigits = (int)currentInput.RoundDigits;
                 double value;
-                if (double.TryParse(currentInput.Item2.InputField.text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out value))
+                if (double.TryParse(currentInputTextInput.InputField.text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out value))
                 {
                     value += Math.Pow(10, -roundDigits) * up;
                     var digits = roundDigits - (int)Math.Log10(Math.Abs(up));
                     value *= Math.Pow(10, digits);
                     value = Math.Round(value, MidpointRounding.AwayFromZero);
                     value *= Math.Pow(10, -digits);
-                    currentInput.Item2.InputField.text = value.ToString();
+                    currentInputTextInput.InputField.text = value.ToString();
                 }
             }
         }
@@ -535,12 +540,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             return (rectTransform, textComponent);
         }
 
-        public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, string value, UnityAction<string> onChange, string focusMove = null, int? roundDigits = null)
+        public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, string value, UnityAction<string> onChange, int? roundDigits = null)
         {
             var label = AddLabel(parent, title, text, TextAlignmentOptions.Right, 12);
-            return (label.Item1, label.Item2, AddTextInput(parent, title, value, TextAlignmentOptions.Left, 10, onChange, focusMove, roundDigits));
+            return (label.Item1, label.Item2, AddTextInput(parent, title, value, TextAlignmentOptions.Left, 10, onChange, roundDigits));
         }
-        public static UITextInput AddTextInput(Transform parent, string title, string value, TextAlignmentOptions alignment, float fontSize, UnityAction<string> onChange, string focusMove = null, int? roundDigits = null)
+        public static UITextInput AddTextInput(Transform parent, string title, string value, TextAlignmentOptions alignment, float fontSize, UnityAction<string> onChange, int? roundDigits = null)
         {
             var textInput = UnityEngine.Object.Instantiate(PersistentUI.Instance.TextInputPrefab, parent);
             textInput.GetComponent<Image>().pixelsPerUnitMultiplier = 3;
@@ -557,10 +562,25 @@ namespace ChroMapper_CameraMovement.UserInterface
                 EndTextInputLock();
             });
             textInput.InputField.onSelect.AddListener(delegate {
-                BeginTextInputLock(title);
+                BeginTextInputLock(textInput);
             });
-            focusMoveList.Add(title, (focusMove, textInput, roundDigits));
+            focusMoveList.Add(textInput, new TextInputState { RoundDigits = roundDigits });
             return textInput;
+        }
+
+        public static void SetTextInputFocusMove(UITextInput textInput, UITextInput nextInput)
+        {
+            if (textInput == null)
+                return;
+
+            TextInputState state;
+            if (!focusMoveList.TryGetValue(textInput, out state))
+            {
+                state = new TextInputState();
+                focusMoveList[textInput] = state;
+            }
+
+            state.NextInput = nextInput;
         }
 
         public static (RectTransform, TextMeshProUGUI, Toggle) AddCheckbox(Transform parent, string title, string text, Vector2 pos, bool value, UnityAction<bool> onClick)

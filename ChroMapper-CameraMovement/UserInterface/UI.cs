@@ -233,6 +233,39 @@ namespace ChroMapper_CameraMovement.UserInterface
             return !IsPluginUIObject(selectedObject);
         }
 
+        private static bool IsTrackedPluginTextInputObject(GameObject obj)
+        {
+            if (obj == null || !obj.activeInHierarchy || !IsPluginUIObject(obj))
+                return false;
+
+            foreach (var (_, textInput, _) in focusMoveList.Values)
+            {
+                if (textInput == null)
+                    continue;
+
+                var textInputObject = textInput.gameObject;
+                if (textInputObject != null && (obj == textInputObject || obj.transform.IsChildOf(textInputObject.transform)))
+                    return true;
+
+                var inputFieldObject = textInput.InputField != null ? textInput.InputField.gameObject : null;
+                if (inputFieldObject != null && (obj == inputFieldObject || obj.transform.IsChildOf(inputFieldObject.transform)))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static void ValidateTextInputInterceptionState()
+        {
+            if (!textInputLockActive || inputFocusMoveActive)
+                return;
+
+            var currentEventSystem = CurrentEventSystem;
+            var selectedObject = currentEventSystem != null ? currentEventSystem.currentSelectedGameObject : null;
+            if (selectedObject == null || !IsTrackedPluginTextInputObject(selectedObject))
+                EndTextInputLock();
+        }
+
         public static void ReleasePluginActionMapLocksForShutdown()
         {
             var allActionMaps = typeof(CMInput).GetNestedTypes().Where(x => x.IsInterface).ToArray();
@@ -365,6 +398,8 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public static void QueuedActionMaps()
         {
+            ValidateTextInputInterceptionState();
+
             // ChroMapper 0.8.629辺りからTextInputをマウスで行き来するとキー操作無効になるので対策
             // 同じフレームで同じActionMapに対してEnable、Disableするとなるっぽい
             if (inputEndEdit && inputSelect)

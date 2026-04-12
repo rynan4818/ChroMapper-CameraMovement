@@ -588,13 +588,37 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
+        private void OnPreviewShortcut(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            if (UI.ShouldBlockPluginShortcut()) return;
+
+            OnPreview();
+        }
+
+        private void OnScriptMapperShortcut(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            if (UI.ShouldBlockPluginShortcut()) return;
+
+            ScriptMapperController.Instance.ScriptMapperRun();
+        }
+
         public void OnDragWIndows(InputAction.CallbackContext context)
         {
+            if (UI.ShouldBlockPluginShortcut())
+            {
+                dragWindowKeyEnable = false;
+                return;
+            }
+
             dragWindowKeyEnable = context.ReadValueAsButton();
         }
 
         public void OnSubCameraRect(InputAction.CallbackContext context)
         {
+            if (UI.ShouldBlockPluginShortcut()) return;
+
             var rect = context.ReadValue<Vector2>();
             var scale = 100;
             if (dragWindowKeyEnable)
@@ -864,10 +888,10 @@ namespace ChroMapper_CameraMovement.Component
             layoutCamera.gameObject.SetActive(false);
 
             previewAction = new InputAction("Preview", binding: Options.Instance.previewKeyBinding);
-            previewAction.performed += context => OnPreview();
+            previewAction.performed += OnPreviewShortcut;
             previewAction.Enable();
             scriptMapperAction = new InputAction("Script Mapper run", binding: Options.Instance.scriptMapperKeyBinding);
-            scriptMapperAction.performed += context => ScriptMapperController.Instance.ScriptMapperRun();
+            scriptMapperAction.performed += OnScriptMapperShortcut;
             scriptMapperAction.Enable();
             dragWindowsAction = new InputAction("Drag Windows", binding: Options.Instance.dragWindowKeyBinding);
             dragWindowsAction.started += OnDragWIndows;

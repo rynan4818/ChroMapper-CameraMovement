@@ -125,6 +125,7 @@ namespace ChroMapper_CameraMovement.Component
                 return;
             }
             if (!context.performed) return;
+            if (UI.ShouldBlockPluginShortcut()) return;
             if (!UI.keyDisable) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;

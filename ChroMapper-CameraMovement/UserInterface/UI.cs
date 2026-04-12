@@ -182,6 +182,57 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         private static EventSystem CurrentEventSystem => EventSystem.current != null ? EventSystem.current : eventsystem;
 
+        private static IEnumerable<GameObject> PluginMenuRoots
+        {
+            get
+            {
+                if (_mainMenuUI?._cameraMovementMainMenu != null)
+                    yield return _mainMenuUI._cameraMovementMainMenu;
+                if (_settingMenuUI?._cameraMovementSettingMenu != null)
+                    yield return _settingMenuUI._cameraMovementSettingMenu;
+                if (_bookmarkMenuUI?._cameraMovementBookmarkMenu != null)
+                    yield return _bookmarkMenuUI._cameraMovementBookmarkMenu;
+                if (_cameraControlMenuUI?._cameraControlMenu != null)
+                    yield return _cameraControlMenuUI._cameraControlMenu;
+                if (_multiDisplayUI?._cameraMovementMultiDisplay != null)
+                    yield return _multiDisplayUI._cameraMovementMultiDisplay;
+                if (_movementPlayerUI?._movementPlayerMenu != null)
+                    yield return _movementPlayerUI._movementPlayerMenu;
+                if (_packageExportMenuUI?._cameraMovementPackageExportMenu != null)
+                    yield return _packageExportMenuUI._cameraMovementPackageExportMenu;
+            }
+        }
+
+        public static bool IsPluginUIObject(GameObject obj)
+        {
+            if (obj == null)
+                return false;
+
+            foreach (var menuRoot in PluginMenuRoots)
+            {
+                if (obj == menuRoot || obj.transform.IsChildOf(menuRoot.transform))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool ShouldBlockPluginShortcut()
+        {
+            if (!Options.Instance.cameraMovementEnable)
+                return true;
+
+            if (textInputLockActive)
+                return true;
+
+            var currentEventSystem = CurrentEventSystem;
+            var selectedObject = currentEventSystem != null ? currentEventSystem.currentSelectedGameObject : null;
+            if (selectedObject == null)
+                return false;
+
+            return !IsPluginUIObject(selectedObject);
+        }
+
         private static void BeginTextInputLock(string fallbackName)
         {
             if (inputFocusMoveActive)

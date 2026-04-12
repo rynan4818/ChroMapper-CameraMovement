@@ -40,9 +40,11 @@ namespace ChroMapper_CameraMovement.Component
         // --- 入力アクション ---
         private InputAction splineDragAction;
         private InputAction mousePositionAction;
+        private bool inputActionsDisposed;
 
         // --- 内部ステート ---
         private List<SplineBlock> splineBlocks = new List<SplineBlock>();
+        public bool IsEditing { get; private set; }
 
         // --- マウスドラッグ用 ---
         private GameObject selectedHandle;
@@ -73,16 +75,15 @@ namespace ChroMapper_CameraMovement.Component
 
         private void OnDestroy()
         {
-            splineDragAction?.Disable();
-            splineDragAction?.Dispose();
-            mousePositionAction?.Disable();
-            mousePositionAction?.Dispose();
+            DisposeInputActions();
             Cleanup();
+            IsEditing = false;
         }
 
         public void StartEditing(string fullCommandString)
         {
             Cleanup();
+            IsEditing = false;
 
             mainCamera = Camera.main;
             if (mainCamera == null)
@@ -104,17 +105,48 @@ namespace ChroMapper_CameraMovement.Component
 
             splineDragAction.Enable();
             mousePositionAction.Enable();
+            IsEditing = true;
         }
 
-        public string EndEditing()
+        public string CompleteEditingAndDestroy()
         {
             string newCommand = RebuildCommandString();
-
-            splineDragAction.Disable();
-            mousePositionAction.Disable();
-
-            Cleanup();
+            ShutdownEditingState();
+            Destroy(gameObject);
             return newCommand;
+        }
+
+        public void CancelEditingAndDestroy()
+        {
+            ShutdownEditingState();
+            Destroy(gameObject);
+        }
+
+        private void ShutdownEditingState()
+        {
+            IsEditing = false;
+            DisableInputActions();
+            Cleanup();
+        }
+
+        private void DisableInputActions()
+        {
+            splineDragAction?.Disable();
+            mousePositionAction?.Disable();
+            selectedHandle = null;
+        }
+
+        private void DisposeInputActions()
+        {
+            if (inputActionsDisposed)
+                return;
+
+            inputActionsDisposed = true;
+            DisableInputActions();
+            splineDragAction?.Dispose();
+            splineDragAction = null;
+            mousePositionAction?.Dispose();
+            mousePositionAction = null;
         }
 
         private void Update()

@@ -371,6 +371,9 @@ namespace ChroMapper_CameraMovement.UserInterface
             if (menu == null)
                 return;
 
+            if (menu == _bookmarkMenuUI?._cameraMovementBookmarkMenu)
+                _bookmarkMenuUI?.ForceStopSplineEdit();
+
             ClearCurrentInputSelection(menu);
             menu.SetActive(false);
 

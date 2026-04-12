@@ -676,6 +676,7 @@ namespace ChroMapper_CameraMovement.Component
         public void ShutdownPluginRuntimeState(bool disposeActions)
         {
             ExitPreviewMode(false);
+            UI._bookmarkMenuUI?.ForceStopSplineEdit();
             dragWindowKeyEnable = false;
             UI.SetLockState(false);
             SubCameraRectDisable();

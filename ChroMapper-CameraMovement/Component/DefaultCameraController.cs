@@ -25,6 +25,7 @@ namespace ChroMapper_CameraMovement.Component
         public float z;
         public Camera[] targetCamera { get; set; } = { null, null, null };
         private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
+        private bool inputActionsDisposed;
 
         private void Start()
         {
@@ -34,7 +35,7 @@ namespace ChroMapper_CameraMovement.Component
             defaultActiveAction.started += OnDefaultActive;
             defaultActiveAction.performed += OnDefaultActive;
             defaultActiveAction.canceled += OnDefaultActive;
-            defaultActiveAction.Enable();
+            defaultActiveAction.Disable();
             elevateActiveAction = new InputAction("DefaultCamera Elevate Action");
             elevateActiveAction.AddCompositeBinding("1DAxis")
                 .With("positive", Options.Instance.defaultCameraElevatePositiveKeyBinding)
@@ -67,8 +68,7 @@ namespace ChroMapper_CameraMovement.Component
         {
             if (PauseManager.IsPaused || SceneTransitionManager.IsLoading)
                 return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (IsPointerOverEditorUI()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
             if (canDefaultCamera)
@@ -89,36 +89,103 @@ namespace ChroMapper_CameraMovement.Component
             else
                 z = x = 0;
         }
+
+        private bool IsPointerOverEditorUI()
+        {
+            return customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(0, true) ||
+                (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject());
+        }
+
+        public void Deactivate()
+        {
+            var wasActive = canDefaultCamera;
+
+            canDefaultCamera = false;
+            zRotReset = false;
+            mouseX = mouseY = 0f;
+            x = y = z = 0f;
+
+            zRotResetActiveAction?.Disable();
+            moveActiveAction?.Disable();
+            elevateActiveAction?.Disable();
+            rotActiveAction?.Disable();
+
+            if (Options.Instance.cameraMovementEnable)
+            {
+                CameraMovementController.orbitCamera?.orbitActiveAction.Enable();
+                CameraMovementController.plusCamera?.plusActiveAction.Enable();
+            }
+
+            UI.EnableAction(typeof(DefaultCameraController), actionMapsDisableTimeLine);
+
+            if (wasActive || Cursor.lockState == CursorLockMode.Locked)
+                UI.SetLockState(false);
+        }
+
+        public void Shutdown()
+        {
+            canDefaultCamera = false;
+            zRotReset = false;
+            mouseX = mouseY = 0f;
+            x = y = z = 0f;
+
+            defaultActiveAction?.Disable();
+            zRotResetActiveAction?.Disable();
+            moveActiveAction?.Disable();
+            elevateActiveAction?.Disable();
+            rotActiveAction?.Disable();
+            UI.EnableAction(typeof(DefaultCameraController), actionMapsDisableTimeLine);
+        }
+
+        public void DisposeInputActions()
+        {
+            if (inputActionsDisposed)
+                return;
+
+            inputActionsDisposed = true;
+            Shutdown();
+            DisposeInputAction(ref defaultActiveAction);
+            DisposeInputAction(ref elevateActiveAction);
+            DisposeInputAction(ref rotActiveAction);
+            DisposeInputAction(ref moveActiveAction);
+            DisposeInputAction(ref zRotResetActiveAction);
+        }
+
+        private static void DisposeInputAction(ref InputAction action)
+        {
+            action?.Disable();
+            action?.Dispose();
+            action = null;
+        }
+
+        private void OnDestroy()
+        {
+            DisposeInputActions();
+        }
+
         public void OnDefaultActive(InputAction.CallbackContext context)
         {
+            if (context.canceled)
+            {
+                Deactivate();
+                return;
+            }
+            if (!context.performed) return;
+            if (UI.ShouldBlockPluginShortcut()) return;
             if (!UI.keyDisable) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
+            if (IsPointerOverEditorUI()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
-            canDefaultCamera = context.performed;
-            if (canDefaultCamera)
-            {
-                UI.DisableAction(actionMapsDisableTimeLine);
-                CameraMovementController.orbitCamera.orbitActiveAction.Disable();
-                CameraMovementController.plusCamera.plusActiveAction.Disable();
-                rotActiveAction.Enable();
-                elevateActiveAction.Enable();
-                moveActiveAction.Enable();
-                zRotResetActiveAction.Enable();
-                UI.SetLockState(true);
-            }
-            else
-            {
-                zRotResetActiveAction.Disable();
-                moveActiveAction.Disable();
-                elevateActiveAction.Disable();
-                rotActiveAction.Disable();
-                CameraMovementController.orbitCamera.orbitActiveAction.Enable();
-                CameraMovementController.plusCamera.plusActiveAction.Enable();
-                UI.EnableAction(actionMapsDisableTimeLine);
-                UI.SetLockState(false);
-            }
+
+            canDefaultCamera = true;
+            UI.DisableAction(typeof(DefaultCameraController), actionMapsDisableTimeLine);
+            CameraMovementController.orbitCamera.orbitActiveAction.Disable();
+            CameraMovementController.plusCamera.plusActiveAction.Disable();
+            rotActiveAction.Enable();
+            elevateActiveAction.Enable();
+            moveActiveAction.Enable();
+            zRotResetActiveAction.Enable();
+            UI.SetLockState(true);
         }
         public void OnMoveCamera(InputAction.CallbackContext context)
         {

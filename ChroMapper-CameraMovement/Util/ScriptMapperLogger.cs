@@ -72,5 +72,20 @@ namespace ChroMapper_CameraMovement.Util
             _streamWriter?.Dispose();
             _memoryStream?.Dispose();
         }
+
+        public void LogWarning(string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void LogError(string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void LogDebug(string message)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

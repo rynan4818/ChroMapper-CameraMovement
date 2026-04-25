@@ -37,6 +37,7 @@ namespace ChroMapper_CameraMovement.Component
         public float minElevationAngle { get; set; } = 0.01f;
         public float maxElevationAngle { get; set; } = 179.99f;
         private static readonly Type[] actionMapsDisableTimeLine = { typeof(CMInput.ITimelineActions), typeof(CMInput.IPlaybackActions) };
+        private bool inputActionsDisposed;
 
         private void Start()
         {
@@ -45,7 +46,7 @@ namespace ChroMapper_CameraMovement.Component
             orbitActiveAction.started += OnOrbitActive;
             orbitActiveAction.performed += OnOrbitActive;
             orbitActiveAction.canceled += OnOrbitActive;
-            orbitActiveAction.Enable();
+            orbitActiveAction.Disable();
             orbitSubActiveAction = new InputAction("Orbit Sub Active");
             orbitSubActiveAction.AddBinding(Options.Instance.orbitSubActiveKeyBinding);
             orbitSubActiveAction.started += OnOrbitSubActive;
@@ -85,8 +86,7 @@ namespace ChroMapper_CameraMovement.Component
         {
             if (!canOrbitCamera) return;
             if (canOrbitZrotCamera) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (IsPointerOverEditorUI()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             if (canRotCamera && canMoveCamera)
@@ -127,65 +127,143 @@ namespace ChroMapper_CameraMovement.Component
             }
         }
 
+        private bool IsPointerOverEditorUI()
+        {
+            return customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(0, true) ||
+                (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject());
+        }
+
+        public void Deactivate()
+        {
+            var wasActive = canOrbitCamera;
+
+            canOrbitCamera = false;
+            canMoveCamera = false;
+            canRotCamera = false;
+            canOrbitSubCamera = false;
+            canOrbitZrotCamera = false;
+            cameraUpdate = false;
+            mouseX = mouseY = 0f;
+
+            orbitSubActiveAction?.Disable();
+            orbitZrotActiveAction?.Disable();
+            moveActiveAction?.Disable();
+            rotActiveAction?.Disable();
+            zoomActiveAction?.Disable();
+            mouseMoveAction?.Disable();
+            if (targetPosObject != null)
+                targetPosObject.SetActive(false);
+
+            if (Options.Instance.cameraMovementEnable)
+            {
+                CameraMovementController.defaultCamera?.defaultActiveAction.Enable();
+                CameraMovementController.plusCamera?.plusActiveAction.Enable();
+            }
+
+            UI.EnableAction(typeof(OrbitCameraController), actionMapsDisableTimeLine);
+
+            if (wasActive || Cursor.lockState == CursorLockMode.Locked)
+                UI.SetLockState(false);
+        }
+
+        public void Shutdown()
+        {
+            canOrbitCamera = false;
+            canMoveCamera = false;
+            canRotCamera = false;
+            canOrbitSubCamera = false;
+            canOrbitZrotCamera = false;
+            cameraUpdate = false;
+            mouseX = mouseY = 0f;
+
+            orbitActiveAction?.Disable();
+            orbitSubActiveAction?.Disable();
+            orbitZrotActiveAction?.Disable();
+            moveActiveAction?.Disable();
+            rotActiveAction?.Disable();
+            zoomActiveAction?.Disable();
+            mouseMoveAction?.Disable();
+            if (targetPosObject != null)
+                targetPosObject.SetActive(false);
+            UI.EnableAction(typeof(OrbitCameraController), actionMapsDisableTimeLine);
+        }
+
+        public void DisposeInputActions()
+        {
+            if (inputActionsDisposed)
+                return;
+
+            inputActionsDisposed = true;
+            Shutdown();
+            DisposeInputAction(ref orbitActiveAction);
+            DisposeInputAction(ref orbitSubActiveAction);
+            DisposeInputAction(ref orbitZrotActiveAction);
+            DisposeInputAction(ref moveActiveAction);
+            DisposeInputAction(ref rotActiveAction);
+            DisposeInputAction(ref mouseMoveAction);
+            DisposeInputAction(ref zoomActiveAction);
+            if (targetPosObject != null)
+            {
+                Destroy(targetPosObject);
+                targetPosObject = null;
+            }
+        }
+
+        private static void DisposeInputAction(ref InputAction action)
+        {
+            action?.Disable();
+            action?.Dispose();
+            action = null;
+        }
+
+        private void OnDestroy()
+        {
+            DisposeInputActions();
+        }
+
         public void OnOrbitActive(InputAction.CallbackContext context)
         {
+            if (context.canceled)
+            {
+                Deactivate();
+                return;
+            }
+            if (!context.performed) return;
+            if (UI.ShouldBlockPluginShortcut()) return;
             if (!UI.keyDisable) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
-            canOrbitCamera = context.performed;
-            if (canOrbitCamera)
-            {
-                distance = Vector3.Distance(targetObject.transform.position, targetCamera[MultiDisplayController.activeWindowNumber].transform.position);
-                var planeCamera = Vector3.ProjectOnPlane(targetCamera[MultiDisplayController.activeWindowNumber].transform.position, Vector3.up);
-                var planeTarget = Vector3.ProjectOnPlane(targetObject.transform.position, Vector3.up);
-                var diff = planeCamera - planeTarget;
-                var axis = Vector3.Cross(Vector3.forward, diff);
-                azimuthalAngle = Vector3.Angle(Vector3.forward, diff);
-                if (axis.y < 0)
-                    azimuthalAngle += 90;
-                else
-                {
-                    if (azimuthalAngle <= 90)
-                        azimuthalAngle = 90 - azimuthalAngle;
-                    else
-                        azimuthalAngle = 360 - azimuthalAngle + 90;
-                }
-                diff = targetCamera[MultiDisplayController.activeWindowNumber].transform.position - targetObject.transform.position;
-                elevationAngle = Mathf.Clamp(Vector3.Angle(Vector3.up, diff), minElevationAngle, maxElevationAngle);
-                UI.DisableAction(actionMapsDisableTimeLine);
-                CameraMovementController.defaultCamera.defaultActiveAction.Disable();
-                CameraMovementController.plusCamera.plusActiveAction.Disable();
-                orbitSubActiveAction.Enable();
-                orbitZrotActiveAction.Enable();
-                moveActiveAction.Enable();
-                rotActiveAction.Enable();
-                zoomActiveAction.Enable();
-                mouseMoveAction.Enable();
-                if (Options.Instance.orbitTargetObject)
-                    targetPosObject.SetActive(true);
-                if (MultiDisplayController.activeWindowNumber == 0)
-                    UI.SetLockState(true);
-            }
+            canOrbitCamera = true;
+            distance = Vector3.Distance(targetObject.transform.position, targetCamera[MultiDisplayController.activeWindowNumber].transform.position);
+            var planeCamera = Vector3.ProjectOnPlane(targetCamera[MultiDisplayController.activeWindowNumber].transform.position, Vector3.up);
+            var planeTarget = Vector3.ProjectOnPlane(targetObject.transform.position, Vector3.up);
+            var diff = planeCamera - planeTarget;
+            var axis = Vector3.Cross(Vector3.forward, diff);
+            azimuthalAngle = Vector3.Angle(Vector3.forward, diff);
+            if (axis.y < 0)
+                azimuthalAngle += 90;
             else
             {
-                orbitSubActiveAction.Disable();
-                orbitZrotActiveAction.Disable();
-                moveActiveAction.Disable();
-                rotActiveAction.Disable();
-                zoomActiveAction.Disable();
-                mouseMoveAction.Disable();
-                CameraMovementController.defaultCamera.defaultActiveAction.Enable();
-                CameraMovementController.plusCamera.plusActiveAction.Enable();
-                canMoveCamera = false;
-                canRotCamera = false;
-                canOrbitSubCamera = false;
-                canOrbitZrotCamera = false;
-                cameraUpdate = false;
-                targetPosObject.SetActive(false);
-                UI.EnableAction(actionMapsDisableTimeLine);
-                if (MultiDisplayController.activeWindowNumber == 0)
-                    UI.SetLockState(false);
+                if (azimuthalAngle <= 90)
+                    azimuthalAngle = 90 - azimuthalAngle;
+                else
+                    azimuthalAngle = 360 - azimuthalAngle + 90;
             }
+            diff = targetCamera[MultiDisplayController.activeWindowNumber].transform.position - targetObject.transform.position;
+            elevationAngle = Mathf.Clamp(Vector3.Angle(Vector3.up, diff), minElevationAngle, maxElevationAngle);
+            UI.DisableAction(typeof(OrbitCameraController), actionMapsDisableTimeLine);
+            CameraMovementController.defaultCamera.defaultActiveAction.Disable();
+            CameraMovementController.plusCamera.plusActiveAction.Disable();
+            orbitSubActiveAction.Enable();
+            orbitZrotActiveAction.Enable();
+            moveActiveAction.Enable();
+            rotActiveAction.Enable();
+            zoomActiveAction.Enable();
+            mouseMoveAction.Enable();
+            if (Options.Instance.orbitTargetObject)
+                targetPosObject.SetActive(true);
+            if (MultiDisplayController.activeWindowNumber == 0)
+                UI.SetLockState(true);
         }
         public void OnOrbitSubActive(InputAction.CallbackContext context)
         {
@@ -212,8 +290,7 @@ namespace ChroMapper_CameraMovement.Component
         public void OnZoomActive(InputAction.CallbackContext context)
         {
             if (!canOrbitCamera) return;
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+            if (IsPointerOverEditorUI()) return;
             if (MultiDisplayController.activeWindowNumber == -1) return;
             if (targetCamera[MultiDisplayController.activeWindowNumber] == null || targetObject == null) return;
             if (canOrbitSubCamera)
@@ -239,7 +316,6 @@ namespace ChroMapper_CameraMovement.Component
                 distance = Mathf.Clamp(value, Options.Instance.orbitMinDistance, Options.Instance.orbitMaxDistance);
                 cameraUpdate = true;
             }
-            if (customStandaloneInputModule.IsPointerOverGameObject<GraphicRaycaster>(-1, true)) return;
             if (!context.performed) return;
         }
     }

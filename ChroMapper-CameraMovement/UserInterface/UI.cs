@@ -17,6 +17,12 @@ namespace ChroMapper_CameraMovement.UserInterface
 {
     public class UI
     {
+        private sealed class TextInputState
+        {
+            public UITextInput NextInput;
+            public int? RoundDigits;
+        }
+
         public static readonly ExtensionButton _extensionBtn = new ExtensionButton();
         public static MainMenuUI _mainMenuUI = new MainMenuUI();
         public static SettingMenuUI _settingMenuUI = new SettingMenuUI();
@@ -24,18 +30,23 @@ namespace ChroMapper_CameraMovement.UserInterface
         public static CameraControlMenuUI _cameraControlMenuUI = new CameraControlMenuUI();
         public static MultiDisplayUI _multiDisplayUI = new MultiDisplayUI();
         public static MovementPlayerUI _movementPlayerUI = new MovementPlayerUI();
-        public static List<Type> queuedToDisable = new List<Type>();
-        public static List<Type> queuedToEnable = new List<Type>();
+        public static PackageExportMenuUI _packageExportMenuUI = new PackageExportMenuUI();
         public static bool keyDisable { get; private set; }
         public static Vector2 savedMousePos;
         public static EventSystem eventsystem;
-        public static string currentInputField;
-        public static Dictionary<string, (string, UITextInput, int?)> focusMoveList;
+        private static UITextInput currentInputTextInput;
+        private static Dictionary<UITextInput, TextInputState> focusMoveList;
         public static bool inputFocusMoveActive;
         public static bool inputRoundActive;
         public static bool inputEndEdit;
         public static bool inputSelect;
-        public static Dictionary<Type, bool> keyEnableState = new Dictionary<Type, bool>();
+        private static readonly Type menuActionOwner = typeof(UI);
+        private static readonly Type textInputActionOwner = typeof(UITextInput);
+        private static readonly Dictionary<Type, HashSet<Type>> queuedToDisableByOwner = new Dictionary<Type, HashSet<Type>>();
+        private static readonly Dictionary<Type, HashSet<Type>> queuedToEnableByOwner = new Dictionary<Type, HashSet<Type>>();
+        private static readonly Dictionary<Type, Dictionary<Type, bool>> keyEnableStateByOwner = new Dictionary<Type, Dictionary<Type, bool>>();
+        private static bool textInputLockActive;
+        private static bool textInputLockedWithMenuDisable;
 
         private static readonly Type[] editActionMapsDisabled =
         {
@@ -74,10 +85,17 @@ namespace ChroMapper_CameraMovement.UserInterface
         public void AddMenu(MapEditorUI mapEditorUI)
         {
             keyDisable = false;
-            currentInputField = null;
-            focusMoveList = new Dictionary<string, (string, UITextInput, int?)>();
+            currentInputTextInput = null;
+            focusMoveList = new Dictionary<UITextInput, TextInputState>();
             inputFocusMoveActive = false;
             inputRoundActive = false;
+            inputEndEdit = false;
+            inputSelect = false;
+            textInputLockActive = false;
+            textInputLockedWithMenuDisable = false;
+            queuedToDisableByOwner.Clear();
+            queuedToEnableByOwner.Clear();
+            keyEnableStateByOwner.Clear();
             eventsystem = EventSystem.current;
             var topBarCanvas = mapEditorUI.MainUIGroup[5];
             _mainMenuUI.AddMenu(topBarCanvas);
@@ -86,39 +104,293 @@ namespace ChroMapper_CameraMovement.UserInterface
             _cameraControlMenuUI.AddMenu(topBarCanvas);
             _multiDisplayUI.AddMenu(topBarCanvas);
             _movementPlayerUI.AddMenu(topBarCanvas);
+            _packageExportMenuUI.AddMenu(topBarCanvas);
+        }
+
+        private static Dictionary<Type, bool> GetOwnerActionState(Type owner)
+        {
+            Dictionary<Type, bool> ownerState;
+            if (!keyEnableStateByOwner.TryGetValue(owner, out ownerState))
+            {
+                ownerState = new Dictionary<Type, bool>();
+                keyEnableStateByOwner[owner] = ownerState;
+            }
+            return ownerState;
+        }
+
+        private static HashSet<Type> GetQueuedActions(Dictionary<Type, HashSet<Type>> queue, Type owner)
+        {
+            HashSet<Type> queued;
+            if (!queue.TryGetValue(owner, out queued))
+            {
+                queued = new HashSet<Type>();
+                queue[owner] = queued;
+            }
+            return queued;
+        }
+
+        private static void RemoveQueuedAction(Dictionary<Type, HashSet<Type>> queue, Type owner, Type actionMap)
+        {
+            HashSet<Type> queued;
+            if (!queue.TryGetValue(owner, out queued))
+                return;
+
+            queued.Remove(actionMap);
+            if (queued.Count == 0)
+                queue.Remove(owner);
+        }
+
+        private static void ClearQueuedActions(Type owner)
+        {
+            queuedToDisableByOwner.Remove(owner);
+            queuedToEnableByOwner.Remove(owner);
         }
 
         public static void DisableAction(Type[] actionMaps)
         {
+            DisableAction(menuActionOwner, actionMaps);
+        }
+
+        public static void DisableAction(Type owner, IEnumerable<Type> actionMaps)
+        {
+            var ownerState = GetOwnerActionState(owner);
             foreach (Type actionMap in actionMaps)
             {
-                if (keyEnableState.ContainsKey(actionMap) && !keyEnableState[actionMap])
+                bool enabled;
+                if (ownerState.TryGetValue(actionMap, out enabled) && !enabled)
                     continue;
-                keyEnableState[actionMap] = false;
-                queuedToEnable.Remove(actionMap);
-                if (!queuedToDisable.Contains(actionMap))
-                    queuedToDisable.Add(actionMap);
+
+                ownerState[actionMap] = false;
+                RemoveQueuedAction(queuedToEnableByOwner, owner, actionMap);
+                GetQueuedActions(queuedToDisableByOwner, owner).Add(actionMap);
             }
         }
 
         public static void EnableAction(Type[] actionMaps)
         {
+            EnableAction(menuActionOwner, actionMaps);
+        }
+
+        public static void EnableAction(Type owner, IEnumerable<Type> actionMaps)
+        {
+            var ownerState = GetOwnerActionState(owner);
             foreach (Type actionMap in actionMaps)
             {
-                if (keyEnableState.ContainsKey(actionMap) && keyEnableState[actionMap])
+                bool enabled;
+                if (ownerState.TryGetValue(actionMap, out enabled) && enabled)
                     continue;
-                keyEnableState[actionMap] = true;
-                queuedToDisable.Remove(actionMap);
-                if (!queuedToEnable.Contains(actionMap))
-                    queuedToEnable.Add(actionMap);
+
+                ownerState[actionMap] = true;
+                RemoveQueuedAction(queuedToDisableByOwner, owner, actionMap);
+                GetQueuedActions(queuedToEnableByOwner, owner).Add(actionMap);
             }
+        }
+
+        private static EventSystem CurrentEventSystem => EventSystem.current != null ? EventSystem.current : eventsystem;
+
+        private static IEnumerable<GameObject> PluginMenuRoots
+        {
+            get
+            {
+                if (_mainMenuUI?._cameraMovementMainMenu != null)
+                    yield return _mainMenuUI._cameraMovementMainMenu;
+                if (_settingMenuUI?._cameraMovementSettingMenu != null)
+                    yield return _settingMenuUI._cameraMovementSettingMenu;
+                if (_bookmarkMenuUI?._cameraMovementBookmarkMenu != null)
+                    yield return _bookmarkMenuUI._cameraMovementBookmarkMenu;
+                if (_cameraControlMenuUI?._cameraControlMenu != null)
+                    yield return _cameraControlMenuUI._cameraControlMenu;
+                if (_multiDisplayUI?._cameraMovementMultiDisplay != null)
+                    yield return _multiDisplayUI._cameraMovementMultiDisplay;
+                if (_movementPlayerUI?._movementPlayerMenu != null)
+                    yield return _movementPlayerUI._movementPlayerMenu;
+                if (_packageExportMenuUI?._cameraMovementPackageExportMenu != null)
+                    yield return _packageExportMenuUI._cameraMovementPackageExportMenu;
+            }
+        }
+
+        public static bool IsPluginUIObject(GameObject obj)
+        {
+            if (obj == null)
+                return false;
+
+            foreach (var menuRoot in PluginMenuRoots)
+            {
+                if (obj == menuRoot || obj.transform.IsChildOf(menuRoot.transform))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static bool ShouldBlockPluginShortcut()
+        {
+            if (!Options.Instance.cameraMovementEnable)
+                return true;
+
+            if (textInputLockActive)
+                return true;
+
+            var currentEventSystem = CurrentEventSystem;
+            var selectedObject = currentEventSystem != null ? currentEventSystem.currentSelectedGameObject : null;
+            if (selectedObject == null)
+                return false;
+
+            return !IsPluginUIObject(selectedObject);
+        }
+
+        private static bool IsTrackedPluginTextInputObject(GameObject obj)
+        {
+            if (obj == null || !obj.activeInHierarchy || !IsPluginUIObject(obj))
+                return false;
+
+            foreach (var textInput in focusMoveList.Keys)
+            {
+                if (textInput == null)
+                    continue;
+
+                var textInputObject = textInput.gameObject;
+                if (textInputObject != null && (obj == textInputObject || obj.transform.IsChildOf(textInputObject.transform)))
+                    return true;
+
+                var inputFieldObject = textInput.InputField != null ? textInput.InputField.gameObject : null;
+                if (inputFieldObject != null && (obj == inputFieldObject || obj.transform.IsChildOf(inputFieldObject.transform)))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static void ValidateTextInputInterceptionState()
+        {
+            if (!textInputLockActive || inputFocusMoveActive)
+                return;
+
+            var currentEventSystem = CurrentEventSystem;
+            var selectedObject = currentEventSystem != null ? currentEventSystem.currentSelectedGameObject : null;
+            if (selectedObject == null || !IsTrackedPluginTextInputObject(selectedObject))
+                EndTextInputLock();
+        }
+
+        public static void ReleasePluginActionMapLocksForShutdown()
+        {
+            var allActionMaps = typeof(CMInput).GetNestedTypes().Where(x => x.IsInterface).ToArray();
+            EnableAction(menuActionOwner, allActionMaps);
+            EnableAction(textInputActionOwner, allActionMaps);
+            EnableAction(typeof(DefaultCameraController), allActionMaps);
+            EnableAction(typeof(PlusCameraController), allActionMaps);
+            EnableAction(typeof(OrbitCameraController), allActionMaps);
+            QueuedActionMaps();
+            FlushInputInstallerQueuesImmediately();
+        }
+
+        public static void ResetTransientStateForShutdown(bool clearRegisteredInputs)
+        {
+            var currentEventSystem = CurrentEventSystem;
+            var selectedObject = currentEventSystem != null ? currentEventSystem.currentSelectedGameObject : null;
+            if (IsPluginUIObject(selectedObject))
+                currentEventSystem.SetSelectedGameObject(null);
+
+            currentInputTextInput = null;
+            inputFocusMoveActive = false;
+            inputRoundActive = false;
+            inputEndEdit = false;
+            inputSelect = false;
+            textInputLockActive = false;
+            textInputLockedWithMenuDisable = false;
+            keyDisable = false;
+            queuedToDisableByOwner.Clear();
+            queuedToEnableByOwner.Clear();
+            keyEnableStateByOwner.Clear();
+
+            if (clearRegisteredInputs)
+                focusMoveList = new Dictionary<UITextInput, TextInputState>();
+        }
+
+        private static void FlushInputInstallerQueuesImmediately()
+        {
+            var installerType = typeof(CMInputCallbackInstaller);
+            var instanceField = installerType.GetField("instance", BindingFlags.NonPublic | BindingFlags.Static);
+            var updateMethod = installerType.GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance);
+            var installer = instanceField != null ? instanceField.GetValue(null) : null;
+            if (installer != null && updateMethod != null)
+                updateMethod.Invoke(installer, null);
+        }
+
+        private static void BeginTextInputLock(UITextInput textInput)
+        {
+            if (inputFocusMoveActive)
+                return;
+
+            if (!textInputLockActive)
+            {
+                textInputLockedWithMenuDisable = keyDisable;
+                if (textInputLockedWithMenuDisable)
+                    DisableAction(textInputActionOwner, editActionMapsDisabled);
+                else
+                    DisableAction(textInputActionOwner, actionMapsDisabled);
+
+                Plugin.movement.KeyDisable();
+                textInputLockActive = true;
+            }
+
+            currentInputTextInput = textInput;
+            inputSelect = true;
+        }
+
+        private static void EndTextInputLock()
+        {
+            if (inputFocusMoveActive)
+                return;
+
+            if (textInputLockActive)
+            {
+                if (textInputLockedWithMenuDisable)
+                    EnableAction(textInputActionOwner, editActionMapsDisabled);
+                else
+                    EnableAction(textInputActionOwner, actionMapsDisabled);
+
+                Plugin.movement.KeyEnable();
+            }
+
+            currentInputTextInput = null;
+            inputEndEdit = true;
+            textInputLockActive = false;
+            textInputLockedWithMenuDisable = false;
+        }
+
+        public static void ClearCurrentInputSelection(GameObject scope = null)
+        {
+            var currentEventSystem = CurrentEventSystem;
+            var selectedObject = currentEventSystem != null ? currentEventSystem.currentSelectedGameObject : null;
+
+            if (scope != null && selectedObject != null && !selectedObject.transform.IsChildOf(scope.transform))
+                return;
+
+            currentEventSystem?.SetSelectedGameObject(null);
+            EndTextInputLock();
+        }
+
+        public static void HideMenu(GameObject menu, bool updateKeyDisableCheck = true)
+        {
+            if (menu == null)
+                return;
+
+            if (menu == _bookmarkMenuUI?._cameraMovementBookmarkMenu)
+                _bookmarkMenuUI?.ForceStopSplineEdit();
+
+            ClearCurrentInputSelection(menu);
+            menu.SetActive(false);
+
+            if (updateKeyDisableCheck)
+                KeyDisableCheck();
         }
 
         public static void KeyDisableCheck()
         {
             if (Options.Instance.cameraMovementEnable && Options.Instance.mappingDisable && (_settingMenuUI._cameraMovementSettingMenu.activeSelf || _bookmarkMenuUI._cameraMovementBookmarkMenu.activeSelf ||
                 _cameraControlMenuUI._cameraControlMenu.activeSelf || _multiDisplayUI._cameraMovementMultiDisplay.activeSelf || _movementPlayerUI._movementPlayerMenu.activeSelf || Options.Instance.subCamera ||
-                Options.Instance.movement || Options.Instance.uIhidden || Options.Instance.bookmarkLines))
+                (_packageExportMenuUI._cameraMovementPackageExportMenu != null && _packageExportMenuUI._cameraMovementPackageExportMenu.activeSelf) || Options.Instance.movement || Options.Instance.uIhidden || Options.Instance.bookmarkLines))
             {
                 DisableAction(actionMapsDisabled);
                 EnableAction(editActionMapsDisabled);
@@ -134,22 +406,33 @@ namespace ChroMapper_CameraMovement.UserInterface
 
         public static void QueuedActionMaps()
         {
+            ValidateTextInputInterceptionState();
+
             // ChroMapper 0.8.629辺りからTextInputをマウスで行き来するとキー操作無効になるので対策
             // 同じフレームで同じActionMapに対してEnable、Disableするとなるっぽい
             if (inputEndEdit && inputSelect)
             {
+                ClearQueuedActions(textInputActionOwner);
                 inputEndEdit = false;
                 inputSelect = false;
-                queuedToDisable.Clear();
-                queuedToEnable.Clear();
                 return;
             }
-            if (queuedToDisable.Any())
-                CMInputCallbackInstaller.DisableActionMaps(typeof(UI), queuedToDisable.ToArray());
-            queuedToDisable.Clear();
-            if (queuedToEnable.Any())
-                CMInputCallbackInstaller.ClearDisabledActionMaps(typeof(UI), queuedToEnable.ToArray());
-            queuedToEnable.Clear();
+            foreach (var ownerQueue in queuedToDisableByOwner.ToArray())
+            {
+                if (ownerQueue.Value.Count == 0)
+                    continue;
+
+                CMInputCallbackInstaller.DisableActionMaps(ownerQueue.Key, ownerQueue.Value.ToArray());
+            }
+            queuedToDisableByOwner.Clear();
+            foreach (var ownerQueue in queuedToEnableByOwner.ToArray())
+            {
+                if (ownerQueue.Value.Count == 0)
+                    continue;
+
+                CMInputCallbackInstaller.ClearDisabledActionMaps(ownerQueue.Key, ownerQueue.Value.ToArray());
+            }
+            queuedToEnableByOwner.Clear();
             inputEndEdit = false;
             inputSelect = false;
         }
@@ -166,7 +449,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             else if (!lockMouse && mouseLocked)
             {
                 Cursor.lockState = CursorLockMode.None;
-                Mouse.current.WarpCursorPosition(new Vector2(savedMousePos.x, Screen.height - savedMousePos.y));
+                Mouse.current.WarpCursorPosition(savedMousePos);
                 CameraController_SetLockStatePatch.OriginalSetLockStateDisable = false;
             }
         }
@@ -181,43 +464,46 @@ namespace ChroMapper_CameraMovement.UserInterface
             if (inputFocusMoveActive)
                 return;
             inputFocusMoveActive = true;
-            (string, UITextInput, int?) currentInput;
-            if (focusMoveList.TryGetValue(currentInputField, out currentInput))
+            TextInputState currentInput;
+            if (currentInputTextInput != null && focusMoveList.TryGetValue(currentInputTextInput, out currentInput))
             {
-                if (currentInput.Item1 == null)
+                if (currentInput.NextInput == null)
                     return;
-                (string, UITextInput, int?) nextInput;
-                if (focusMoveList.TryGetValue(currentInput.Item1, out nextInput))
+
+                if (focusMoveList.ContainsKey(currentInput.NextInput))
                 {
-                    nextInput.Item2.InputField.Select();
-                    currentInputField = currentInput.Item1;
+                    currentInput.NextInput.InputField.Select();
+                    currentInputTextInput = currentInput.NextInput;
                 }
             }
         }
         public static void InputRound(InputAction.CallbackContext context, int up)
         {
-            if (!context.ReadValueAsButton())
+            if (context.canceled)
             {
                 inputRoundActive = false;
                 return;
             }
-            if (inputRoundActive)
+
+            if (!context.performed || inputRoundActive)
                 return;
-            (string, UITextInput, int?) currentInput;
-            if (focusMoveList.TryGetValue(currentInputField, out currentInput))
+
+            inputRoundActive = true;
+            TextInputState currentInput;
+            if (currentInputTextInput != null && focusMoveList.TryGetValue(currentInputTextInput, out currentInput))
             {
-                if (currentInput.Item3 == null)
+                if (currentInput.RoundDigits == null)
                     return;
-                var roundDigits = (int)currentInput.Item3;
+                var roundDigits = (int)currentInput.RoundDigits;
                 double value;
-                if (double.TryParse(currentInput.Item2.InputField.text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out value))
+                if (double.TryParse(currentInputTextInput.InputField.text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out value))
                 {
                     value += Math.Pow(10, -roundDigits) * up;
                     var digits = roundDigits - (int)Math.Log10(Math.Abs(up));
                     value *= Math.Pow(10, digits);
                     value = Math.Round(value, MidpointRounding.AwayFromZero);
                     value *= Math.Pow(10, -digits);
-                    currentInput.Item2.InputField.text = value.ToString();
+                    currentInputTextInput.InputField.text = value.ToString();
                 }
             }
         }
@@ -257,12 +543,12 @@ namespace ChroMapper_CameraMovement.UserInterface
             return (rectTransform, textComponent);
         }
 
-        public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, string value, UnityAction<string> onChange, string focusMove = null, int? roundDigits = null)
+        public static (RectTransform, TextMeshProUGUI, UITextInput) AddTextInput(Transform parent, string title, string text, string value, UnityAction<string> onChange, int? roundDigits = null)
         {
             var label = AddLabel(parent, title, text, TextAlignmentOptions.Right, 12);
-            return (label.Item1, label.Item2, AddTextInput(parent, title, value, TextAlignmentOptions.Left, 10, onChange, focusMove, roundDigits));
+            return (label.Item1, label.Item2, AddTextInput(parent, title, value, TextAlignmentOptions.Left, 10, onChange, roundDigits));
         }
-        public static UITextInput AddTextInput(Transform parent, string title, string value, TextAlignmentOptions alignment, float fontSize, UnityAction<string> onChange, string focusMove = null, int? roundDigits = null)
+        public static UITextInput AddTextInput(Transform parent, string title, string value, TextAlignmentOptions alignment, float fontSize, UnityAction<string> onChange, int? roundDigits = null)
         {
             var textInput = UnityEngine.Object.Instantiate(PersistentUI.Instance.TextInputPrefab, parent);
             textInput.GetComponent<Image>().pixelsPerUnitMultiplier = 3;
@@ -273,29 +559,31 @@ namespace ChroMapper_CameraMovement.UserInterface
             textInput.InputField.textComponent.fontSize = fontSize;
             textInput.InputField.onValueChanged.AddListener(onChange);
             textInput.InputField.onEndEdit.AddListener(delegate {
-                if (inputFocusMoveActive)
-                    return;
-                if (keyDisable)
-                    EnableAction(editActionMapsDisabled);
-                else
-                    EnableAction(actionMapsDisabled);
-                Plugin.movement.KeyEnable();
-                currentInputField = null;
-                inputEndEdit = true;
+                EndTextInputLock();
+            });
+            textInput.InputField.onDeselect.AddListener(_ => {
+                EndTextInputLock();
             });
             textInput.InputField.onSelect.AddListener(delegate {
-                if (inputFocusMoveActive)
-                    return;
-                if (keyDisable)
-                    DisableAction(editActionMapsDisabled);
-                else
-                    DisableAction(actionMapsDisabled);
-                Plugin.movement.KeyDisable();
-                currentInputField = eventsystem.currentSelectedGameObject.name;
-                inputSelect = true;
+                BeginTextInputLock(textInput);
             });
-            focusMoveList.Add(title, (focusMove, textInput, roundDigits));
+            focusMoveList.Add(textInput, new TextInputState { RoundDigits = roundDigits });
             return textInput;
+        }
+
+        public static void SetTextInputFocusMove(UITextInput textInput, UITextInput nextInput)
+        {
+            if (textInput == null)
+                return;
+
+            TextInputState state;
+            if (!focusMoveList.TryGetValue(textInput, out state))
+            {
+                state = new TextInputState();
+                focusMoveList[textInput] = state;
+            }
+
+            state.NextInput = nextInput;
         }
 
         public static (RectTransform, TextMeshProUGUI, Toggle) AddCheckbox(Transform parent, string title, string text, Vector2 pos, bool value, UnityAction<bool> onClick)

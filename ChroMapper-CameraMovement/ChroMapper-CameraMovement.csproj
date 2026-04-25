@@ -58,6 +58,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Xml" />
     <Reference Include="Unity.InputSystem">
       <HintPath>$(ChroMapperDir)\ChroMapper_Data\Managed\Unity.InputSystem.dll</HintPath>
@@ -174,6 +175,8 @@
     <Compile Include="Controller\BookmarkController.cs" />
     <Compile Include="Controller\MovementPlayerController.cs" />
     <Compile Include="Controller\ScriptMapperCSharpController.cs" />
+    <Compile Include="Controller\OscController.cs" />
+    <Compile Include="Controller\PackageExportController.cs" />
     <Compile Include="Controller\WindowController.cs" />
     <Compile Include="HarmonyPatches\CameraController_SetLockStatePatch.cs" />
     <Compile Include="HarmonyPatches\BookmarkRenderingController_SetGridBookmarkNameColorPatch.cs" />
@@ -187,6 +190,7 @@
     <Compile Include="UserInterface\MainMenuUI.cs" />
     <Compile Include="UserInterface\MovementPlayerUI.cs" />
     <Compile Include="UserInterface\MultiDisplayUI.cs" />
+    <Compile Include="UserInterface\PackageExportMenuUI.cs" />
     <Compile Include="Util\ScriptMapperLogger.cs" />
     <Compile Include="UserInterface\SettingMenuUI.cs" />
     <Compile Include="UserInterface\UI.cs" />
@@ -196,6 +200,9 @@
     <Compile Include="Controller\VRMAvatarController.cs" />
     <Compile Include="Util\TimeoutTimer.cs" />
     <Compile Include="Util\UnityUtility.cs" />
+    <Compile Include="Util\OscClient.cs" />
+    <Compile Include="Util\OscDataTypes.cs" />
+    <Compile Include="Util\OscPacketEncoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icon.png" />

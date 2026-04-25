@@ -374,9 +374,9 @@ namespace ChroMapper_CameraMovement.UserInterface
 
             var closeButton = UI.AddButton(_cameraMovementSettingMenu.transform, "Close", "Close", () =>
             {
-                _cameraMovementSettingMenu.SetActive(false);
-                UI.KeyDisableCheck();
+                UI.HideMenu(_cameraMovementSettingMenu, false);
                 movementController.SubCameraRectDisable();
+                UI.KeyDisableCheck();
             });
             UI.MoveTransform(closeButton.transform, 50, 25, 0, 1, 440, -220);
 

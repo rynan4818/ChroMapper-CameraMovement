@@ -69,7 +69,7 @@ namespace ChroMapper_CameraMovement.UserInterface
             {
                 if (activeEditorInstance != null)
                 {
-                    CancelSplineEdit();
+                    ForceStopSplineEdit();
                 }
             });
             UI.MoveTransform(bookmarkMenuInput.Item1, 150, 16, 0.1f, 1, 10, -15);
@@ -84,7 +84,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 bookmarkMenuInputText.InputField.text = currentBookmarkLabelText.text;
                 if (activeEditorInstance != null)
                 {
-                    CancelSplineEdit();
+                    ForceStopSplineEdit();
                 }
             });
             bookmarkMenuCopyButton.Text.fontSize = 9;
@@ -95,7 +95,7 @@ namespace ChroMapper_CameraMovement.UserInterface
                 bookmarkMenuInputText.InputField.text = "";
                 if (activeEditorInstance != null)
                 {
-                    CancelSplineEdit();
+                    ForceStopSplineEdit();
                 }
             });
             bookmarkMenuClearButton.Text.fontSize = 10;
@@ -245,43 +245,81 @@ namespace ChroMapper_CameraMovement.UserInterface
                     Debug.LogWarning("SplineEditor: spline コマンドではありません。");
                     return;
                 }
+                SplineEditor editorInstance = null;
                 try
                 {
-                    activeEditorInstance = new GameObject("SplineEditor_Instance").AddComponent<SplineEditor>();
-                    activeEditorInstance.StartEditing(command);
-                    bookmarkMenuInputText.InputField.interactable = false;
-                    splineEditButton.SetText("Complete");
+                    editorInstance = new GameObject("SplineEditor_Instance").AddComponent<SplineEditor>();
+                    editorInstance.StartEditing(command);
+                    if (!editorInstance.IsEditing)
+                    {
+                        Object.Destroy(editorInstance.gameObject);
+                        SetSplineEditUiState(false);
+                        return;
+                    }
+
+                    activeEditorInstance = editorInstance;
+                    SetSplineEditUiState(true);
                 }
                 catch (System.Exception e)
                 {
                     Debug.LogError($"SplineEditor: 編集の開始に失敗しました。{e.Message}");
-                    if (activeEditorInstance != null)
-                        Object.Destroy(activeEditorInstance.gameObject);
+                    if (editorInstance != null)
+                        Object.Destroy(editorInstance.gameObject);
                     activeEditorInstance = null;
+                    SetSplineEditUiState(false);
                 }
             }
             else
             {
-                string newCommand = activeEditorInstance.EndEditing();
-                activeEditorInstance = null;
-                splineEditButton.SetText("Spline");
-                bookmarkMenuInputText.InputField.interactable = true;
-                bookmarkMenuInputText.InputField.text = newCommand;
+                CompleteSplineEdit();
+            }
+        }
+
+        private void SetSplineEditUiState(bool active)
+        {
+            if (splineEditButton != null)
+                splineEditButton.SetText(active ? "Complete" : "Spline");
+
+            if (bookmarkMenuInputText?.InputField != null)
+                bookmarkMenuInputText.InputField.interactable = !active;
+        }
+
+        private void CompleteSplineEdit()
+        {
+            var editor = activeEditorInstance;
+            activeEditorInstance = null;
+
+            try
+            {
+                if (editor == null)
+                    return;
+
+                var newCommand = editor.CompleteEditingAndDestroy();
+                if (bookmarkMenuInputText?.InputField != null)
+                    bookmarkMenuInputText.InputField.text = newCommand;
+            }
+            finally
+            {
+                SetSplineEditUiState(false);
             }
         }
 
         /// <summary>
-        /// 他の操作によって Spline 編集を強制キャンセルする処理
+        /// 他の操作によって Spline 編集を強制停止する処理
         /// </summary>
-        private void CancelSplineEdit()
+        public void ForceStopSplineEdit()
         {
-            if (activeEditorInstance == null)
-                return;
-            Debug.LogWarning("SplineEditor: 編集がキャンセルされました。");
-            activeEditorInstance.EndEditing();
+            var editor = activeEditorInstance;
             activeEditorInstance = null;
-            splineEditButton.SetText("Spline");
-            bookmarkMenuInputText.InputField.interactable = true;
+
+            try
+            {
+                editor?.CancelEditingAndDestroy();
+            }
+            finally
+            {
+                SetSplineEditUiState(false);
+            }
         }
     }
 }
